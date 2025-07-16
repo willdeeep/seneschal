@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+
+{% block title %}Create Character - Seneschal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="mb-4">Create New Character</h1>
+        
+        <form method="POST">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Character Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="player_name" class="form-label">Player Name</label>
+                            <input type="text" class="form-control" id="player_name" name="player_name">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="race" class="form-label">Race *</label>
+                            <select class="form-control" id="race" name="race" required>
+                                <option value="">Select Race</option>
+                                <option value="Human">Human</option>
+                                <option value="Elf">Elf</option>
+                                <option value="Dwarf">Dwarf</option>
+                                <option value="Halfling">Halfling</option>
+                                <option value="Dragonborn">Dragonborn</option>
+                                <option value="Gnome">Gnome</option>
+                                <option value="Half-Elf">Half-Elf</option>
+                                <option value="Half-Orc">Half-Orc</option>
+                                <option value="Tiefling">Tiefling</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="character_class" class="form-label">Class *</label>
+                            <select class="form-control" id="character_class" name="character_class" required>
+                                <option value="">Select Class</option>
+                                <option value="Barbarian">Barbarian</option>
+                                <option value="Bard">Bard</option>
+                                <option value="Cleric">Cleric</option>
+                                <option value="Druid">Druid</option>
+                                <option value="Fighter">Fighter</option>
+                                <option value="Monk">Monk</option>
+                                <option value="Paladin">Paladin</option>
+                                <option value="Ranger">Ranger</option>
+                                <option value="Rogue">Rogue</option>
+                                <option value="Sorcerer">Sorcerer</option>
+                                <option value="Warlock">Warlock</option>
+                                <option value="Wizard">Wizard</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="level" class="form-label">Level</label>
+                            <input type="number" class="form-control" id="level" name="level" value="1" min="1" max="20">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="background" class="form-label">Background</label>
+                        <textarea class="form-control" id="background" name="background" rows="3" placeholder="Character background and history..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Character Backstory</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="why_adventuring" class="form-label">Why Are You Adventuring?</label>
+                            <textarea class="form-control" id="why_adventuring" name="why_adventuring" rows="3" placeholder="What drives you to seek adventure?"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="origin" class="form-label">Origin Story</label>
+                            <textarea class="form-control" id="origin" name="origin" rows="3" placeholder="Where did you come from? What shaped your early life?"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="class_origin" class="form-label">How Did You Learn Your Class Skills?</label>
+                            <textarea class="form-control" id="class_origin" name="class_origin" rows="3" placeholder="How did you become a fighter/wizard/etc?"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="attachments" class="form-label">Important Attachments</label>
+                            <textarea class="form-control" id="attachments" name="attachments" rows="3" placeholder="People, places, or things that matter to you..."></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="secret" class="form-label">Secret</label>
+                            <textarea class="form-control" id="secret" name="secret" rows="3" placeholder="What secret do you keep hidden?"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="attitude_origin" class="form-label">Attitude & Worldview Origin</label>
+                            <textarea class="form-control" id="attitude_origin" name="attitude_origin" rows="3" placeholder="What shaped your outlook on life?"></textarea>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Core Motivation (Select all that apply)</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="power" id="motivation_power">
+                                    <label class="form-check-label" for="motivation_power">Power</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="wealth" id="motivation_wealth">
+                                    <label class="form-check-label" for="motivation_wealth">Wealth</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="knowledge" id="motivation_knowledge">
+                                    <label class="form-check-label" for="motivation_knowledge">Knowledge</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="justice" id="motivation_justice">
+                                    <label class="form-check-label" for="motivation_justice">Justice</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="redemption" id="motivation_redemption">
+                                    <label class="form-check-label" for="motivation_redemption">Redemption</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="adventure" id="motivation_adventure">
+                                    <label class="form-check-label" for="motivation_adventure">Adventure</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="family" id="motivation_family">
+                                    <label class="form-check-label" for="motivation_family">Family</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="survival" id="motivation_survival">
+                                    <label class="form-check-label" for="motivation_survival">Survival</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="freedom" id="motivation_freedom">
+                                    <label class="form-check-label" for="motivation_freedom">Freedom</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Ability Scores</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <label for="strength" class="form-label">Strength</label>
+                            <input type="number" class="form-control" id="strength" name="strength" value="10" min="1" max="20">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="dexterity" class="form-label">Dexterity</label>
+                            <input type="number" class="form-control" id="dexterity" name="dexterity" value="10" min="1" max="20">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="constitution" class="form-label">Constitution</label>
+                            <input type="number" class="form-control" id="constitution" name="constitution" value="10" min="1" max="20">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="intelligence" class="form-label">Intelligence</label>
+                            <input type="number" class="form-control" id="intelligence" name="intelligence" value="10" min="1" max="20">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="wisdom" class="form-label">Wisdom</label>
+                            <input type="number" class="form-control" id="wisdom" name="wisdom" value="10" min="1" max="20">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="charisma" class="form-label">Charisma</label>
+                            <input type="number" class="form-control" id="charisma" name="charisma" value="10" min="1" max="20">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Combat Stats</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="max_hp" class="form-label">Max HP</label>
+                            <input type="number" class="form-control" id="max_hp" name="max_hp" value="8" min="1">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="current_hp" class="form-label">Current HP</label>
+                            <input type="number" class="form-control" id="current_hp" name="current_hp" value="8" min="0">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="armor_class" class="form-label">Armor Class</label>
+                            <input type="number" class="form-control" id="armor_class" name="armor_class" value="10" min="1">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="speed" class="form-label">Speed (ft)</label>
+                            <input type="number" class="form-control" id="speed" name="speed" value="30" min="0">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="initiative" class="form-label">Initiative Modifier</label>
+                            <input type="number" class="form-control" id="initiative" name="initiative" value="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="gold_pieces" class="form-label">Gold Pieces</label>
+                            <input type="number" class="form-control" id="gold_pieces" name="gold_pieces" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Character Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="personality_traits" class="form-label">Personality Traits</label>
+                            <textarea class="form-control" id="personality_traits" name="personality_traits" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="ideals" class="form-label">Ideals</label>
+                            <textarea class="form-control" id="ideals" name="ideals" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bonds" class="form-label">Bonds</label>
+                            <textarea class="form-control" id="bonds" name="bonds" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="flaws" class="form-label">Flaws</label>
+                            <textarea class="form-control" id="flaws" name="flaws" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4" id="proficiencies-section">
+                <div class="card-header">
+                    <h5>Available Proficiencies</h5>
+                    <small class="text-muted">Select race and class to see available proficiencies</small>
+                </div>
+                <div class="card-body" id="proficiencies-list">
+                    <p class="text-muted">Please select a race and class first.</p>
+                </div>
+            </div>
+
+            <div class="card mt-4" id="languages-section">
+                <div class="card-header">
+                    <h5>Available Languages</h5>
+                    <small class="text-muted">Select race and class to see available languages</small>
+                </div>
+                <div class="card-body" id="languages-list">
+                    <p class="text-muted">Please select a race and class first.</p>
+                </div>
+            </div>
+
+            <div class="card mt-4" id="features-section">
+                <div class="card-header">
+                    <h5>Available Features & Traits</h5>
+                    <small class="text-muted">Select race and class to see available features</small>
+                </div>
+                <div class="card-body" id="features-list">
+                    <p class="text-muted">Please select a race and class first.</p>
+                </div>
+            </div>
+
+            <div class="card mt-4" id="spells-section" style="display: none;">
+                <div class="card-header">
+                    <h5>Available Spells</h5>
+                    <small class="text-muted">Spells available to your class</small>
+                </div>
+                <div class="card-body" id="spells-list">
+                    <p class="text-muted">No spells available for this class.</p>
+                </div>
+            </div>
+
+            <div class="mt-4 mb-5">
+                <button type="submit" class="btn btn-primary btn-lg">Create Character</button>
+                <a href="{{ url_for('characters.index') }}" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const raceSelect = document.getElementById('race');
+    const classSelect = document.getElementById('character_class');
+    
+    // Function to update available options based on race and class selection
+    function updateAvailableOptions() {
+        const selectedRace = raceSelect.value;
+        const selectedClass = classSelect.value;
+        
+        if (selectedRace && selectedClass) {
+            // Update proficiencies
+            updateProficiencies(selectedRace, selectedClass);
+            // Update languages
+            updateLanguages(selectedRace, selectedClass);
+            // Update features
+            updateFeatures(selectedRace, selectedClass);
+            // Update spells (if applicable)
+            updateSpells(selectedClass);
+        }
+    }
+    
+    // Function to update proficiencies
+    function updateProficiencies(race, characterClass) {
+        fetch(`{{ url_for('characters.get_available_proficiencies') }}?race=${race}&class=${characterClass}`)
+            .then(response => response.json())
+            .then(data => {
+                const proficienciesList = document.getElementById('proficiencies-list');
+                if (data.proficiencies && data.proficiencies.length > 0) {
+                    let html = '<div class="row">';
+                    data.proficiencies.forEach(prof => {
+                        html += `
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="proficiencies" value="${prof.id}" id="prof_${prof.id}">
+                                    <label class="form-check-label" for="prof_${prof.id}">
+                                        ${prof.name} (${prof.type})
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    proficienciesList.innerHTML = html;
+                } else {
+                    proficienciesList.innerHTML = '<p class="text-muted">No additional proficiencies available for this combination.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching proficiencies:', error);
+                document.getElementById('proficiencies-list').innerHTML = '<p class="text-danger">Error loading proficiencies.</p>';
+            });
+    }
+    
+    // Function to update languages
+    function updateLanguages(race, characterClass) {
+        fetch(`{{ url_for('characters.get_available_languages') }}?race=${race}&class=${characterClass}`)
+            .then(response => response.json())
+            .then(data => {
+                const languagesList = document.getElementById('languages-list');
+                if (data.languages && data.languages.length > 0) {
+                    let html = '<div class="row">';
+                    data.languages.forEach(lang => {
+                        html += `
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="languages" value="${lang.id}" id="lang_${lang.id}">
+                                    <label class="form-check-label" for="lang_${lang.id}">
+                                        ${lang.name}
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    languagesList.innerHTML = html;
+                } else {
+                    languagesList.innerHTML = '<p class="text-muted">No additional languages available for this combination.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching languages:', error);
+                document.getElementById('languages-list').innerHTML = '<p class="text-danger">Error loading languages.</p>';
+            });
+    }
+    
+    // Function to update features
+    function updateFeatures(race, characterClass) {
+        fetch(`{{ url_for('characters.get_available_features') }}?race=${race}&class=${characterClass}`)
+            .then(response => response.json())
+            .then(data => {
+                const featuresList = document.getElementById('features-list');
+                if (data.features && data.features.length > 0) {
+                    let html = '<div class="row">';
+                    data.features.forEach(feature => {
+                        const shortDesc = feature.description.length > 100 ? 
+                            feature.description.substring(0, 100) + '...' : 
+                            feature.description;
+                        html += `
+                            <div class="col-md-6 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="features" value="${feature.id}" id="feat_${feature.id}">
+                                    <label class="form-check-label" for="feat_${feature.id}">
+                                        <strong>${feature.name}</strong> (${feature.source})
+                                        <br><small class="text-muted">${shortDesc}</small>
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    featuresList.innerHTML = html;
+                } else {
+                    featuresList.innerHTML = '<p class="text-muted">No additional features available for this combination.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching features:', error);
+                document.getElementById('features-list').innerHTML = '<p class="text-danger">Error loading features.</p>';
+            });
+    }
+    
+    // Function to update spells
+    function updateSpells(characterClass) {
+        const spellsSection = document.getElementById('spells-section');
+        
+        // Only show spells for spellcasting classes
+        const spellcastingClasses = ['Wizard', 'Sorcerer', 'Warlock', 'Bard', 'Cleric', 'Druid', 'Paladin', 'Ranger'];
+        if (spellcastingClasses.includes(characterClass)) {
+            spellsSection.style.display = 'block';
+            
+            fetch(`{{ url_for('characters.get_available_spells') }}?class=${characterClass}`)
+                .then(response => response.json())
+                .then(data => {
+                    const spellsList = document.getElementById('spells-list');
+                    if (data.spells && data.spells.length > 0) {
+                        let html = '<div class="row">';
+                        data.spells.forEach(spell => {
+                            const shortDesc = spell.description.length > 100 ? 
+                                spell.description.substring(0, 100) + '...' : 
+                                spell.description;
+                            html += `
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="spells" value="${spell.id}" id="spell_${spell.id}">
+                                        <label class="form-check-label" for="spell_${spell.id}">
+                                            <strong>${spell.name}</strong> (Level ${spell.level})
+                                            <br><small class="text-muted">${shortDesc}</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                        spellsList.innerHTML = html;
+                    } else {
+                        spellsList.innerHTML = '<p class="text-muted">No spells available for this class level.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching spells:', error);
+                    document.getElementById('spells-list').innerHTML = '<p class="text-danger">Error loading spells.</p>';
+                });
+        } else {
+            spellsSection.style.display = 'none';
+        }
+    }
+    
+    // Add event listeners
+    raceSelect.addEventListener('change', updateAvailableOptions);
+    classSelect.addEventListener('change', updateAvailableOptions);
+    
+    // Initial update if both race and class are selected
+    updateAvailableOptions();
+});
+</script>
+{% endblock %}
