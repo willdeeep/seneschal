@@ -1,0 +1,126 @@
+# Python Version Management
+.python-version
+
+# Virtual Environment
+.venv
+venv/
+env/
+
+# Python Cache and Compiled Files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Flask specific
+instance/
+.webassets-cache
+
+# Environment variables
+.env
+.flaskenv
+
+# Database files (if using SQLite for local development)
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE - Selective VS Code exclusion
+# Keep shared debug configurations, exclude personal settings
+.vscode/settings.json
+.vscode/extensions.json
+.vscode/.ropeproject
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Docker
+.dockerignore
+
+# D&D Project Specific
+# Scraped data cache (if you want to regenerate)
+scraper/data/cache/
+scraper/data/temp/
+
+# Log files
+*.log
+logs/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Development artifacts
+.coverage.*
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Production secrets (never commit these!)
+config/production.py
+*.pem
+*.key
+.env.production
+.env.local
+
+# Character sheet uploads (if you add file upload functionality)
+uploads/
+temp_uploads/
+
+# Generated documentation
+docs/_build/
+site/
