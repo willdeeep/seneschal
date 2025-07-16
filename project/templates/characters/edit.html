@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Character - Seneschal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="mb-4">Edit Character: {{ character.name }}</h1>
+        
+        <form method="POST">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Character Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ character.name }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="player_name" class="form-label">Player Name</label>
+                            <input type="text" class="form-control" id="player_name" name="player_name" value="{{ character.player_name or '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="race" class="form-label">Race *</label>
+                            <select class="form-control" id="race" name="race" required>
+                                <option value="">Select Race</option>
+                                <option value="Human" {% if character.race == 'Human' %}selected{% endif %}>Human</option>
+                                <option value="Elf" {% if character.race == 'Elf' %}selected{% endif %}>Elf</option>
+                                <option value="Dwarf" {% if character.race == 'Dwarf' %}selected{% endif %}>Dwarf</option>
+                                <option value="Halfling" {% if character.race == 'Halfling' %}selected{% endif %}>Halfling</option>
+                                <option value="Dragonborn" {% if character.race == 'Dragonborn' %}selected{% endif %}>Dragonborn</option>
+                                <option value="Gnome" {% if character.race == 'Gnome' %}selected{% endif %}>Gnome</option>
+                                <option value="Half-Elf" {% if character.race == 'Half-Elf' %}selected{% endif %}>Half-Elf</option>
+                                <option value="Half-Orc" {% if character.race == 'Half-Orc' %}selected{% endif %}>Half-Orc</option>
+                                <option value="Tiefling" {% if character.race == 'Tiefling' %}selected{% endif %}>Tiefling</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="character_class" class="form-label">Class *</label>
+                            <select class="form-control" id="character_class" name="character_class" required>
+                                <option value="">Select Class</option>
+                                <option value="Barbarian" {% if character.character_class == 'Barbarian' %}selected{% endif %}>Barbarian</option>
+                                <option value="Bard" {% if character.character_class == 'Bard' %}selected{% endif %}>Bard</option>
+                                <option value="Cleric" {% if character.character_class == 'Cleric' %}selected{% endif %}>Cleric</option>
+                                <option value="Druid" {% if character.character_class == 'Druid' %}selected{% endif %}>Druid</option>
+                                <option value="Fighter" {% if character.character_class == 'Fighter' %}selected{% endif %}>Fighter</option>
+                                <option value="Monk" {% if character.character_class == 'Monk' %}selected{% endif %}>Monk</option>
+                                <option value="Paladin" {% if character.character_class == 'Paladin' %}selected{% endif %}>Paladin</option>
+                                <option value="Ranger" {% if character.character_class == 'Ranger' %}selected{% endif %}>Ranger</option>
+                                <option value="Rogue" {% if character.character_class == 'Rogue' %}selected{% endif %}>Rogue</option>
+                                <option value="Sorcerer" {% if character.character_class == 'Sorcerer' %}selected{% endif %}>Sorcerer</option>
+                                <option value="Warlock" {% if character.character_class == 'Warlock' %}selected{% endif %}>Warlock</option>
+                                <option value="Wizard" {% if character.character_class == 'Wizard' %}selected{% endif %}>Wizard</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="level" class="form-label">Level</label>
+                            <input type="number" class="form-control" id="level" name="level" value="{{ character.level }}" min="1" max="20">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="background" class="form-label">Background</label>
+                        <textarea class="form-control" id="background" name="background" rows="3" placeholder="Character background and history...">{{ character.background or '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Character Backstory</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="why_adventuring" class="form-label">Why Are You Adventuring?</label>
+                            <textarea class="form-control" id="why_adventuring" name="why_adventuring" rows="3" placeholder="What drives you to seek adventure?">{{ character.why_adventuring or '' }}</textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="origin" class="form-label">Origin Story</label>
+                            <textarea class="form-control" id="origin" name="origin" rows="3" placeholder="Where did you come from? What shaped your early life?">{{ character.origin or '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="class_origin" class="form-label">How Did You Learn Your Class Skills?</label>
+                            <textarea class="form-control" id="class_origin" name="class_origin" rows="3" placeholder="How did you become a fighter/wizard/etc?">{{ character.class_origin or '' }}</textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="attachments" class="form-label">Important Attachments</label>
+                            <textarea class="form-control" id="attachments" name="attachments" rows="3" placeholder="People, places, or things that matter to you...">{{ character.attachments or '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="secret" class="form-label">Secret</label>
+                            <textarea class="form-control" id="secret" name="secret" rows="3" placeholder="What secret do you keep hidden?">{{ character.secret or '' }}</textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="attitude_origin" class="form-label">Attitude & Worldview Origin</label>
+                            <textarea class="form-control" id="attitude_origin" name="attitude_origin" rows="3" placeholder="What shaped your outlook on life?">{{ character.attitude_origin or '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Core Motivation (Select all that apply)</label>
+                        {% set character_motivations = (character.motivation or '').split(',') %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="power" id="motivation_power" {% if 'power' in character_motivations %}checked{% endif %}>
+                                    <label class="form-check-label" for="motivation_power">Power</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="wealth" id="motivation_wealth" {% if 'wealth' in character_motivations %}checked{% endif %}>
+                                    <label class="form-check-label" for="motivation_wealth">Wealth</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="knowledge" id="motivation_knowledge" {% if 'knowledge' in character_motivations %}checked{% endif %}>
+                                    <label class="form-check-label" for="motivation_knowledge">Knowledge</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="justice" id="motivation_justice" {% if 'justice' in character_motivations %}checked{% endif %}>
+                                    <label class="form-check-label" for="motivation_justice">Justice</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="redemption" id="motivation_redemption" {% if 'redemption' in character_motivations %}checked{% endif %}>
+                                    <label class="form-check-label" for="motivation_redemption">Redemption</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="adventure" id="motivation_adventure" {% if 'adventure' in character_motivations %}checked{% endif %}>
+                                    <label class="form-check-label" for="motivation_adventure">Adventure</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="family" id="motivation_family" {% if 'family' in character_motivations %}checked{% endif %}>
+                                    <label class="form-check-label" for="motivation_family">Family</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="survival" id="motivation_survival" {% if 'survival' in character_motivations %}checked{% endif %}>
+                                    <label class="form-check-label" for="motivation_survival">Survival</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="motivation" value="freedom" id="motivation_freedom" {% if 'freedom' in character_motivations %}checked{% endif %}>
+                                    <label class="form-check-label" for="motivation_freedom">Freedom</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Ability Scores</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <label for="strength" class="form-label">Strength</label>
+                            <input type="number" class="form-control" id="strength" name="strength" value="{{ character.strength }}" min="1" max="20">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="dexterity" class="form-label">Dexterity</label>
+                            <input type="number" class="form-control" id="dexterity" name="dexterity" value="{{ character.dexterity }}" min="1" max="20">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="constitution" class="form-label">Constitution</label>
+                            <input type="number" class="form-control" id="constitution" name="constitution" value="{{ character.constitution }}" min="1" max="20">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="intelligence" class="form-label">Intelligence</label>
+                            <input type="number" class="form-control" id="intelligence" name="intelligence" value="{{ character.intelligence }}" min="1" max="20">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="wisdom" class="form-label">Wisdom</label>
+                            <input type="number" class="form-control" id="wisdom" name="wisdom" value="{{ character.wisdom }}" min="1" max="20">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="charisma" class="form-label">Charisma</label>
+                            <input type="number" class="form-control" id="charisma" name="charisma" value="{{ character.charisma }}" min="1" max="20">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Combat Stats</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="max_hp" class="form-label">Max HP</label>
+                            <input type="number" class="form-control" id="max_hp" name="max_hp" value="{{ character.max_hp }}" min="1">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="current_hp" class="form-label">Current HP</label>
+                            <input type="number" class="form-control" id="current_hp" name="current_hp" value="{{ character.current_hp }}" min="0">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="armor_class" class="form-label">Armor Class</label>
+                            <input type="number" class="form-control" id="armor_class" name="armor_class" value="{{ character.armor_class }}" min="1">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="speed" class="form-label">Speed (ft)</label>
+                            <input type="number" class="form-control" id="speed" name="speed" value="{{ character.speed }}" min="0">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="initiative" class="form-label">Initiative Modifier</label>
+                            <input type="number" class="form-control" id="initiative" name="initiative" value="{{ character.initiative }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="gold_pieces" class="form-label">Gold Pieces</label>
+                            <input type="number" class="form-control" id="gold_pieces" name="gold_pieces" value="{{ character.gold_pieces }}" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Character Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="personality_traits" class="form-label">Personality Traits</label>
+                            <textarea class="form-control" id="personality_traits" name="personality_traits" rows="3">{{ character.personality_traits or '' }}</textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="ideals" class="form-label">Ideals</label>
+                            <textarea class="form-control" id="ideals" name="ideals" rows="3">{{ character.ideals or '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bonds" class="form-label">Bonds</label>
+                            <textarea class="form-control" id="bonds" name="bonds" rows="3">{{ character.bonds or '' }}</textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="flaws" class="form-label">Flaws</label>
+                            <textarea class="form-control" id="flaws" name="flaws" rows="3">{{ character.flaws or '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Proficiencies</h5>
+                </div>
+                <div class="card-body">
+                    {% if proficiencies %}
+                        <div class="row">
+                            {% for proficiency in proficiencies %}
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="proficiencies" value="{{ proficiency.id }}" id="prof_{{ proficiency.id }}" 
+                                               {% if proficiency in character.proficiencies %}checked{% endif %}>
+                                        <label class="form-check-label" for="prof_{{ proficiency.id }}">
+                                            {{ proficiency.name }} ({{ proficiency.type }})
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No proficiencies available.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Languages</h5>
+                </div>
+                <div class="card-body">
+                    {% if languages %}
+                        <div class="row">
+                            {% for language in languages %}
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="languages" value="{{ language.id }}" id="lang_{{ language.id }}"
+                                               {% if language in character.languages %}checked{% endif %}>
+                                        <label class="form-check-label" for="lang_{{ language.id }}">
+                                            {{ language.name }}
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No languages available.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Features & Traits</h5>
+                </div>
+                <div class="card-body">
+                    {% if features %}
+                        <div class="row">
+                            {% for feature in features %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="features" value="{{ feature.id }}" id="feat_{{ feature.id }}"
+                                               {% if feature in character.features %}checked{% endif %}>
+                                        <label class="form-check-label" for="feat_{{ feature.id }}">
+                                            <strong>{{ feature.name }}</strong> ({{ feature.source }})
+                                            <br><small class="text-muted">{{ feature.description[:100] }}{% if feature.description|length > 100 %}...{% endif %}</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No features available.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 mb-5">
+                <button type="submit" class="btn btn-primary btn-lg">Update Character</button>
+                <a href="{{ url_for('characters.view', character_id=character.id) }}" class="btn btn-secondary btn-lg">Cancel</a>
+                <a href="{{ url_for('characters.index') }}" class="btn btn-outline-secondary btn-lg">Back to Characters</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

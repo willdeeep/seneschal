@@ -190,6 +190,16 @@ def edit(character_id):
         character.bonds = request.form.get('bonds')
         character.flaws = request.form.get('flaws')
         
+        # Backstory fields
+        character.why_adventuring = request.form.get('why_adventuring')
+        motivation_list = request.form.getlist('motivation')
+        character.motivation = ','.join(motivation_list) if motivation_list else ''
+        character.origin = request.form.get('origin')
+        character.class_origin = request.form.get('class_origin')
+        character.attachments = request.form.get('attachments')
+        character.secret = request.form.get('secret')
+        character.attitude_origin = request.form.get('attitude_origin')
+        
         # Update relationships
         character.proficiencies = []
         proficiency_ids = request.form.getlist('proficiencies')
