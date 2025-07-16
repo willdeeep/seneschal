@@ -1,0 +1,209 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "🎯 Flask App (Local Development)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/app.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1",
+                "PYTHONPATH": "${workspaceFolder}",
+                "DATABASE_URL": "postgresql://seneschal:seneschal@localhost:5432/seneschal"
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "redirectOutput": true,
+            "preLaunchTask": "check-postgres"
+        },
+        {
+            "name": "🐳 Flask App (Docker Attach)",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "/app"
+                }
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "🗃️ Database Schema Creation",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/create_tables.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "DATABASE_URL": "postgresql://seneschal:seneschal@localhost:5432/seneschal"
+            },
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false
+        },
+        {
+            "name": "🎲 Character Creation Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/app.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1",
+                "PYTHONPATH": "${workspaceFolder}",
+                "CHARACTER_DEBUG": "1"
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "postDebugTask": "open-character-creation"
+        },
+        {
+            "name": "📊 D20 SRD Data Import",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/scraper/populate_with_enhanced_d20srd.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "DATABASE_URL": "postgresql://seneschal:seneschal@localhost:5432/seneschal"
+            },
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false
+        },
+        {
+            "name": "🔍 API Endpoints Testing",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/app.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1",
+                "PYTHONPATH": "${workspaceFolder}",
+                "API_DEBUG": "1"
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false
+        },
+        {
+            "name": "🧪 Run Unit Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "${workspaceFolder}/tests/unit",
+                "-v",
+                "--tb=short"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "TESTING": "1"
+            },
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "🔧 Run Functional Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "${workspaceFolder}/tests/functional",
+                "-v",
+                "--tb=short"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "TESTING": "1"
+            },
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "🎯 Debug Specific Test",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "${input:testFile}",
+                "-v",
+                "--tb=long",
+                "-s"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "TESTING": "1"
+            },
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "🛡️ Character Model Validation",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/debug_character_validation.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "DATABASE_URL": "postgresql://seneschal:seneschal@localhost:5432/seneschal"
+            },
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": true
+        },
+        {
+            "name": "📝 Flask Routes Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/app.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1",
+                "PYTHONPATH": "${workspaceFolder}",
+                "ROUTE_DEBUG": "1"
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false
+        },
+        {
+            "name": "🗒️ Current File Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "stopOnEntry": false
+        }
+    ],
+    "inputs": [
+        {
+            "id": "testFile",
+            "description": "Enter the test file path (relative to workspace)",
+            "default": "tests/unit/test_models.py",
+            "type": "promptString"
+        }
+    ]
+}

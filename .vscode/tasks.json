@@ -1,0 +1,179 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "check-postgres",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": ["ps", "db"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "start-postgres",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": ["up", "-d", "db"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "open-character-creation",
+            "type": "shell",
+            "command": "open",
+            "args": ["http://localhost:5000/characters/create"],
+            "group": "build",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": [],
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        },
+        {
+            "label": "run-all-tests",
+            "type": "shell",
+            "command": "python",
+            "args": ["-m", "pytest", "tests/", "-v", "--tb=short"],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "options": {
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}",
+                    "TESTING": "1"
+                }
+            },
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": "^(.*):(\\d+):\\s+(.*)$",
+                            "file": 1,
+                            "line": 2,
+                            "message": 3
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "lint-python",
+            "type": "shell",
+            "command": "flake8",
+            "args": ["project/", "tests/", "--max-line-length=120"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
+                            "file": 1,
+                            "line": 2,
+                            "column": 3,
+                            "message": 4
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "format-python",
+            "type": "shell",
+            "command": "black",
+            "args": ["project/", "tests/", "--line-length=120"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "create-test-db",
+            "type": "shell",
+            "command": "python",
+            "args": ["create_tables.py"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "options": {
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}",
+                    "DATABASE_URL": "postgresql://seneschal:seneschal@localhost:5432/seneschal"
+                }
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "populate-test-data",
+            "type": "shell",
+            "command": "python",
+            "args": ["scraper/populate_with_enhanced_d20srd.py"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "options": {
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}",
+                    "DATABASE_URL": "postgresql://seneschal:seneschal@localhost:5432/seneschal"
+                }
+            },
+            "problemMatcher": [],
+            "dependsOn": "create-test-db"
+        }
+    ]
+}
