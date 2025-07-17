@@ -2,7 +2,7 @@ import os
 import tempfile
 import pytest
 from project import create_app, db
-from project.models import User
+from project.models import User, Character
 
 
 def is_github_actions():
@@ -181,3 +181,136 @@ def populated_db(app):
             'proficiencies': [athletics, longswords],
             'languages': [common]
         }
+
+
+# Advanced session-scoped fixtures for complex testing scenarios
+
+@pytest.fixture(scope="function")
+def persistent_test_user(app):
+    """Create a test user that persists across test operations within the same function."""
+    with app.app_context():
+        user = User(email='persistent@example.com', name='Persistent Test User')
+        user.set_password('testpass')
+        db.session.add(user)
+        db.session.commit()
+
+        # Keep the user attached to the session for the entire test
+        db.session.expunge(user)
+        yield db.session.merge(user)
+
+        # Cleanup after test
+        merged_user = db.session.merge(user)
+        db.session.delete(merged_user)
+        db.session.commit()
+
+
+@pytest.fixture(scope="function")
+def character_lifecycle_setup(app, persistent_test_user):
+    """
+    Setup for testing complete character lifecycle scenarios.
+    Returns a context manager that maintains session state.
+    """
+    class CharacterLifecycle:
+        def __init__(self, user):
+            self.user = user
+            self.characters = []
+
+        def create_character(self, **kwargs):
+            """Create a character and keep it in session."""
+            defaults = {
+                'name': f'Test Character {len(self.characters) + 1}',
+                'race': 'Human',
+                'character_class': 'Fighter',
+                'level': 1,
+                'strength': 15, 'dexterity': 14, 'constitution': 13,
+                'intelligence': 12, 'wisdom': 10, 'charisma': 8,
+                'user_id': self.user.id
+            }
+            defaults.update(kwargs)
+
+            character = Character(**defaults)
+            db.session.add(character)
+            db.session.commit()
+            self.characters.append(character)
+            return character
+
+        def level_up_character(self, character, new_level):
+            """Level up a character and update related stats."""
+            character.level = new_level
+            character.update_proficiency_bonus()
+            db.session.commit()
+            return character
+
+        def add_equipment(self, character, items):
+            """Add equipment to character (placeholder for future feature)."""
+            # This would integrate with item management system
+            pass
+
+        def save_campaign_progress(self, character, story_beats):
+            """Save character's campaign progress (future feature)."""
+            # This would save character development over time
+            pass
+
+    with app.app_context():
+        lifecycle = CharacterLifecycle(persistent_test_user)
+        yield lifecycle
+
+        # Cleanup all characters created during test
+        for character in lifecycle.characters:
+            db.session.delete(character)
+        db.session.commit()
+
+
+@pytest.fixture(scope="function")
+def campaign_party_setup(app, persistent_test_user):
+    """Setup a complete party of characters for campaign testing."""
+    with app.app_context():
+        party = {
+            'tank': Character(
+                name='Thorin Ironshield',
+                race='Dwarf',
+                character_class='Paladin',
+                level=3,
+                strength=16, dexterity=10, constitution=15,
+                intelligence=8, wisdom=14, charisma=13,
+                user_id=persistent_test_user.id
+            ),
+            'dps': Character(
+                name='Legolas Swiftarrow',
+                race='Elf',
+                character_class='Ranger',
+                level=3,
+                strength=13, dexterity=17, constitution=12,
+                intelligence=14, wisdom=15, charisma=10,
+                user_id=persistent_test_user.id
+            ),
+            'healer': Character(
+                name='Gandalf Brightstaff',
+                race='Human',
+                character_class='Cleric',
+                level=3,
+                strength=10, dexterity=12, constitution=13,
+                intelligence=14, wisdom=16, charisma=15,
+                user_id=persistent_test_user.id
+            ),
+            'utility': Character(
+                name='Bilbo Lightfingers',
+                race='Halfling',
+                character_class='Rogue',
+                level=3,
+                strength=8, dexterity=18, constitution=12,
+                intelligence=13, wisdom=14, charisma=16,
+                user_id=persistent_test_user.id
+            )
+        }
+
+        for character in party.values():
+            db.session.add(character)
+        db.session.commit()
+
+        yield party
+
+        # Cleanup
+        for character in party.values():
+            db.session.delete(character)
+        db.session.commit()
