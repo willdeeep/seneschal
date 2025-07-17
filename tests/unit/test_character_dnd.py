@@ -53,7 +53,7 @@ class TestCharacterModelUnit:
 class TestCharacterModelDatabase:
     """Functional tests that require database interaction."""
 
-    def test_character_creation_and_persistence(self, app, test_user):
+    def test_character_creation_and_persistence(self, app, persistent_test_user):
         """Test creating and saving a character to database."""
         with app.app_context():
             character = Character(
@@ -67,7 +67,7 @@ class TestCharacterModelDatabase:
                 intelligence=8,
                 wisdom=12,
                 charisma=15,
-                user_id=test_user.id
+                user_id=persistent_test_user.id
             )
 
             from project import db
@@ -80,14 +80,51 @@ class TestCharacterModelDatabase:
             assert saved_character is not None
             assert saved_character.race == "Dragonborn"
             assert saved_character.character_class == "Paladin"
+            
+            # Cleanup
+            db.session.delete(saved_character)
+            db.session.commit()
 
-    def test_character_relationships(self, app, populated_db):
+    def test_character_relationships(self, app, persistent_test_user):
         """Test character relationships with proficiencies and languages."""
         with app.app_context():
-            character = populated_db['character']
-            # Athletics proficiency
-            athletics = populated_db['proficiencies'][0]
-            common = populated_db['languages'][0]  # Common language
+            # Create test data using persistent user
+            from project.models import Character, Proficiency, Language
+            from project import db
+            
+            # Create test character
+            character = Character(
+                name="Test Character",
+                race="Human",
+                character_class="Fighter",
+                level=1,
+                strength=15,
+                dexterity=14,
+                constitution=13,
+                intelligence=12,
+                wisdom=10,
+                charisma=8,
+                user_id=persistent_test_user.id
+            )
+            db.session.add(character)
+
+            # Create test proficiencies
+            athletics = Proficiency(
+                name="Athletics",
+                proficiency_type="skill",
+                associated_ability="strength"
+            )
+            longswords = Proficiency(
+                name="Longswords",
+                proficiency_type="weapon"
+            )
+            db.session.add_all([athletics, longswords])
+
+            # Create test language
+            common = Language(name="Common", language_type="Standard")
+            db.session.add(common)
+            
+            db.session.commit()
 
             # Add relationships
             character.proficiencies.append(athletics)
@@ -101,6 +138,15 @@ class TestCharacterModelDatabase:
             assert common in character.languages
             assert character in athletics.characters
             assert character in common.characters
+            
+            # Cleanup test data
+            character.proficiencies.clear()
+            character.languages.clear()
+            db.session.delete(character)
+            db.session.delete(athletics)
+            db.session.delete(longswords)
+            db.session.delete(common)
+            db.session.commit()
 
 
 @pytest.mark.requires_db
