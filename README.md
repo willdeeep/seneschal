@@ -116,7 +116,7 @@ seneschal/
    ```bash
    # Option 1: Using Docker (Recommended)
    docker-compose up -d db
-   
+  
    # Option 2: Local PostgreSQL
    # Create database 'seneschal' with user 'seneschal'
    ```
@@ -259,7 +259,7 @@ class Character(db.Model):
     current_hp, max_hp, armor_class, initiative, speed
 
     # Enhanced Backstory Fields
-    why_adventuring, motivation, origin, class_origin, 
+    why_adventuring, motivation, origin, class_origin,
     attachments, secret, attitude_origin
 
     # Relationships

@@ -6,7 +6,7 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <h1 class="mb-4">Edit Character: {{ character.name }}</h1>
-        
+
         <form method="POST">
             <div class="card">
                 <div class="card-header">
@@ -23,7 +23,7 @@
                             <input type="text" class="form-control" id="player_name" name="player_name" value="{{ character.player_name or '' }}">
                         </div>
                     </div>
-                    
+                   
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="race" class="form-label">Race *</label>
@@ -63,7 +63,7 @@
                             <input type="number" class="form-control" id="level" name="level" value="{{ character.level }}" min="1" max="20">
                         </div>
                     </div>
-                    
+                   
                     <div class="mb-3">
                         <label for="background" class="form-label">Background</label>
                         <textarea class="form-control" id="background" name="background" rows="3" placeholder="Character background and history...">{{ character.background or '' }}</textarea>
@@ -265,7 +265,7 @@
                             {% for proficiency in proficiencies %}
                                 <div class="col-md-4 mb-2">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="proficiencies" value="{{ proficiency.id }}" id="prof_{{ proficiency.id }}" 
+                                        <input class="form-check-input" type="checkbox" name="proficiencies" value="{{ proficiency.id }}" id="prof_{{ proficiency.id }}"
                                                {% if proficiency in character.proficiencies %}checked{% endif %}>
                                         <label class="form-check-label" for="prof_{{ proficiency.id }}">
                                             {{ proficiency.name }} ({{ proficiency.type }})

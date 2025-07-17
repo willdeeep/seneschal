@@ -19,28 +19,28 @@ class BaseScraper(ABC):
         self.name = name
         self.logger = self._setup_logger()
         self.session: Optional[aiohttp.ClientSession] = None
-        self.throttler = Throttler(rate_limit=1/REQUEST_DELAY)
-        
+        self.throttler = Throttler(rate_limit=1 / REQUEST_DELAY)
+
     def _setup_logger(self) -> logging.Logger:
         """Set up logging for this scraper."""
         logger = logging.getLogger(f"scraper.{self.name}")
         logger.setLevel(logging.INFO)
-        
+
         if not logger.handlers:
             handler = logging.StreamHandler()
             formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
             )
             handler.setFormatter(formatter)
             logger.addHandler(handler)
-            
+
         return logger
 
     async def __aenter__(self):
         """Async context manager entry."""
         self.session = aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(total=TIMEOUT),
-            headers={'User-Agent': USER_AGENT}
+            headers={"User-Agent": USER_AGENT},
         )
         return self
 
@@ -49,11 +49,13 @@ class BaseScraper(ABC):
         if self.session:
             await self.session.close()
 
-    async def fetch_json(self, url: str, retries: int = MAX_RETRIES) -> Optional[Dict[str, Any]]:
+    async def fetch_json(
+        self, url: str, retries: int = MAX_RETRIES
+    ) -> Optional[Dict[str, Any]]:
         """Fetch JSON data from URL with retry logic."""
         if not self.session:
             raise RuntimeError("Session not initialized. Use async context manager.")
-        
+
         async with self.throttler:
             for attempt in range(retries + 1):
                 try:
@@ -64,17 +66,19 @@ class BaseScraper(ABC):
                             self.logger.debug(f"Successfully fetched {url}")
                             return data
                         elif response.status == 429:  # Rate limited
-                            wait_time = 2 ** attempt
-                            self.logger.warning(f"Rate limited. Waiting {wait_time}s before retry.")
+                            wait_time = 2**attempt
+                            self.logger.warning(
+                                f"Rate limited. Waiting {wait_time}s before retry."
+                            )
                             await asyncio.sleep(wait_time)
                         else:
                             self.logger.warning(f"HTTP {response.status} for {url}")
-                            
+
                 except aiohttp.ClientError as e:
                     self.logger.warning(f"Request failed for {url}: {e}")
                     if attempt < retries:
-                        await asyncio.sleep(2 ** attempt)
-                    
+                        await asyncio.sleep(2**attempt)
+
         self.logger.error(f"Failed to fetch {url} after {retries + 1} attempts")
         return None
 
@@ -82,9 +86,9 @@ class BaseScraper(ABC):
         """Save scraped data to JSON file."""
         os.makedirs(DATA_DIR, exist_ok=True)
         filepath = os.path.join(DATA_DIR, f"{filename}.json")
-        
+
         try:
-            with open(filepath, 'w', encoding='utf-8') as f:
+            with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
             self.logger.info(f"Saved {len(data)} items to {filepath}")
         except Exception as e:
@@ -104,13 +108,13 @@ class DataProcessor:
         """Clean and normalize text data."""
         if not text:
             return ""
-        
+
         # Remove extra whitespace
         text = " ".join(text.split())
-        
+
         # Remove common markup that might leak through
         text = text.replace("**", "").replace("*", "")
-        
+
         return text.strip()
 
     @staticmethod
@@ -118,11 +122,11 @@ class DataProcessor:
         """Normalize names for consistency."""
         if not name:
             return ""
-        
+
         # Basic normalization
         name = name.strip()
         name = " ".join(word.capitalize() for word in name.split())
-        
+
         return name
 
     @staticmethod
@@ -130,35 +134,40 @@ class DataProcessor:
         """Parse dice notation like '1d8' or '2d6+3'."""
         if not dice_str:
             return {}
-        
+
         # Simple regex for dice notation
         import re
-        match = re.match(r'(\d+)d(\d+)(?:\s*([+-])\s*(\d+))?', dice_str.strip())
-        
+
+        match = re.match(r"(\d+)d(\d+)(?:\s*([+-])\s*(\d+))?", dice_str.strip())
+
         if match:
             count, sides, operator, modifier = match.groups()
-            result = {
-                'count': int(count),
-                'sides': int(sides),
-                'original': dice_str
-            }
-            
+            result = {"count": int(count), "sides": int(sides), "original": dice_str}
+
             if operator and modifier:
                 mod_value = int(modifier)
-                if operator == '-':
+                if operator == "-":
                     mod_value = -mod_value
-                result['modifier'] = mod_value
-                
+                result["modifier"] = mod_value
+
             return result
-        
-        return {'original': dice_str}
+
+        return {"original": dice_str}
 
 
 def setup_data_directories():
     """Set up the data directory structure."""
     categories = [
-        'races', 'classes', 'spells', 'equipment', 'backgrounds',
-        'feats', 'skills', 'languages', 'conditions', 'magic_items'
+        "races",
+        "classes",
+        "spells",
+        "equipment",
+        "backgrounds",
+        "feats",
+        "skills",
+        "languages",
+        "conditions",
+        "magic_items",
     ]
 
     for category in categories:

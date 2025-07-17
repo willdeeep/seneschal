@@ -67,7 +67,7 @@
                             <div class="col-4">
                                 <div class="border rounded p-2">
                                     <strong>Hit Points</strong><br>
-                                    <span class="fs-4 
+                                    <span class="fs-4
                                         {% if character.current_hp and character.max_hp %}
                                             {% if character.current_hp < character.max_hp * 0.3 %}text-danger
                                             {% elif character.current_hp < character.max_hp * 0.7 %}text-warning
@@ -250,7 +250,7 @@
                     <div class="card-body">
                         {% for feature in character.features %}
                             <div class="mb-2">
-                                <strong>{{ feature.name }}</strong> 
+                                <strong>{{ feature.name }}</strong>
                                 <span class="badge bg-info">{{ feature.source }}</span>
                                 <br><small class="text-muted">{{ feature.description }}</small>
                             </div>
@@ -274,7 +274,7 @@
                             {% for character_item in character.inventory %}
                             <div class="col-md-6 col-lg-4 mb-2">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span>{{ character_item.item.name }} 
+                                    <span>{{ character_item.item.name }}
                                         {% if character_item.equipped %}<i class="text-success" title="Equipped">⚔</i>{% endif %}
                                     </span>
                                     <span class="badge bg-primary">{{ character_item.quantity }}</span>

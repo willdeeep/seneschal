@@ -3,13 +3,13 @@
 Enhanced database population script using curated D&D 5e data.
 """
 
+from dnd5e_data import DND5E_PROFICIENCIES, DND5E_FEATURES, DND5E_EQUIPMENT
+from project.models import Proficiency, Language, Feature, Item
+from project import create_app, db
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from project import create_app, db
-from project.models import Proficiency, Language, Feature, Item
-from dnd5e_data import DND5E_PROFICIENCIES, DND5E_FEATURES, DND5E_EQUIPMENT
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 def populate_proficiencies():
@@ -29,7 +29,7 @@ def populate_proficiencies():
                 proficiency = Proficiency(
                     name=prof_name,
                     proficiency_type=category,
-                    description=f"A {category} proficiency."
+                    description=f"A {category} proficiency.",
                 )
                 db.session.add(proficiency)
                 added_count += 1
@@ -47,25 +47,43 @@ def populate_languages():
 
     added_count = 0
 
-    for language_name in DND5E_PROFICIENCIES['languages']:
+    for language_name in DND5E_PROFICIENCIES["languages"]:
         # Determine language type
-        common_languages = ['Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish', 'Goblin', 'Halfling', 'Orc']
-        exotic_languages = ['Abyssal', 'Celestial', 'Draconic', 'Deep Speech', 'Infernal', 'Primordial', 'Sylvan', 'Undercommon']
-        
+        common_languages = [
+            "Common",
+            "Dwarvish",
+            "Elvish",
+            "Giant",
+            "Gnomish",
+            "Goblin",
+            "Halfling",
+            "Orc",
+        ]
+        exotic_languages = [
+            "Abyssal",
+            "Celestial",
+            "Draconic",
+            "Deep Speech",
+            "Infernal",
+            "Primordial",
+            "Sylvan",
+            "Undercommon",
+        ]
+
         if language_name in common_languages:
-            lang_type = 'Standard'
+            lang_type = "Standard"
         elif language_name in exotic_languages:
-            lang_type = 'Exotic'
+            lang_type = "Exotic"
         else:
-            lang_type = 'Dialect'
-        
+            lang_type = "Dialect"
+
         # Check if language already exists
         existing = Language.query.filter_by(name=language_name).first()
         if not existing:
             language = Language(
                 name=language_name,
                 language_type=lang_type,
-                description=f"The {language_name} language."
+                description=f"The {language_name} language.",
             )
             db.session.add(language)
             added_count += 1
@@ -89,9 +107,7 @@ def populate_features():
             existing = Feature.query.filter_by(name=feature_name).first()
             if not existing:
                 feature = Feature(
-                    name=feature_name,
-                    feature_type=category,
-                    description=feature_desc
+                    name=feature_name, feature_type=category, description=feature_desc
                 )
                 db.session.add(feature)
                 added_count += 1
@@ -119,7 +135,7 @@ def populate_equipment():
                     item_type=item_type,
                     cost_gp=cost_gp,
                     weight_lbs=weight_lbs,
-                    description=description
+                    description=description,
                 )
                 db.session.add(item)
                 added_count += 1
@@ -134,31 +150,31 @@ def main():
 
     with app.app_context():
         print("Starting enhanced database population...")
-        
+
         # Create all tables
         db.create_all()
-        
+
         # Populate with comprehensive D&D data
         populate_proficiencies()
         populate_languages()
         populate_features()
         populate_equipment()
-        
+
         # Print summary
         prof_count = Proficiency.query.count()
         lang_count = Language.query.count()
         feat_count = Feature.query.count()
         item_count = Item.query.count()
-        
-        print("\n" + "="*50)
+
+        print("\n" + "=" * 50)
         print("DATABASE POPULATION COMPLETE")
-        print("="*50)
+        print("=" * 50)
         print(f"Total Proficiencies: {prof_count}")
         print(f"Total Languages: {lang_count}")
         print(f"Total Features: {feat_count}")
         print(f"Total Items: {item_count}")
-        print("="*50)
+        print("=" * 50)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

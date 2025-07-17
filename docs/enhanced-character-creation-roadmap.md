@@ -26,11 +26,11 @@ This roadmap outlines the next major feature improvement: implementing a sophist
 **Status:** ✅ **COMPLETE**
 
 ### Objectives
-✅ Create comprehensive Species and CharacterClass models  
-✅ Populate database with D&D 5e SRD data structure  
-✅ Establish proper relationships and constraints  
-✅ Build robust testing foundation  
-✅ Remove legacy race/character_class fields  
+✅ Create comprehensive Species and CharacterClass models 
+✅ Populate database with D&D 5e SRD data structure 
+✅ Establish proper relationships and constraints 
+✅ Build robust testing foundation 
+✅ Remove legacy race/character_class fields 
 ✅ Implement computed properties for ability scores and proficiencies
 
 ### Implementation Details
@@ -47,7 +47,7 @@ class Species(db.Model):
     proficiencies = db.Column(db.JSON)  # Skill/weapon proficiencies
     speed = db.Column(db.Integer, default=30)
     size = db.Column(db.String(20), default='Medium')
-    
+   
 class CharacterClass(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
@@ -57,7 +57,7 @@ class CharacterClass(db.Model):
     skill_proficiencies = db.Column(db.JSON)  # Available skills
     armor_proficiencies = db.Column(db.JSON)
     weapon_proficiencies = db.Column(db.JSON)
-    
+   
 class SubSpecies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -73,38 +73,38 @@ class Character(db.Model):
     species_id = db.Column(db.Integer, db.ForeignKey('species.id'), nullable=True)
     subspecies_id = db.Column(db.Integer, db.ForeignKey('subspecies.id'), nullable=True)
     class_id = db.Column(db.Integer, db.ForeignKey('character_class.id'), nullable=True)
-    
+   
     # Relationships
     species = db.relationship('Species', backref='characters')
     subspecies = db.relationship('SubSpecies', backref='characters')
     char_class = db.relationship('CharacterClass', backref='characters')  # Updated naming
-    
+   
     # Computed properties - IMPLEMENTED
     @property
     def effective_ability_scores(self):
         """Calculate ability scores with species bonuses."""
         # Returns dict with species bonuses applied
-        
+
     @property
     def all_proficiencies(self):
         """Combine species, class, and background proficiencies."""
         # Returns combined list of all proficiencies
-        
+
     @property
     def all_languages(self):
         """Get all languages from species and other sources."""
         # Returns combined list of all languages
-        
+
     @property
     def all_traits(self):
         """Get all traits from species and subspecies."""
         # Returns combined list of all traits
-        
+
     @property
     def effective_speed(self):
         """Get effective speed from species."""
         # Returns speed value from species
-        
+
     @property
     def effective_size(self):
         """Get effective size from species."""
@@ -122,7 +122,7 @@ class Character(db.Model):
 
 # Final Character table structure:
 # - species_id (INTEGER, nullable, FK to species.id)
-# - subspecies_id (INTEGER, nullable, FK to subspecies.id) 
+# - subspecies_id (INTEGER, nullable, FK to subspecies.id)
 # - class_id (INTEGER, nullable, FK to character_class.id)
 # - No legacy race/character_class fields remain
 ```
@@ -160,31 +160,31 @@ def populate_species():
 # tests/unit/test_species_class_models.py - IMPLEMENTED
 class TestSpeciesClassModels:
     """Test the new Species and CharacterClass models."""
-    
+   
     def test_species_creation_and_relationships(self, persistent_test_user):
         """Test Species model creation and character relationships."""
         # ✅ IMPLEMENTED AND PASSING
-        
+
     def test_character_class_creation(self, persistent_test_user):
         """Test CharacterClass model creation."""
         # ✅ IMPLEMENTED AND PASSING
-        
+
     def test_character_with_species_and_class(self, character_lifecycle_setup):
         """Test Character with Species and Class relationships."""
         # ✅ IMPLEMENTED AND PASSING
         lifecycle = character_lifecycle_setup
-        
+
         # Create character with species and class
         character = lifecycle.create_character(
             species_id=species.id,  # Updated to use foreign keys
             class_id=char_class.id,  # Updated to use foreign keys
             # subspecies_id=subspecies.id  # Optional
         )
-        
+
         # Test effective ability scores - WORKING
         assert character.effective_ability_scores['dex'] == 16  # 14 base + 2 species
         assert character.effective_ability_scores['int'] == 15  # 15 base
-        
+
         # Test computed properties - ALL WORKING
         assert 'Perception' in character.all_proficiencies
         assert 'Arcana' in character.all_proficiencies
@@ -207,11 +207,11 @@ class TestSpeciesClassModels:
 - [x] **Legacy field removal (race/character_class completely eliminated)**
 
 ### Success Criteria
-✅ All tests pass with new models (10 tests passing, 8 skipped)  
-✅ Database migration runs cleanly (comprehensive schema migration completed)  
-⏳ Species/class data accurately reflects D&D 5e SRD (*pending data population*)  
-✅ Character creation maintains backward compatibility  
-✅ Performance impact is minimal  
+✅ All tests pass with new models (10 tests passing, 8 skipped) 
+✅ Database migration runs cleanly (comprehensive schema migration completed) 
+⏳ Species/class data accurately reflects D&D 5e SRD (*pending data population*) 
+✅ Character creation maintains backward compatibility 
+✅ Performance impact is minimal 
 ✅ Computed properties work correctly for all character attributes
 
 ---
@@ -240,13 +240,13 @@ class CharacterCreationForm {
         this.baseAbilityScores = {};
         this.init();
     }
-    
+   
     init() {
         this.bindSpeciesSelection();
         this.bindClassSelection();
         this.bindAbilityScoreChanges();
     }
-    
+   
     onSpeciesSelect(speciesId) {
         // Update available subspecies
         // Recalculate ability scores
@@ -272,12 +272,12 @@ def create():
             ability_scores=get_ability_scores_from_form(),
             optimization_level=request.form.get('optimization', 'none')
         )
-        
+
     # GET request - show form
     species = Species.query.all()
     classes = CharacterClass.query.all()
-    return render_template('characters/create.html', 
-                         species=species, 
+    return render_template('characters/create.html',
+                         species=species,
                          classes=classes)
 ```
 
@@ -286,15 +286,15 @@ def create():
 # tests/functional/test_character_creation_ui.py
 class TestCharacterCreationUI:
     """Test the enhanced character creation interface."""
-    
+   
     def test_species_selection_updates_ability_scores(self, app, persistent_test_user):
         """Test that selecting a species updates ability score displays."""
         pass
-        
+
     def test_class_selection_updates_proficiencies(self, app, persistent_test_user):
         """Test that selecting a class updates available proficiencies."""
         pass
-        
+
     def test_complete_character_creation_workflow(self, app, persistent_test_user):
         """Test the complete character creation process."""
         pass
@@ -329,7 +329,7 @@ class TestCharacterCreationUI:
 # project/optimization.py
 class CharacterOptimizer:
     """Engine for optimizing character builds."""
-    
+   
     def optimize_build(self, species, character_class, level=1, playstyle='balanced'):
         """Suggest optimal ability scores and proficiencies."""
         optimization = {
@@ -339,7 +339,7 @@ class CharacterOptimizer:
             'spells': self.suggest_spells(character_class, level) if self.is_spellcaster(character_class) else None
         }
         return optimization
-        
+
     def validate_build(self, character_data):
         """Validate that a character build follows D&D 5e rules."""
         return ValidationResult(
@@ -354,25 +354,25 @@ class CharacterOptimizer:
 # tests/unit/test_character_optimization.py
 class TestCharacterOptimization:
     """Test the character optimization engine."""
-    
+   
     def test_optimization_workflow(self, character_lifecycle_setup):
         """Test the complete character optimization process."""
         lifecycle = character_lifecycle_setup
-        
+
         # Test all species/class combinations
         species = ['Human', 'Elf', 'Dwarf', 'Halfling']
         classes = ['Fighter', 'Wizard', 'Rogue', 'Cleric']
-        
+
         for species_name in species:
             for char_class in classes:
                 optimal_build = lifecycle.optimize_character_build(
-                    species=species_name, 
-                    character_class=char_class, 
+                    species=species_name,
+                    character_class=char_class,
                     level=1
                 )
-                
+               
                 character = lifecycle.create_character(**optimal_build)
-                
+               
                 # Test progression through levels
                 for level in range(2, 6):
                     character = lifecycle.level_up_character(character, level)

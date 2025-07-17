@@ -41,7 +41,7 @@ if [ $? -eq 0 ]; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "Importing data into database..."
         $PYTHON_CMD import_data.py
-        
+
         if [ $? -eq 0 ]; then
             echo "Data import completed successfully!"
         else

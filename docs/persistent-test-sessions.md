@@ -57,14 +57,14 @@ Our implementation uses three key fixture types:
 def test_character_progression_workflow(character_lifecycle_setup):
     """Test complete character progression from creation to high level."""
     lifecycle = character_lifecycle_setup
-    
+   
     # Create character at level 1
     character = lifecycle.create_character(name="Aragorn", character_class="Ranger")
-    
+   
     # Progress through multiple levels
     character = lifecycle.level_up_character(character, 5)
     character = lifecycle.level_up_character(character, 11)
-    
+   
     # Verify progression persists across operations
     assert character.level == 11
     assert character.proficiency_bonus == 4
@@ -75,13 +75,13 @@ def test_character_progression_workflow(character_lifecycle_setup):
 def test_party_dynamics_and_balance(campaign_party_setup):
     """Test party composition and balance calculations."""
     party = campaign_party_setup
-    
+   
     # Verify role distribution
     assert party['tank'].character_class == 'Paladin'
     assert party['dps'].character_class == 'Ranger'
     assert party['healer'].character_class == 'Cleric'
     assert party['utility'].character_class == 'Rogue'
-    
+   
     # Test party-wide statistics
     total_levels = sum(char.level for char in party.values())
     assert total_levels == 12  # 4 characters at level 3
@@ -92,19 +92,19 @@ def test_party_dynamics_and_balance(campaign_party_setup):
 def test_backstory_workflow_with_lifecycle(character_lifecycle_setup):
     """Test complete backstory development workflow."""
     lifecycle = character_lifecycle_setup
-    
+   
     # Create character with initial backstory
     character = lifecycle.create_character(
         name="Evolving Hero",
         why_adventuring="Seeking redemption for past sins",
         secret="Responsible for family's downfall"
     )
-    
+   
     # Character grows and backstory evolves
     character = lifecycle.level_up_character(character, 5)
     character.motivation += ", protecting others"
     character.secret = "Learning to forgive themselves"
-    
+   
     # Verify evolution persists
     assert "protecting others" in character.motivation
     assert "Learning to forgive" in character.secret
