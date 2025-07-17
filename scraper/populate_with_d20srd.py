@@ -17,15 +17,15 @@ from dnd5e_data import DND5E_PROFICIENCIES, DND5E_FEATURES, DND5E_EQUIPMENT
 async def scrape_and_populate_skills():
     """Scrape skills from D20 SRD and populate database."""
     print("Scraping skills from D20 SRD...")
-    
+
     scraper = D20SRDScraper()
     scraped_data = await scraper.scrape_skills()
-    
+
     # Clear existing skill proficiencies
     db.session.query(Proficiency).filter_by(proficiency_type='skills').delete()
-    
+
     added_count = 0
-    
+
     for skill_name, skill_info in scraped_data.items():
         proficiency = Proficiency(
             name=skill_name,
@@ -35,7 +35,7 @@ async def scrape_and_populate_skills():
         )
         db.session.add(proficiency)
         added_count += 1
-    
+
     print(f"Added {added_count} skills from D20 SRD")
     return added_count
 
@@ -43,12 +43,12 @@ async def scrape_and_populate_skills():
 def populate_other_proficiencies():
     """Populate non-skill proficiencies from static data."""
     print("Populating other proficiencies...")
-    
+
     # Clear existing non-skill proficiencies
     db.session.query(Proficiency).filter(Proficiency.proficiency_type != 'skills').delete()
-    
+
     added_count = 0
-    
+
     for category, proficiencies in DND5E_PROFICIENCIES.items():
         if category == 'skills':
             continue  # Skip skills, handled by scraper
@@ -61,7 +61,7 @@ def populate_other_proficiencies():
             )
             db.session.add(proficiency)
             added_count += 1
-    
+
     print(f"Added {added_count} other proficiencies")
     return added_count
 
@@ -69,12 +69,12 @@ def populate_other_proficiencies():
 def populate_languages():
     """Populate database with D&D 5e languages."""
     print("Populating languages...")
-    
+
     # Clear existing languages
     db.session.query(Language).delete()
-    
+
     added_count = 0
-    
+
     for language_name in DND5E_PROFICIENCIES['languages']:
         # Determine language type
         common_languages = ['Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish', 'Goblin', 'Halfling', 'Orc']
@@ -94,7 +94,7 @@ def populate_languages():
         )
         db.session.add(language)
         added_count += 1
-    
+
     print(f"Added {added_count} languages")
     return added_count
 
@@ -102,12 +102,12 @@ def populate_languages():
 def populate_features():
     """Populate database with D&D 5e features."""
     print("Populating features...")
-    
+
     # Clear existing features
     db.session.query(Feature).delete()
-    
+
     added_count = 0
-    
+
     for category, features in DND5E_FEATURES.items():
         for feature_name, feature_desc in features:
             feature = Feature(
@@ -117,7 +117,7 @@ def populate_features():
             )
             db.session.add(feature)
             added_count += 1
-    
+
     print(f"Added {added_count} features")
     return added_count
 
@@ -125,12 +125,12 @@ def populate_features():
 def populate_equipment():
     """Populate database with D&D 5e equipment."""
     print("Populating equipment...")
-    
+
     # Clear existing items
     db.session.query(Item).delete()
-    
+
     added_count = 0
-    
+
     for _category, items in DND5E_EQUIPMENT.items():
         for item_name, item_type, cost_gp, weight_lbs, description in items:
             item = Item(
@@ -142,7 +142,7 @@ def populate_equipment():
             )
             db.session.add(item)
             added_count += 1
-    
+
     print(f"Added {added_count} items")
     return added_count
 
@@ -150,7 +150,7 @@ def populate_equipment():
 async def main():
     """Main population function with D20 SRD integration."""
     app = create_app()
-    
+
     with app.app_context():
         print("Starting enhanced database population with D20 SRD data...")
         

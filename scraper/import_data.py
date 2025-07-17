@@ -15,7 +15,7 @@ from project.models import Proficiency, Language, Feature, Item
 
 class DataImporter:
     """Import scraped D&D data into the database."""
-    
+
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.app = create_app()
@@ -39,7 +39,7 @@ class DataImporter:
         except Exception as e:
             self.logger.error("Error loading %s: %s", filename, e)
             return []
-    
+
     def import_proficiencies(self, data: List[Dict[str, Any]]) -> int:
         """Import proficiency data."""
         count = 0
@@ -70,7 +70,7 @@ class DataImporter:
                 count = 0
         
         return count
-    
+
     def import_languages(self, data: List[Dict[str, Any]]) -> int:
         """Import language data."""
         count = 0
@@ -100,7 +100,7 @@ class DataImporter:
                 count = 0
         
         return count
-    
+
     def import_features(self, data: List[Dict[str, Any]]) -> int:
         """Import feature data."""
         count = 0
@@ -136,7 +136,7 @@ class DataImporter:
                 count = 0
         
         return count
-    
+
     def import_equipment(self, data: List[Dict[str, Any]]) -> int:
         """Import equipment data."""
         count = 0
@@ -179,7 +179,7 @@ class DataImporter:
                 count = 0
         
         return count
-    
+
     def extract_skills_from_data(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Extract skill proficiencies from various data sources."""
         skills = []
@@ -211,7 +211,7 @@ class DataImporter:
                 })
         
         return skills
-    
+
     def import_all_data(self):
         """Import all available scraped data."""
         total_imported = 0
@@ -289,9 +289,9 @@ def main():
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
-    
+
     importer = DataImporter()
-    
+
     try:
         print("Starting data import...")
         total = importer.import_all_data()

@@ -25,9 +25,9 @@ def debug_character_creation():
     """Debug character creation with comprehensive validation."""
     print("🎯 Starting Character Model Debug Session")
     print("=" * 50)
-    
+
     app = create_app()
-    
+
     with app.app_context():
         # Test database connection
         try:
@@ -217,9 +217,9 @@ def debug_database_queries():
     """Debug common database queries."""
     print("\n🔍 Testing Database Queries")
     print("-" * 30)
-    
+
     app = create_app()
-    
+
     with app.app_context():
         # Test character queries
         characters = Character.query.all()
@@ -244,9 +244,9 @@ if __name__ == "__main__":
     print("🚀 Character Model Debug Tool")
     print("This script will test character creation, validation, and relationships.")
     print()
-    
+
     # Set breakpoint here for debugging
     debug_character_creation()
     debug_database_queries()
-    
+
     print("\n✨ All debugging completed!")

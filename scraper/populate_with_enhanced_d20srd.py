@@ -17,15 +17,15 @@ from dnd5e_data import DND5E_PROFICIENCIES, DND5E_FEATURES, DND5E_EQUIPMENT
 async def scrape_and_populate_skills():
     """Scrape skills from D20 SRD and populate database."""
     print("Scraping skills from D20 SRD...")
-    
+
     scraper = D20SRDScraper()
     scraped_data = await scraper.scrape_skills()
-    
+
     # Clear existing skill proficiencies
     db.session.query(Proficiency).filter_by(proficiency_type='skills').delete()
-    
+
     added_count = 0
-    
+
     for skill_name, skill_info in scraped_data.items():
         proficiency = Proficiency(
             name=skill_name,
@@ -35,7 +35,7 @@ async def scrape_and_populate_skills():
         )
         db.session.add(proficiency)
         added_count += 1
-    
+
     print(f"Added {added_count} skills from D20 SRD")
     return added_count
 
@@ -43,15 +43,15 @@ async def scrape_and_populate_skills():
 async def scrape_and_populate_spells():
     """Scrape spells from D20 SRD and populate database."""
     print("Scraping spells from D20 SRD...")
-    
+
     scraper = D20SRDScraper()
     scraped_data = await scraper.scrape_spells()
-    
+
     # Clear existing spells
     db.session.query(Spell).delete()
-    
+
     added_count = 0
-    
+
     # Basic spell data from scraper - we'll enhance with manual data later
     for spell_name, spell_info in scraped_data.items():
         # Skip very short names that are likely navigation elements
@@ -72,7 +72,7 @@ async def scrape_and_populate_spells():
         )
         db.session.add(spell)
         added_count += 1
-    
+
     print(f"Added {added_count} spells from D20 SRD")
     return added_count
 
@@ -80,12 +80,12 @@ async def scrape_and_populate_spells():
 def populate_other_proficiencies():
     """Populate non-skill proficiencies from static data."""
     print("Populating other proficiencies...")
-    
+
     # Clear existing non-skill proficiencies
     db.session.query(Proficiency).filter(Proficiency.proficiency_type != 'skills').delete()
-    
+
     added_count = 0
-    
+
     for category, proficiencies in DND5E_PROFICIENCIES.items():
         if category == 'skills':
             continue  # Skip skills, handled by scraper
@@ -98,7 +98,7 @@ def populate_other_proficiencies():
             )
             db.session.add(proficiency)
             added_count += 1
-    
+
     print(f"Added {added_count} other proficiencies")
     return added_count
 
@@ -106,12 +106,12 @@ def populate_other_proficiencies():
 def populate_languages():
     """Populate database with D&D 5e languages."""
     print("Populating languages...")
-    
+
     # Clear existing languages
     db.session.query(Language).delete()
-    
+
     added_count = 0
-    
+
     for language_name in DND5E_PROFICIENCIES['languages']:
         # Determine language type
         common_languages = ['Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish', 'Goblin', 'Halfling', 'Orc']
@@ -131,7 +131,7 @@ def populate_languages():
         )
         db.session.add(language)
         added_count += 1
-    
+
     print(f"Added {added_count} languages")
     return added_count
 
@@ -139,12 +139,12 @@ def populate_languages():
 def populate_features():
     """Populate database with D&D 5e features."""
     print("Populating features...")
-    
+
     # Clear existing features
     db.session.query(Feature).delete()
-    
+
     added_count = 0
-    
+
     for category, features in DND5E_FEATURES.items():
         for feature_name, feature_desc in features:
             # Determine usage patterns based on feature name
@@ -168,7 +168,7 @@ def populate_features():
             )
             db.session.add(feature)
             added_count += 1
-    
+
     print(f"Added {added_count} features")
     return added_count
 
@@ -176,12 +176,12 @@ def populate_features():
 def populate_equipment():
     """Populate database with D&D 5e equipment."""
     print("Populating equipment...")
-    
+
     # Clear existing items
     db.session.query(Item).delete()
-    
+
     added_count = 0
-    
+
     for _category, items in DND5E_EQUIPMENT.items():
         for item_data in items:
             item_name, item_type, cost_gp, weight_lbs, description = item_data
@@ -205,7 +205,7 @@ def populate_equipment():
             
             db.session.add(item)
             added_count += 1
-    
+
     print(f"Added {added_count} items")
     return added_count
 
@@ -227,7 +227,7 @@ def enhance_weapon_properties(item, weapon_name):
         'Light Crossbow': {'damage_dice': '1d8', 'damage_type': 'piercing', 'weapon_properties': 'ammunition (range 80/320), loading, two-handed'},
         'Heavy Crossbow': {'damage_dice': '1d10', 'damage_type': 'piercing', 'weapon_properties': 'ammunition (range 100/400), heavy, loading, two-handed'},
     }
-    
+
     if weapon_name in weapon_data:
         data = weapon_data[weapon_name]
         item.damage_dice = data.get('damage_dice')
@@ -239,7 +239,7 @@ def enhance_weapon_properties(item, weapon_name):
             item.weapon_range = 'ranged'
         else:
             item.weapon_range = 'melee'
-    
+
     return item
 
 
@@ -259,21 +259,21 @@ def enhance_armor_properties(item, armor_name):
         'Plate Armor': {'armor_class': 18, 'max_dex_bonus': 0, 'stealth_disadvantage': True, 'min_strength': 15},
         'Shield': {'armor_class': 2, 'max_dex_bonus': None, 'stealth_disadvantage': False},
     }
-    
+
     if armor_name in armor_data:
         data = armor_data[armor_name]
         item.armor_class = data.get('armor_class')
         item.max_dex_bonus = data.get('max_dex_bonus')
         item.stealth_disadvantage = data.get('stealth_disadvantage', False)
         item.min_strength = data.get('min_strength')
-    
+
     return item
 
 
 async def main():
     """Main population function with D20 SRD integration."""
     app = create_app()
-    
+
     with app.app_context():
         print("Starting enhanced database population with D20 SRD data...")
         print("="*60)

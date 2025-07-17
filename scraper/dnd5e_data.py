@@ -8,14 +8,14 @@ DND5E_PROFICIENCIES = {
         'Nature', 'Perception', 'Performance', 'Persuasion', 'Religion',
         'Sleight of Hand', 'Stealth', 'Survival'
     ],
-    
+
     'armor': [
         'Light Armor', 'Medium Armor', 'Heavy Armor', 'Shields',
         'Padded Armor', 'Leather Armor', 'Studded Leather',
         'Hide Armor', 'Chain Shirt', 'Scale Mail', 'Breastplate', 'Half Plate',
         'Ring Mail', 'Chain Mail', 'Splint Armor', 'Plate Armor'
     ],
-    
+
     'weapons': [
         'Simple Weapons', 'Martial Weapons',
         # Simple Melee Weapons
@@ -30,7 +30,7 @@ DND5E_PROFICIENCIES = {
         # Martial Ranged Weapons
         'Blowgun', 'Hand Crossbow', 'Heavy Crossbow', 'Longbow', 'Net'
     ],
-    
+
     'tools': [
         # Artisan's Tools
         "Alchemist's Supplies", "Brewer's Supplies", "Calligrapher's Supplies",
@@ -51,7 +51,7 @@ DND5E_PROFICIENCIES = {
         "Disguise Kit", "Forgery Kit", "Herbalism Kit", "Navigator's Tools",
         "Poisoner's Kit", "Thieves' Tools", "Vehicles (Land)", "Vehicles (Water)"
     ],
-    
+
     'languages': [
         # Standard Languages
         'Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish', 'Goblin',
@@ -90,7 +90,7 @@ DND5E_FEATURES = {
         ('Hellish Resistance', 'You have resistance to fire damage.'),
         ('Infernal Legacy', 'You know the thaumaturgy cantrip. Once you reach 3rd level, you can cast hellish rebuke once per day.'),
     ],
-    
+
     'class': [
         # Barbarian
         ('Rage', 'In battle, you fight with primal ferocity. You have advantage on Strength checks and saving throws, bonus melee damage, and resistance to bludgeoning, piercing, and slashing damage.'),
@@ -166,7 +166,7 @@ DND5E_FEATURES = {
         ('Arcane Recovery', 'You have learned to regain some of your magical energy by studying your spellbook.'),
         ('Arcane Tradition', 'You choose an arcane tradition, shaping your practice of magic.'),
     ],
-    
+
     'background': [
         ('Feature: Discovery', 'The quiet seclusion of your extended hermitage gave you access to a unique and powerful discovery.'),
         ('Feature: Shelter of the Faithful', 'You and your companions can expect to receive free healing and care at a temple, shrine, or other established presence of your faith.'),
@@ -226,7 +226,7 @@ DND5E_EQUIPMENT = {
         ('Longbow', 'weapon', 50, 2.0, 'A tall bow for long-range combat.'),
         ('Net', 'weapon', 5, 3.0, 'A weighted net for entangling foes.'),
     ],
-    
+
     'armor': [
         # Light Armor
         ('Padded Armor', 'armor', 5, 8.0, 'Simple quilted cloth armor.'),
@@ -249,7 +249,7 @@ DND5E_EQUIPMENT = {
         # Shields
         ('Shield', 'armor', 10, 6.0, 'A shield grants +2 AC.'),
     ],
-    
+
     'adventuring_gear': [
         ('Backpack', 'gear', 2, 5.0, 'A leather pack with straps for carrying gear.'),
         ('Bedroll', 'gear', 1, 7.0, 'A sleeping bag and blanket.'),

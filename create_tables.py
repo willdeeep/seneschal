@@ -15,7 +15,7 @@ from init_db import init_proficiencies, init_languages, init_features, init_item
 def create_tables():
     """Create all database tables."""
     app = create_app()
-    
+
     with app.app_context():
         print("Creating database tables...")
         db.create_all()

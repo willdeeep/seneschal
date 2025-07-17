@@ -8,12 +8,12 @@ from config import DND5E_API_BASE_URL
 
 class DnD5eAPIScraper(BaseScraper):
     """Scraper for the D&D 5e API (dnd5eapi.co)."""
-    
+
     def __init__(self):
         super().__init__("dnd5e_api")
         self.base_url = DND5E_API_BASE_URL
         self.processor = DataProcessor()
-    
+
     async def scrape_endpoint(self, endpoint: str) -> List[Dict[str, Any]]:
         """Scrape a specific endpoint and return detailed items."""
         # Get the list of items
@@ -52,7 +52,7 @@ class DnD5eAPIScraper(BaseScraper):
         
         self.logger.info("Successfully scraped %d/%d items from %s", len(items), total_items, endpoint)
         return items
-    
+
     async def scrape_races(self) -> List[Dict[str, Any]]:
         """Scrape race data."""
         races = await self.scrape_endpoint('races')
@@ -74,7 +74,7 @@ class DnD5eAPIScraper(BaseScraper):
             processed_races.append(processed_race)
         
         return processed_races
-    
+
     async def scrape_classes(self) -> List[Dict[str, Any]]:
         """Scrape class data."""
         classes = await self.scrape_endpoint('classes')
@@ -97,7 +97,7 @@ class DnD5eAPIScraper(BaseScraper):
             processed_classes.append(processed_class)
         
         return processed_classes
-    
+
     async def scrape_equipment(self) -> List[Dict[str, Any]]:
         """Scrape equipment data."""
         equipment = await self.scrape_endpoint('equipment')
@@ -142,7 +142,7 @@ class DnD5eAPIScraper(BaseScraper):
             processed_equipment.append(processed_item)
         
         return processed_equipment
-    
+
     async def scrape_spells(self) -> List[Dict[str, Any]]:
         """Scrape spell data."""
         spells = await self.scrape_endpoint('spells')
@@ -170,7 +170,7 @@ class DnD5eAPIScraper(BaseScraper):
             processed_spells.append(processed_spell)
         
         return processed_spells
-    
+
     async def scrape_skills(self) -> List[Dict[str, Any]]:
         """Scrape skill data."""
         skills = await self.scrape_endpoint('skills')
@@ -188,7 +188,7 @@ class DnD5eAPIScraper(BaseScraper):
             processed_skills.append(processed_skill)
         
         return processed_skills
-    
+
     def _parse_cost(self, cost_data: Dict[str, Any]) -> int:
         """Parse cost data and return value in copper pieces."""
         if not cost_data:
@@ -207,7 +207,7 @@ class DnD5eAPIScraper(BaseScraper):
         }
         
         return quantity * multipliers.get(unit, 1)
-    
+
     async def scrape(self) -> Dict[str, List[Dict[str, Any]]]:
         """Scrape all configured data types."""
         results = {}

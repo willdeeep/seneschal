@@ -16,7 +16,7 @@ class TestUserModel:
         with app.app_context():
             user = User(email='test@example.com', name='Test User')
             user.set_password('testpass')
-            
+
             assert user.email == 'test@example.com'
             assert user.name == 'Test User'
             assert user.password_hash is not None
@@ -31,7 +31,7 @@ class TestUserModel:
         with app.app_context():
             user = User(email='test@example.com', name='Test User')
             user.set_password('testpass')
-            
+
             assert user.check_password('testpass') is True
             assert user.check_password('wrongpass') is False
 
@@ -55,10 +55,10 @@ class TestUserModel:
         with app.app_context():
             user = User(email='test@example.com', name='Test User')
             user.set_password('testpass')
-            
+
             db.session.add(user)
             db.session.commit()
-            
+
             retrieved_user = User.query.filter_by(email='test@example.com').first()
             assert retrieved_user is not None
             assert retrieved_user.email == 'test@example.com'
@@ -74,13 +74,13 @@ class TestUserModel:
         with app.app_context():
             user1 = User(email='test@example.com', name='Test User 1')
             user1.set_password('testpass1')
-            
+
             user2 = User(email='test@example.com', name='Test User 2')
             user2.set_password('testpass2')
-            
+
             db.session.add(user1)
             db.session.commit()
-            
+
             db.session.add(user2)
             with pytest.raises(Exception):  # Should raise integrity error
                 db.session.commit()

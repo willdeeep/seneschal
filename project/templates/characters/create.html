@@ -306,7 +306,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const raceSelect = document.getElementById('race');
     const classSelect = document.getElementById('character_class');
-    
+
     // Function to update available options based on race and class selection
     function updateAvailableOptions() {
         const selectedRace = raceSelect.value;
@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSpells(selectedClass);
         }
     }
-    
+
     // Function to update proficiencies
     function updateProficiencies(race, characterClass) {
         fetch(`{{ url_for('characters.get_available_proficiencies') }}?race=${race}&class=${characterClass}`)
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('proficiencies-list').innerHTML = '<p class="text-danger">Error loading proficiencies.</p>';
             });
     }
-    
+
     // Function to update languages
     function updateLanguages(race, characterClass) {
         fetch(`{{ url_for('characters.get_available_languages') }}?race=${race}&class=${characterClass}`)
@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('languages-list').innerHTML = '<p class="text-danger">Error loading languages.</p>';
             });
     }
-    
+
     // Function to update features
     function updateFeatures(race, characterClass) {
         fetch(`{{ url_for('characters.get_available_features') }}?race=${race}&class=${characterClass}`)
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('features-list').innerHTML = '<p class="text-danger">Error loading features.</p>';
             });
     }
-    
+
     // Function to update spells
     function updateSpells(characterClass) {
         const spellsSection = document.getElementById('spells-section');
@@ -469,11 +469,11 @@ document.addEventListener('DOMContentLoaded', function() {
             spellsSection.style.display = 'none';
         }
     }
-    
+
     // Add event listeners
     raceSelect.addEventListener('change', updateAvailableOptions);
     classSelect.addEventListener('change', updateAvailableOptions);
-    
+
     // Initial update if both race and class are selected
     updateAvailableOptions();
 });

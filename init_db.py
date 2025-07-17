@@ -56,7 +56,7 @@ def init_proficiencies():
         ('Gaming Set', 'tool'),
         ('Musical Instrument', 'tool'),
     ]
-    
+
     for name, prof_type in proficiencies:
         if not Proficiency.query.filter_by(name=name).first():
             proficiency = Proficiency(name=name, proficiency_type=prof_type)
@@ -83,7 +83,7 @@ def init_languages():
         'Sylvan',
         'Undercommon',
     ]
-    
+
     for name in languages:
         if not Language.query.filter_by(name=name).first():
             language = Language(name=name)
@@ -128,7 +128,7 @@ def init_features():
         ('Arcane Recovery', 'You have learned to regain some of your magical energy by studying your spellbook.', 'Class'),
         ('Ritual Casting', 'You can cast a spell as a ritual if that spell has the ritual tag.', 'Class'),
     ]
-    
+
     for name, description, source in features:
         if not Feature.query.filter_by(name=name).first():
             # Map source to feature_type
@@ -202,7 +202,7 @@ def init_items():
         ('Disguise Kit', 'tool', 25, 3.0, 'Cosmetics, hair dye, and props.'),
         ('Forgery Kit', 'tool', 15, 5.0, 'Paper, inks, and other supplies.'),
     ]
-    
+
     for name, item_type, cost, weight, description in items:
         if not Item.query.filter_by(name=name).first():
             item = Item(
@@ -218,7 +218,7 @@ def init_items():
 def init_db():
     """Initialize the database with basic D&D data."""
     app = create_app()
-    
+
     with app.app_context():
         # Create tables
         db.create_all()

@@ -14,7 +14,7 @@ from config import REQUEST_DELAY, MAX_RETRIES, TIMEOUT, USER_AGENT, DATA_DIR
 
 class BaseScraper(ABC):
     """Base class for all D&D data scrapers."""
-    
+
     def __init__(self, name: str):
         self.name = name
         self.logger = self._setup_logger()
@@ -35,7 +35,7 @@ class BaseScraper(ABC):
             logger.addHandler(handler)
             
         return logger
-    
+
     async def __aenter__(self):
         """Async context manager entry."""
         self.session = aiohttp.ClientSession(
@@ -43,12 +43,12 @@ class BaseScraper(ABC):
             headers={'User-Agent': USER_AGENT}
         )
         return self
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit."""
         if self.session:
             await self.session.close()
-    
+
     async def fetch_json(self, url: str, retries: int = MAX_RETRIES) -> Optional[Dict[str, Any]]:
         """Fetch JSON data from URL with retry logic."""
         if not self.session:
@@ -77,7 +77,7 @@ class BaseScraper(ABC):
                     
         self.logger.error(f"Failed to fetch {url} after {retries + 1} attempts")
         return None
-    
+
     def save_data(self, data: List[Dict[str, Any]], filename: str) -> None:
         """Save scraped data to JSON file."""
         os.makedirs(DATA_DIR, exist_ok=True)
@@ -89,7 +89,7 @@ class BaseScraper(ABC):
             self.logger.info(f"Saved {len(data)} items to {filepath}")
         except Exception as e:
             self.logger.error(f"Failed to save data to {filepath}: {e}")
-    
+
     @abstractmethod
     async def scrape(self) -> List[Dict[str, Any]]:
         """Scrape data from the source. Must be implemented by subclasses."""
@@ -98,7 +98,7 @@ class BaseScraper(ABC):
 
 class DataProcessor:
     """Utility class for processing and cleaning scraped data."""
-    
+
     @staticmethod
     def clean_text(text: str) -> str:
         """Clean and normalize text data."""
@@ -112,7 +112,7 @@ class DataProcessor:
         text = text.replace("**", "").replace("*", "")
         
         return text.strip()
-    
+
     @staticmethod
     def normalize_name(name: str) -> str:
         """Normalize names for consistency."""
@@ -124,7 +124,7 @@ class DataProcessor:
         name = " ".join(word.capitalize() for word in name.split())
         
         return name
-    
+
     @staticmethod
     def parse_dice(dice_str: str) -> Dict[str, Any]:
         """Parse dice notation like '1d8' or '2d6+3'."""
@@ -160,6 +160,6 @@ def setup_data_directories():
         'races', 'classes', 'spells', 'equipment', 'backgrounds',
         'feats', 'skills', 'languages', 'conditions', 'magic_items'
     ]
-    
+
     for category in categories:
         os.makedirs(os.path.join(DATA_DIR, category), exist_ok=True)

@@ -1,5 +1,4 @@
 import pytest
-from flask import url_for
 
 
 @pytest.mark.functional
@@ -57,7 +56,7 @@ class TestAuthentication:
             'email': 'newuser@example.com',
             'password': 'newpassword'
         }, follow_redirects=True)
-        
+
         assert response.status_code == 200
         assert b'Account created successfully!' in response.data
 
@@ -72,7 +71,7 @@ class TestAuthentication:
             'email': 'test@example.com',  # Same as test_user
             'password': 'anotherpassword'
         }, follow_redirects=True)
-        
+
         assert response.status_code == 200
         assert b'Email address already exists' in response.data
 
@@ -86,7 +85,7 @@ class TestAuthentication:
             'email': 'test@example.com',
             'password': 'testpass'
         }, follow_redirects=True)
-        
+
         assert response.status_code == 200
         assert b'Test User' in response.data  # Should show user's name
 
@@ -100,7 +99,7 @@ class TestAuthentication:
             'email': 'test@example.com',
             'password': 'wrongpassword'
         }, follow_redirects=True)
-        
+
         assert response.status_code == 200
         assert b'Please check your login details' in response.data
 
@@ -121,7 +120,7 @@ class TestAuthentication:
         """
         # First login
         auth.login()
-        
+
         # Then logout
         response = client.get('/auth/logout', follow_redirects=True)
         assert response.status_code == 200
@@ -140,7 +139,7 @@ class TestProtectedRoutes:
         """
         # Login first
         auth.login()
-        
+
         response = client.get('/profile')
         assert response.status_code == 200
         assert b'User Profile' in response.data
