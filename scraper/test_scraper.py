@@ -1,13 +1,12 @@
 """Simple test script to verify the scraper functionality."""
 
+from scrapers.dnd5e_api import DnD5eAPIScraper
 import asyncio
 import sys
 import os
 
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from scrapers.dnd5e_api import DnD5eAPIScraper
 
 
 async def test_scraper():
@@ -19,48 +18,52 @@ async def test_scraper():
         async with DnD5eAPIScraper() as scraper:
             # Test fetching a single endpoint
             print("Testing basic API connectivity...")
-            
+
             # Test races endpoint
             races_url = f"{scraper.base_url}/races"
             races_list = await scraper.fetch_json(races_url)
-            
-            if races_list and 'results' in races_list:
-                race_count = len(races_list['results'])
+
+            if races_list and "results" in races_list:
+                race_count = len(races_list["results"])
                 print(f"✓ Successfully connected to API")
                 print(f"✓ Found {race_count} races available")
-                
+
                 # Test detailed fetch for first race
                 if race_count > 0:
-                    first_race_url = f"{scraper.base_url}{races_list['results'][0]['url']}"
+                    first_race_url = (
+                        f"{scraper.base_url}{races_list['results'][0]['url']}"
+                    )
                     race_detail = await scraper.fetch_json(first_race_url)
-                    
+
                     if race_detail:
-                        print(f"✓ Successfully fetched detailed data for: {race_detail.get('name', 'Unknown')}")
+                        print(
+                            f"✓ Successfully fetched detailed data for: {race_detail.get('name', 'Unknown')}"
+                        )
                     else:
                         print("✗ Failed to fetch detailed race data")
                         return False
-                
+
                 # Test equipment endpoint
                 print("\nTesting equipment endpoint...")
                 equipment_url = f"{scraper.base_url}/equipment"
                 equipment_list = await scraper.fetch_json(equipment_url)
-                
-                if equipment_list and 'results' in equipment_list:
-                    equipment_count = len(equipment_list['results'])
+
+                if equipment_list and "results" in equipment_list:
+                    equipment_count = len(equipment_list["results"])
                     print(f"✓ Found {equipment_count} equipment items available")
                 else:
                     print("✗ Failed to fetch equipment list")
                     return False
-                
+
                 print("\n" + "=" * 40)
                 print("Scraper test completed successfully!")
                 print("The scraper is ready to collect D&D data.")
                 return True
-                
+
             else:
                 print("✗ Failed to connect to D&D 5e API")
                 return False
-                
+
     except Exception as e:
         print(f"✗ Error during testing: {e}")
         return False
@@ -93,14 +96,20 @@ def test_data_processing():
     if normalized_name == expected_name:
         print("✓ Name normalization works correctly")
     else:
-        print(f"✗ Name normalization failed: got '{normalized_name}', expected '{expected_name}'")
+        print(
+            f"✗ Name normalization failed: got '{normalized_name}', expected '{expected_name}'"
+        )
         return False
 
     # Test dice parsing
     dice_str = "2d6+3"
     dice_data = processor.parse_dice(dice_str)
 
-    if dice_data.get('count') == 2 and dice_data.get('sides') == 6 and dice_data.get('modifier') == 3:
+    if (
+        dice_data.get("count") == 2
+        and dice_data.get("sides") == 6
+        and dice_data.get("modifier") == 3
+    ):
         print("✓ Dice parsing works correctly")
     else:
         print(f"✗ Dice parsing failed: {dice_data}")

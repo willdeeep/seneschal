@@ -14,13 +14,13 @@ class TestUserModel:
         THEN: The user should be created with correct attributes
         """
         with app.app_context():
-            user = User(email='test@example.com', name='Test User')
-            user.set_password('testpass')
+            user = User(email="test@example.com", name="Test User")
+            user.set_password("testpass")
 
-            assert user.email == 'test@example.com'
-            assert user.name == 'Test User'
+            assert user.email == "test@example.com"
+            assert user.name == "Test User"
             assert user.password_hash is not None
-            assert user.password_hash != 'testpass'  # Password should be hashed
+            assert user.password_hash != "testpass"  # Password should be hashed
 
     def test_password_hashing(self, app):
         """
@@ -29,11 +29,11 @@ class TestUserModel:
         THEN: The password should be hashed and verifiable
         """
         with app.app_context():
-            user = User(email='test@example.com', name='Test User')
-            user.set_password('testpass')
+            user = User(email="test@example.com", name="Test User")
+            user.set_password("testpass")
 
-            assert user.check_password('testpass') is True
-            assert user.check_password('wrongpass') is False
+            assert user.check_password("testpass") is True
+            assert user.check_password("wrongpass") is False
 
     def test_user_representation(self, app):
         """
@@ -42,8 +42,8 @@ class TestUserModel:
         THEN: It should return the email in the format '<User email>'
         """
         with app.app_context():
-            user = User(email='test@example.com', name='Test User')
-            assert str(user) == '<User test@example.com>'
+            user = User(email="test@example.com", name="Test User")
+            assert str(user) == "<User test@example.com>"
 
     @pytest.mark.functional
     def test_user_persistence(self, app):
@@ -53,17 +53,17 @@ class TestUserModel:
         THEN: The user should be retrievable from the database
         """
         with app.app_context():
-            user = User(email='test@example.com', name='Test User')
-            user.set_password('testpass')
+            user = User(email="test@example.com", name="Test User")
+            user.set_password("testpass")
 
             db.session.add(user)
             db.session.commit()
 
-            retrieved_user = User.query.filter_by(email='test@example.com').first()
+            retrieved_user = User.query.filter_by(email="test@example.com").first()
             assert retrieved_user is not None
-            assert retrieved_user.email == 'test@example.com'
-            assert retrieved_user.name == 'Test User'
-            assert retrieved_user.check_password('testpass') is True
+            assert retrieved_user.email == "test@example.com"
+            assert retrieved_user.name == "Test User"
+            assert retrieved_user.check_password("testpass") is True
 
     def test_unique_email_constraint(self, app):
         """
@@ -72,11 +72,11 @@ class TestUserModel:
         THEN: Only the first user should be saved (unique constraint)
         """
         with app.app_context():
-            user1 = User(email='test@example.com', name='Test User 1')
-            user1.set_password('testpass1')
+            user1 = User(email="test@example.com", name="Test User 1")
+            user1.set_password("testpass1")
 
-            user2 = User(email='test@example.com', name='Test User 2')
-            user2.set_password('testpass2')
+            user2 = User(email="test@example.com", name="Test User 2")
+            user2.set_password("testpass2")
 
             db.session.add(user1)
             db.session.commit()
