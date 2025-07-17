@@ -178,8 +178,6 @@ def character_lifecycle_setup(app, persistent_test_user):
             """Create a character and keep it in session."""
             defaults = {
                 'name': f'Test Character {len(self.characters) + 1}',
-                'race': 'Human',
-                'character_class': 'Fighter',
                 'level': 1,
                 'strength': 15, 'dexterity': 14, 'constitution': 13,
                 'intelligence': 12, 'wisdom': 10, 'charisma': 8,
@@ -233,37 +231,25 @@ def campaign_party_setup(app, persistent_test_user):
     with app.app_context():
         party = {
             'tank': Character(
-                name='Thorin Ironshield',
-                race='Dwarf',
-                character_class='Paladin',
-                level=3,
+                name='Thorin Ironshield',                level=3,
                 strength=16, dexterity=10, constitution=15,
                 intelligence=8, wisdom=14, charisma=13,
                 user_id=persistent_test_user.id
             ),
             'dps': Character(
-                name='Legolas Swiftarrow',
-                race='Elf',
-                character_class='Ranger',
-                level=3,
+                name='Legolas Swiftarrow',                level=3,
                 strength=13, dexterity=17, constitution=12,
                 intelligence=14, wisdom=15, charisma=10,
                 user_id=persistent_test_user.id
             ),
             'healer': Character(
-                name='Gandalf Brightstaff',
-                race='Human',
-                character_class='Cleric',
-                level=3,
+                name='Gandalf Brightstaff',                level=3,
                 strength=10, dexterity=12, constitution=13,
                 intelligence=14, wisdom=16, charisma=15,
                 user_id=persistent_test_user.id
             ),
             'utility': Character(
-                name='Bilbo Lightfingers',
-                race='Halfling',
-                character_class='Rogue',
-                level=3,
+                name='Bilbo Lightfingers',                level=3,
                 strength=8, dexterity=18, constitution=12,
                 intelligence=13, wisdom=14, charisma=16,
                 user_id=persistent_test_user.id

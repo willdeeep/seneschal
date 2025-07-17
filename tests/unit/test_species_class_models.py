@@ -9,7 +9,6 @@ from project.models import Character, db
 from project import create_app
 
 
-@pytest.mark.skip(reason="Testing features in development - Species/CharacterClass models")
 @pytest.mark.unit
 class TestSpeciesModel:
     """Unit tests for the Species model."""
@@ -78,7 +77,6 @@ class TestSpeciesModel:
             assert str(species) == '<Species Dwarf>'
 
 
-@pytest.mark.skip(reason="Testing features in development - Species/CharacterClass models")
 @pytest.mark.unit
 class TestCharacterClassModel:
     """Unit tests for the CharacterClass model."""
@@ -218,7 +216,6 @@ class TestSubSpeciesModel:
             assert str(subspecies) == '<SubSpecies Drow>'
 
 
-@pytest.mark.skip(reason="Testing features in development - Species/CharacterClass models")
 @pytest.mark.functional
 class TestCharacterSpeciesClassIntegration:
     """Integration tests for Character with Species and CharacterClass relationships."""
@@ -247,9 +244,7 @@ class TestCharacterSpeciesClassIntegration:
             # Create character with species
             character = Character(
                 name='Test Human',
-                species_id=species.id,
-                character_class='Fighter',  # Legacy field
-                level=1,
+                species_id=species.id,                level=1,
                 strength=15,
                 dexterity=14,
                 constitution=13,
@@ -291,9 +286,7 @@ class TestCharacterSpeciesClassIntegration:
             
             # Create character with class
             character = Character(
-                name='Test Wizard',
-                race='Human',  # Legacy field
-                class_id=char_class.id,
+                name='Test Wizard',                class_id=char_class.id,
                 level=1,
                 strength=8,
                 dexterity=14,
@@ -307,11 +300,11 @@ class TestCharacterSpeciesClassIntegration:
             db.session.flush()
             
             # Test relationship
-            assert character.character_class is not None
-            assert character.character_class.name == 'Wizard'
-            assert character.character_class.hit_die == 6
-            assert character.character_class.primary_ability == 'Intelligence'
-            assert 'Arcana' in character.character_class.skill_proficiencies
+            assert character.char_class is not None
+            assert character.char_class.name == 'Wizard'
+            assert character.char_class.hit_die == 6
+            assert character.char_class.primary_ability == 'Intelligence'
+            assert 'Arcana' in character.char_class.skill_proficiencies
 
     def test_character_with_species_and_class(self, character_lifecycle_setup, app):
         """
@@ -352,10 +345,7 @@ class TestCharacterSpeciesClassIntegration:
             
             # Create character with both species and class
             character = lifecycle.create_character(
-                name='Elven Wizard',
-                race='Elf',  # Legacy field - will be migrated
-                character_class='Wizard',  # Legacy field - will be migrated
-                species_id=species.id,
+                name='Elven Wizard',                species_id=species.id,
                 class_id=char_class.id,
                 level=1,
                 strength=8,
@@ -369,8 +359,8 @@ class TestCharacterSpeciesClassIntegration:
             # Test relationships
             assert character.species is not None
             assert character.species.name == 'Elf'
-            assert character.character_class is not None
-            assert character.character_class.name == 'Wizard'
+            assert character.char_class is not None
+            assert character.char_class.name == 'Wizard'
             
             # Test computed properties (when implemented)
             # These would be implemented as part of the Species/CharacterClass feature
@@ -405,9 +395,7 @@ class TestCharacterSpeciesClassIntegration:
             character = Character(
                 name='High Elf Wizard',
                 species_id=species.id,
-                subspecies_id=subspecies.id,
-                character_class='Wizard',  # Legacy field
-                level=1,
+                subspecies_id=subspecies.id,                level=1,
                 strength=8,
                 dexterity=14,
                 constitution=12,
@@ -533,10 +521,7 @@ class TestSpeciesClassPersistence:
             character = Character(
                 name='Halfling Rogue',
                 species_id=species.id,
-                class_id=char_class.id,
-                race='Halfling',  # Legacy field
-                character_class='Rogue',  # Legacy field
-                level=3,
+                class_id=char_class.id,                level=3,
                 strength=10,
                 dexterity=16,
                 constitution=14,
@@ -555,8 +540,8 @@ class TestSpeciesClassPersistence:
             assert retrieved_character.name == 'Halfling Rogue'
             assert retrieved_character.species is not None
             assert retrieved_character.species.name == 'Halfling'
-            assert retrieved_character.character_class is not None
-            assert retrieved_character.character_class.name == 'Rogue'
+            assert retrieved_character.char_class is not None
+            assert retrieved_character.char_class.name == 'Rogue'
             assert retrieved_character.level == 3
             assert retrieved_character.dexterity == 16
 
@@ -604,10 +589,7 @@ class TestCharacterLifecycleWithSpeciesClass:
             
             # Create character using lifecycle
             character = lifecycle.create_character(
-                name='Tiefling Warlock',
-                race='Tiefling',  # Legacy field
-                character_class='Warlock',  # Legacy field
-                species_id=species.id,
+                name='Tiefling Warlock',                species_id=species.id,
                 class_id=char_class.id,
                 level=1,
                 strength=10,
@@ -621,7 +603,7 @@ class TestCharacterLifecycleWithSpeciesClass:
             # Verify character creation
             assert character.name == 'Tiefling Warlock'
             assert character.species.name == 'Tiefling'
-            assert character.character_class.name == 'Warlock'
+            assert character.char_class.name == 'Warlock'
             assert character.level == 1
             assert character.charisma == 15
 
@@ -663,10 +645,7 @@ class TestCharacterLifecycleWithSpeciesClass:
             
             # Create character
             character = lifecycle.create_character(
-                name='Dwarf Fighter',
-                race='Dwarf',  # Legacy field
-                character_class='Fighter',  # Legacy field
-                species_id=species.id,
+                name='Dwarf Fighter',                species_id=species.id,
                 class_id=char_class.id,
                 level=1,
                 strength=15,
@@ -684,6 +663,6 @@ class TestCharacterLifecycleWithSpeciesClass:
             assert character.level == 2
             assert character.species is not None
             assert character.species.name == 'Dwarf'
-            assert character.character_class is not None
-            assert character.character_class.name == 'Fighter'
+            assert character.char_class is not None
+            assert character.char_class.name == 'Fighter'
             assert character.proficiency_bonus == 2  # Should be updated
