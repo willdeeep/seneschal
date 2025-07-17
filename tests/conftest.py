@@ -133,60 +133,6 @@ def test_user(app):
         return user
 
 
-@pytest.fixture
-def populated_db(app):
-    """Create a test database with sample D&D data."""
-    with app.app_context():
-        from project.models import Character, Proficiency, Language
-
-        # Create test user
-        user = User(email='testuser@example.com', name='Test User')
-        user.set_password('testpass')
-        db.session.add(user)
-        db.session.flush()  # Get user ID
-
-        # Create test character
-        character = Character(
-            name="Test Character",
-            race="Human",
-            character_class="Fighter",
-            level=1,
-            strength=15,
-            dexterity=14,
-            constitution=13,
-            intelligence=12,
-            wisdom=10,
-            charisma=8,
-            user_id=user.id
-        )
-        db.session.add(character)
-
-        # Create test proficiencies
-        athletics = Proficiency(
-            name="Athletics",
-            proficiency_type="skill",
-            associated_ability="strength"
-        )
-        longswords = Proficiency(
-            name="Longswords",
-            proficiency_type="weapon"
-        )
-        db.session.add_all([athletics, longswords])
-
-        # Create test language
-        common = Language(name="Common", language_type="Standard")
-        db.session.add(common)
-
-        db.session.commit()
-
-        return {
-            'user': user,
-            'character': character,
-            'proficiencies': [athletics, longswords],
-            'languages': [common]
-        }
-
-
 # Advanced session-scoped fixtures for complex testing scenarios
 
 @pytest.fixture(scope="function")

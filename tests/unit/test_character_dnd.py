@@ -177,7 +177,7 @@ class TestD20SRDIntegration:
 class TestCharacterGeneration:
     """Slow tests for character generation that are local-only."""
 
-    def test_random_character_generation(self, app, populated_db):
+    def test_random_character_generation(self, app, persistent_test_user):
         """Test generating random characters with all combinations."""
         # This might be slow and is primarily for local testing
         with app.app_context():
@@ -198,7 +198,7 @@ class TestCharacterGeneration:
                         intelligence=10,
                         wisdom=15,
                         charisma=8,
-                        user_id=populated_db['user'].id
+                        user_id=persistent_test_user.id
                     )
 
                     db.session.add(character)
