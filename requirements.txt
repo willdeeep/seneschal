@@ -6,5 +6,6 @@ gunicorn==21.2.0
 pytest==7.4.2
 pytest-cov==4.1.0
 coverage==7.3.2
+flake8==6.1.0
 click==8.1.7
 psycopg2-binary==2.9.7
