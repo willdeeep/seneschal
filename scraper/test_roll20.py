@@ -14,7 +14,7 @@ async def test_roll20_scraper():
     """Test the Roll20 scraper with the specific URLs provided."""
     print("Testing Roll20 Scraper...")
     print("=" * 40)
-    
+
     try:
         async with Roll20Scraper() as scraper:
             print("✓ Scraper initialized successfully")
@@ -87,9 +87,9 @@ async def main():
     """Run Roll20 scraper tests."""
     print("Roll20 D&D Data Scraper Test")
     print("=" * 50)
-    
+
     success = await test_roll20_scraper()
-    
+
     if success:
         print("\n✓ Roll20 scraper is working correctly!")
         print("\nTo run the full Roll20 scraper, execute:")
@@ -108,7 +108,7 @@ async def main():
     else:
         print("\n✗ Roll20 scraper tests failed!")
         return False
-    
+
     return True
 
 

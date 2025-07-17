@@ -26,7 +26,7 @@ def app():
     """Create and configure a new app instance for each test."""
     # Create a temporary file to isolate the database for each test
     db_fd, db_path = tempfile.mkstemp()
-    
+
     # Use SQLite for all tests to ensure CI compatibility
     config = {
         'TESTING': True,
@@ -35,7 +35,7 @@ def app():
         'WTF_CSRF_ENABLED': False,
         'SQLALCHEMY_TRACK_MODIFICATIONS': False
     }
-    
+
     # Add CI-specific configuration
     if is_ci_environment():
         config.update({
@@ -45,7 +45,7 @@ def app():
                 'pool_recycle': 300,
             }
         })
-    
+
     app = create_app(config)
 
     # Create the database and the database table
@@ -98,19 +98,20 @@ def auth(client):
 
 def pytest_collection_modifyitems(config, items):
     """Modify test collection based on environment."""
-    github_skip = pytest.mark.skip(reason="Skipped in GitHub Actions environment")
+    github_skip = pytest.mark.skip(
+        reason="Skipped in GitHub Actions environment")
     requires_network_skip = pytest.mark.skip(reason="Requires network access")
     local_only_skip = pytest.mark.skip(reason="Local development only")
-    
+
     for item in items:
         # Skip tests marked as github_skip when in GitHub Actions
         if "github_skip" in item.keywords and is_github_actions():
             item.add_marker(github_skip)
-        
+
         # Skip tests marked as local_only when in CI
         if "local_only" in item.keywords and is_ci_environment():
             item.add_marker(local_only_skip)
-        
+
         # Skip network tests in CI unless explicitly enabled
         if "requires_network" in item.keywords and is_ci_environment():
             if not os.getenv('ENABLE_NETWORK_TESTS'):
@@ -133,13 +134,13 @@ def populated_db(app):
     """Create a test database with sample D&D data."""
     with app.app_context():
         from project.models import Character, Proficiency, Language
-        
+
         # Create test user
         user = User(email='testuser@example.com', name='Test User')
         user.set_password('testpass')
         db.session.add(user)
         db.session.flush()  # Get user ID
-        
+
         # Create test character
         character = Character(
             name="Test Character",
@@ -155,7 +156,7 @@ def populated_db(app):
             user_id=user.id
         )
         db.session.add(character)
-        
+
         # Create test proficiencies
         athletics = Proficiency(
             name="Athletics",
@@ -167,13 +168,13 @@ def populated_db(app):
             proficiency_type="weapon"
         )
         db.session.add_all([athletics, longswords])
-        
+
         # Create test language
         common = Language(name="Common", language_type="Standard")
         db.session.add(common)
-        
+
         db.session.commit()
-        
+
         return {
             'user': user,
             'character': character,

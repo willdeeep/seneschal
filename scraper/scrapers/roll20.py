@@ -9,12 +9,12 @@ from scrapers.base import BaseScraper, DataProcessor
 
 class Roll20Scraper(BaseScraper):
     """Scraper for Roll20 D&D 5e Compendium."""
-    
+
     def __init__(self):
         super().__init__("roll20")
         self.base_url = "https://roll20.net/compendium/dnd5e"
         self.processor = DataProcessor()
-    
+
     async def fetch_html(self, url: str) -> Optional[BeautifulSoup]:
         """Fetch HTML content and return BeautifulSoup object."""
         if not self.session:
@@ -34,7 +34,7 @@ class Roll20Scraper(BaseScraper):
         except Exception as e:
             self.logger.error("Error fetching HTML from %s: %s", url, e)
             return None
-    
+
     async def scrape_proficiencies(self) -> List[Dict[str, Any]]:
         """Scrape proficiencies from Roll20 compendium."""
         url = f"{self.base_url}/Index:Proficiencies"
@@ -85,7 +85,7 @@ class Roll20Scraper(BaseScraper):
         
         self.logger.info("Scraped %d proficiencies from Roll20", len(proficiencies))
         return proficiencies
-    
+
     async def _scrape_proficiency_sections(self, soup: BeautifulSoup, proficiencies: List[Dict[str, Any]]):
         """Scrape organized proficiency sections from the page."""
         # Look for section headers
@@ -135,7 +135,7 @@ class Roll20Scraper(BaseScraper):
                                 proficiencies.append(proficiency)
                 
                 current_element = current_element.next_sibling
-    
+
     def _determine_proficiency_type(self, name: str, url: str) -> str:
         """Determine the type of proficiency based on name and URL."""
         name_lower = name.lower()
@@ -179,7 +179,7 @@ class Roll20Scraper(BaseScraper):
         
         # Default
         return 'proficiency'
-    
+
     async def scrape_spells(self) -> List[Dict[str, Any]]:
         """Scrape spells from Roll20 compendium."""
         url = f"{self.base_url}/Spells%20List#content"
@@ -233,7 +233,7 @@ class Roll20Scraper(BaseScraper):
         
         self.logger.info("Scraped %d spells from Roll20", len(spells))
         return spells
-    
+
     def _looks_like_spell(self, link) -> bool:
         """Check if a link looks like it points to a spell."""
         text = link.get_text(strip=True).lower()
@@ -267,7 +267,7 @@ class Roll20Scraper(BaseScraper):
             return True
         
         return False
-    
+
     async def _scrape_spell_details(self, url: str, spell_name: str) -> Optional[Dict[str, Any]]:
         """Scrape detailed spell information from a spell page."""
         soup = await self.fetch_html(url)
@@ -342,7 +342,7 @@ class Roll20Scraper(BaseScraper):
         except Exception as e:
             self.logger.warning("Error extracting spell details for %s: %s", spell_name, e)
             return spell_data
-    
+
     async def scrape(self) -> Dict[str, List[Dict[str, Any]]]:
         """Scrape all configured data types from Roll20."""
         results = {}

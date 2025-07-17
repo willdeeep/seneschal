@@ -29,7 +29,7 @@ def setup_logging():
 
 class ScraperOrchestrator:
     """Orchestrates multiple scrapers to collect D&D data."""
-    
+
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.scrapers = []
@@ -44,7 +44,7 @@ class ScraperOrchestrator:
         # Add Roll20 scraper for additional proficiencies and spells
         if SCRAPE_CONFIG.get('skills') or SCRAPE_CONFIG.get('spells'):
             self.scrapers.append(Roll20Scraper())
-    
+
     async def run_scraping(self) -> Dict[str, Any]:
         """Run all configured scrapers."""
         self.logger.info("Starting data scraping process...")
@@ -83,7 +83,7 @@ class ScraperOrchestrator:
         self._print_summary(all_results)
         
         return all_results
-    
+
     def _save_combined_results(self, results: Dict[str, List[Any]]):
         """Save combined results from all scrapers."""
         for data_type, items in results.items():
@@ -98,7 +98,7 @@ class ScraperOrchestrator:
                     self.logger.info("Saved %d combined %s items to %s", len(items), data_type, filepath)
                 except Exception as e:
                     self.logger.error("Failed to save combined %s data: %s", data_type, e)
-    
+
     def _print_summary(self, results: Dict[str, List[Any]]):
         """Print a summary of scraped data."""
         print("\n" + "="*50)
@@ -120,7 +120,7 @@ async def main():
     """Main entry point for the scraper."""
     setup_logging()
     logger = logging.getLogger(__name__)
-    
+
     try:
         orchestrator = ScraperOrchestrator()
         results = await orchestrator.run_scraping()
@@ -139,7 +139,7 @@ async def main():
 if __name__ == "__main__":
     # Run the scraper
     results = asyncio.run(main())
-    
+
     if results:
         print("\nScraping completed successfully!")
         print("To import this data into your database, run:")

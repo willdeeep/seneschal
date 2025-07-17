@@ -15,7 +15,7 @@ from scrapers.base import BaseScraper
 
 class D20SRDScraper(BaseScraper):
     """Scraper for D20 SRD website - much more reliable than Roll20."""
-    
+
     def __init__(self):
         super().__init__("d20srd")
         self.base_url = "https://5e.d20srd.org"
@@ -62,7 +62,7 @@ class D20SRDScraper(BaseScraper):
             except Exception as e:
                 self.logger.error(f"Unexpected error scraping skills: {e}")
                 return {}
-    
+
     def _parse_skills_from_abilities_page(self, soup):
         """Parse skills organized by ability from the abilities page."""
         skills = {}
@@ -91,7 +91,7 @@ class D20SRDScraper(BaseScraper):
                 }
         
         return skills
-    
+
     def _extract_skill_description(self, soup, skill_name, ability):
         """Extract description for a specific skill."""
         # Look for the skill heading and extract following content
@@ -129,7 +129,7 @@ class D20SRDScraper(BaseScraper):
         }
         
         return fallback_descriptions.get(skill_name, f"A {ability} based skill check.")
-    
+
     async def scrape_equipment(self):
         """Scrape equipment data from D20 SRD."""
         equipment_url = f"{self.base_url}/indexes/equipment.htm"
@@ -155,7 +155,7 @@ class D20SRDScraper(BaseScraper):
             except Exception as e:
                 self.logger.error(f"Unexpected error scraping equipment: {e}")
                 return {}
-    
+
     def _parse_equipment_page(self, soup):
         """Parse equipment from the equipment index page."""
         equipment = {}
@@ -178,7 +178,7 @@ class D20SRDScraper(BaseScraper):
                 }
         
         return equipment
-    
+
     def _categorize_equipment(self, name, href):
         """Categorize equipment based on name and URL."""
         name_lower = name.lower()
@@ -193,7 +193,7 @@ class D20SRDScraper(BaseScraper):
             return 'consumable'
         else:
             return 'gear'
-    
+
     async def scrape_spells(self):
         """Scrape spell data from D20 SRD."""
         spells_url = f"{self.base_url}/indexes/spells.htm"
@@ -219,7 +219,7 @@ class D20SRDScraper(BaseScraper):
             except Exception as e:
                 self.logger.error(f"Unexpected error scraping spells: {e}")
                 return {}
-    
+
     def _parse_spells_page(self, soup):
         """Parse spells from the spells index page."""
         spells = {}
@@ -241,7 +241,7 @@ class D20SRDScraper(BaseScraper):
                 }
         
         return spells
-    
+
     def _guess_spell_school(self, spell_name):
         """Make an educated guess about spell school based on name."""
         school_keywords = {
@@ -261,18 +261,18 @@ class D20SRDScraper(BaseScraper):
                 return school
         
         return 'unknown'
-    
+
     def _guess_spell_level(self, spell_name):
         """Attempt to guess spell level from name (basic heuristic)."""
         # This is very basic - in reality we'd need to scrape individual spell pages
         if any(cantrip in spell_name.lower() for cantrip in ['light', 'mage hand', 'prestidigitation']):
             return 0
         return 1  # Default to 1st level
-    
+
     async def scrape(self):
         """Implementation of the abstract scrape method from BaseScraper."""
         return await self.scrape_all_data()
-    
+
     async def scrape_all_data(self):
         """Scrape all D&D data from D20 SRD."""
         self.logger.info("Starting comprehensive D20 SRD scraping...")
@@ -296,19 +296,19 @@ class D20SRDScraper(BaseScraper):
 async def main():
     """Main function to test the D20 SRD scraper."""
     scraper = D20SRDScraper()
-    
+
     # Test skills scraping
     skills = await scraper.scrape_skills()
     print(f"\nSkills found: {len(skills)}")
     for skill_name, skill_data in list(skills.items())[:3]:
         print(f"- {skill_name} ({skill_data['ability']}): {skill_data['description'][:100]}...")
-    
+
     # Test equipment scraping
     equipment = await scraper.scrape_equipment()
     print(f"\nEquipment found: {len(equipment)}")
     for item_name, item_data in list(equipment.items())[:3]:
         print(f"- {item_name} ({item_data['type']})")
-    
+
     # Test spells scraping
     spells = await scraper.scrape_spells()
     print(f"\nSpells found: {len(spells)}")

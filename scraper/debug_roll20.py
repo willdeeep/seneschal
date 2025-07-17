@@ -7,12 +7,12 @@ from bs4 import BeautifulSoup
 
 async def examine_roll20_pages():
     """Examine the structure of Roll20 pages to understand how to scrape them."""
-    
+
     urls = [
         "https://roll20.net/compendium/dnd5e/Index:Proficiencies",
         "https://roll20.net/compendium/dnd5e/Spells%20List"
     ]
-    
+
     async with aiohttp.ClientSession() as session:
         for url in urls:
             print(f"\nExamining: {url}")

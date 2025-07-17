@@ -251,17 +251,17 @@ The heart of the application with comprehensive D&D 5e support:
 class Character(db.Model):
     # Basic Information
     name, race, character_class, level, background, alignment
-    
+
     # Ability Scores
     strength, dexterity, constitution, intelligence, wisdom, charisma
-    
+
     # Combat Stats
     current_hp, max_hp, armor_class, initiative, speed
-    
+
     # Enhanced Backstory Fields
     why_adventuring, motivation, origin, class_origin, 
     attachments, secret, attitude_origin
-    
+
     # Relationships
     proficiencies, languages, features, spells, inventory, spell_slots
 ```

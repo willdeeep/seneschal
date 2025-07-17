@@ -15,12 +15,12 @@ from dnd5e_data import DND5E_PROFICIENCIES, DND5E_FEATURES, DND5E_EQUIPMENT
 def populate_proficiencies():
     """Populate database with D&D 5e proficiencies."""
     print("Populating proficiencies...")
-    
+
     # Clear existing proficiencies
     db.session.query(Proficiency).delete()
-    
+
     added_count = 0
-    
+
     for category, proficiencies in DND5E_PROFICIENCIES.items():
         for prof_name in proficiencies:
             # Check if proficiency already exists
@@ -33,7 +33,7 @@ def populate_proficiencies():
                 )
                 db.session.add(proficiency)
                 added_count += 1
-    
+
     db.session.commit()
     print(f"Added {added_count} proficiencies")
 
@@ -41,12 +41,12 @@ def populate_proficiencies():
 def populate_languages():
     """Populate database with D&D 5e languages."""
     print("Populating languages...")
-    
+
     # Clear existing languages
     db.session.query(Language).delete()
-    
+
     added_count = 0
-    
+
     for language_name in DND5E_PROFICIENCIES['languages']:
         # Determine language type
         common_languages = ['Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish', 'Goblin', 'Halfling', 'Orc']
@@ -69,7 +69,7 @@ def populate_languages():
             )
             db.session.add(language)
             added_count += 1
-    
+
     db.session.commit()
     print(f"Added {added_count} languages")
 
@@ -77,12 +77,12 @@ def populate_languages():
 def populate_features():
     """Populate database with D&D 5e features."""
     print("Populating features...")
-    
+
     # Clear existing features
     db.session.query(Feature).delete()
-    
+
     added_count = 0
-    
+
     for category, features in DND5E_FEATURES.items():
         for feature_name, feature_desc in features:
             # Check if feature already exists
@@ -95,7 +95,7 @@ def populate_features():
                 )
                 db.session.add(feature)
                 added_count += 1
-    
+
     db.session.commit()
     print(f"Added {added_count} features")
 
@@ -103,12 +103,12 @@ def populate_features():
 def populate_equipment():
     """Populate database with D&D 5e equipment."""
     print("Populating equipment...")
-    
+
     # Clear existing items
     db.session.query(Item).delete()
-    
+
     added_count = 0
-    
+
     for _category, items in DND5E_EQUIPMENT.items():
         for item_name, item_type, cost_gp, weight_lbs, description in items:
             # Check if item already exists
@@ -123,7 +123,7 @@ def populate_equipment():
                 )
                 db.session.add(item)
                 added_count += 1
-    
+
     db.session.commit()
     print(f"Added {added_count} items")
 
@@ -131,7 +131,7 @@ def populate_equipment():
 def main():
     """Main population function."""
     app = create_app()
-    
+
     with app.app_context():
         print("Starting enhanced database population...")
         

@@ -11,12 +11,12 @@ login_manager = LoginManager()
 def create_app(test_config=None):
     """Create and configure Flask application using the application factory pattern."""
     app = Flask(__name__, instance_relative_config=True)
-    
+
     # Default configuration
     app.config.from_mapping(
         SECRET_KEY=os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production'),
         SQLALCHEMY_DATABASE_URI=os.environ.get(
-            'DATABASE_URL', 
+            'DATABASE_URL',
             f'sqlite:///{os.path.join(app.instance_path, "seneschal.sqlite")}'
         ),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
@@ -43,7 +43,7 @@ def create_app(test_config=None):
 
     # Import and register user loader
     from project.models import User
-    
+
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))

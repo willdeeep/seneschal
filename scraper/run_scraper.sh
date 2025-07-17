@@ -37,7 +37,7 @@ if [ $? -eq 0 ]; then
     echo ""
     read -p "Would you like to import the scraped data into the database? (y/N): " -n 1 -r
     echo ""
-    
+
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "Importing data into database..."
         $PYTHON_CMD import_data.py
