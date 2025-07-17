@@ -80,7 +80,7 @@ class TestCharacterModelDatabase:
             assert saved_character is not None
             assert saved_character.race == "Dragonborn"
             assert saved_character.character_class == "Paladin"
-            
+
             # Cleanup
             db.session.delete(saved_character)
             db.session.commit()
@@ -91,7 +91,7 @@ class TestCharacterModelDatabase:
             # Create test data using persistent user
             from project.models import Character, Proficiency, Language
             from project import db
-            
+
             # Create test character
             character = Character(
                 name="Test Character",
@@ -123,7 +123,7 @@ class TestCharacterModelDatabase:
             # Create test language
             common = Language(name="Common", language_type="Standard")
             db.session.add(common)
-            
+
             db.session.commit()
 
             # Add relationships
@@ -138,7 +138,7 @@ class TestCharacterModelDatabase:
             assert common in character.languages
             assert character in athletics.characters
             assert character in common.characters
-            
+
             # Cleanup test data
             character.proficiencies.clear()
             character.languages.clear()
