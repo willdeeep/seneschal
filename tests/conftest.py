@@ -87,7 +87,11 @@ def auth(client):
         def logout(self):
             return self._client.get('/auth/logout')
 
-        def signup(self, name='Test User', email='test@example.com', password='testpass'):
+        def signup(
+                self,
+                name='Test User',
+                email='test@example.com',
+                password='testpass'):
             return self._client.post(
                 '/auth/signup',
                 data={'name': name, 'email': email, 'password': password}
@@ -187,9 +191,11 @@ def populated_db(app):
 
 @pytest.fixture(scope="function")
 def persistent_test_user(app):
-    """Create a test user that persists across test operations within the same function."""
+    """Create a test user that persists across test operations."""
     with app.app_context():
-        user = User(email='persistent@example.com', name='Persistent Test User')
+        user = User(
+            email='persistent@example.com',
+            name='Persistent Test User')
         user.set_password('testpass')
         db.session.add(user)
         db.session.commit()
@@ -198,8 +204,15 @@ def persistent_test_user(app):
         db.session.expunge(user)
         yield db.session.merge(user)
 
-        # Cleanup after test
+        # Cleanup after test - first delete all characters, then user
         merged_user = db.session.merge(user)
+        # Delete all characters belonging to this user first
+        characters = Character.query.filter_by(user_id=merged_user.id).all()
+        for character in characters:
+            db.session.delete(character)
+        db.session.commit()
+
+        # Now safe to delete the user
         db.session.delete(merged_user)
         db.session.commit()
 
@@ -257,7 +270,14 @@ def character_lifecycle_setup(app, persistent_test_user):
 
         # Cleanup all characters created during test
         for character in lifecycle.characters:
-            db.session.delete(character)
+            try:
+                # Refresh the character from database to ensure it's attached
+                # to session
+                character = db.session.merge(character)
+                db.session.delete(character)
+            except Exception:
+                # Character might already be deleted, skip
+                pass
         db.session.commit()
 
 
@@ -312,5 +332,12 @@ def campaign_party_setup(app, persistent_test_user):
 
         # Cleanup
         for character in party.values():
-            db.session.delete(character)
+            try:
+                # Refresh the character from database to ensure it's attached
+                # to session
+                character = db.session.merge(character)
+                db.session.delete(character)
+            except Exception:
+                # Character might already be deleted, skip
+                pass
         db.session.commit()

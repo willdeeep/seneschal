@@ -218,7 +218,7 @@ class TestCharacterBackstoryFields:
 
             # Clear session and reload to test true persistence
             db.session.expunge(character)
-            reloaded_character = Character.query.get(character_id)
+            reloaded_character = db.session.get(Character, character_id)
 
             # Verify all backstory fields persisted correctly
             assert reloaded_character.why_adventuring == "Forest was destroyed by industry"
@@ -406,7 +406,7 @@ class TestAdvancedCharacterScenarios:
 
             # Clear session and reload to test persistence
             db.session.expunge(character)
-            reloaded = Character.query.get(character_id)
+            reloaded = db.session.get(Character, character_id)
 
             # Verify all data persisted correctly
             assert reloaded.level == 6
