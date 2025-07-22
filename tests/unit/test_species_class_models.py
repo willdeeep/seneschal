@@ -604,7 +604,7 @@ class TestSpeciesClassPersistence:
                 traits=["Lucky", "Brave", "Halfling Nimbleness"],
                 languages=["Common", "Halfling"],
                 speed=25,
-                size="Small",
+                size="Small", 
             )
             db.session.add(species)
 
