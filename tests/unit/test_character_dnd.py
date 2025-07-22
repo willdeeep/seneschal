@@ -4,7 +4,7 @@ Demonstrates proper test marking for CI/local environments.
 """
 
 import pytest
-from project.models import Character
+from project.models import Character, Species, CharacterClass
 from project import db
 
 
@@ -18,11 +18,11 @@ class TestCharacterModelUnit:
         character = Character()
 
         # Test various ability scores
-        assert character.get_ability_modifier(10) == 0   # Average
-        assert character.get_ability_modifier(8) == -1   # Below average
-        assert character.get_ability_modifier(16) == 3   # High
-        assert character.get_ability_modifier(20) == 5   # Max standard
-        assert character.get_ability_modifier(3) == -4   # Very low
+        assert character.get_ability_modifier(10) == 0  # Average
+        assert character.get_ability_modifier(8) == -1  # Below average
+        assert character.get_ability_modifier(16) == 3  # High
+        assert character.get_ability_modifier(20) == 5  # Max standard
+        assert character.get_ability_modifier(3) == -4  # Very low
 
     def test_proficiency_bonus_by_level(self):
         """Test proficiency bonus calculation by level."""
@@ -56,10 +56,47 @@ class TestCharacterModelDatabase:
     def test_character_creation_and_persistence(self, app, persistent_test_user):
         """Test creating and saving a character to database."""
         with app.app_context():
+            # Create test species
+            species = Species(
+                name="Dragonborn",
+                ability_score_increases={"str": 2, "cha": 1},
+                traits=["Draconic Ancestry", "Breath Weapon", "Damage Resistance"],
+                languages=["Common", "Draconic"],
+                speed=30,
+                size="Medium",
+            )
+            db.session.add(species)
+            db.session.flush()
+
+            # Create test character class
+            char_class = CharacterClass(
+                name="Paladin",
+                hit_die=10,
+                primary_ability="Charisma",
+                saving_throw_proficiencies=["Wisdom", "Charisma"],
+                skill_proficiencies=[
+                    "Athletics",
+                    "Insight",
+                    "Intimidation",
+                    "Medicine",
+                    "Persuasion",
+                    "Religion",
+                ],
+                armor_proficiencies=[
+                    "Light Armor",
+                    "Medium Armor",
+                    "Heavy Armor",
+                    "Shields",
+                ],
+                weapon_proficiencies=["Simple Weapons", "Martial Weapons"],
+            )
+            db.session.add(char_class)
+            db.session.flush()
+
             character = Character(
                 name="Test Paladin",
-                race="Dragonborn",
-                character_class="Paladin",
+                species_id=species.id,
+                class_id=char_class.id,
                 level=2,
                 strength=16,
                 dexterity=10,
@@ -67,22 +104,22 @@ class TestCharacterModelDatabase:
                 intelligence=8,
                 wisdom=12,
                 charisma=15,
-                user_id=persistent_test_user.id
+                user_id=persistent_test_user.id,
             )
 
-            from project import db
             db.session.add(character)
             db.session.commit()
 
             # Verify character was saved
-            saved_character = Character.query.filter_by(
-                name="Test Paladin").first()
+            saved_character = Character.query.filter_by(name="Test Paladin").first()
             assert saved_character is not None
-            assert saved_character.race == "Dragonborn"
-            assert saved_character.character_class == "Paladin"
+            assert saved_character.species.name == "Dragonborn"
+            assert saved_character.char_class.name == "Paladin"
 
             # Cleanup
             db.session.delete(saved_character)
+            db.session.delete(species)
+            db.session.delete(char_class)
             db.session.commit()
 
     def test_character_relationships(self, app, persistent_test_user):
@@ -92,11 +129,57 @@ class TestCharacterModelDatabase:
             from project.models import Character, Proficiency, Language
             from project import db
 
+            # Create test species
+            species = Species(
+                name="Human",
+                ability_score_increases={
+                    "str": 1,
+                    "dex": 1,
+                    "con": 1,
+                    "int": 1,
+                    "wis": 1,
+                    "cha": 1,
+                },
+                traits=["Extra Language", "Extra Skill"],
+                languages=["Common"],
+                speed=30,
+                size="Medium",
+            )
+            db.session.add(species)
+            db.session.flush()
+
+            # Create test character class
+            char_class = CharacterClass(
+                name="Fighter",
+                hit_die=10,
+                primary_ability="Strength",
+                saving_throw_proficiencies=["Strength", "Constitution"],
+                skill_proficiencies=[
+                    "Acrobatics",
+                    "Animal Handling",
+                    "Athletics",
+                    "History",
+                    "Insight",
+                    "Intimidation",
+                    "Perception",
+                    "Survival",
+                ],
+                armor_proficiencies=[
+                    "Light Armor",
+                    "Medium Armor",
+                    "Heavy Armor",
+                    "Shields",
+                ],
+                weapon_proficiencies=["Simple Weapons", "Martial Weapons"],
+            )
+            db.session.add(char_class)
+            db.session.flush()
+
             # Create test character
             character = Character(
                 name="Test Character",
-                race="Human",
-                character_class="Fighter",
+                species_id=species.id,
+                class_id=char_class.id,
                 level=1,
                 strength=15,
                 dexterity=14,
@@ -104,7 +187,7 @@ class TestCharacterModelDatabase:
                 intelligence=12,
                 wisdom=10,
                 charisma=8,
-                user_id=persistent_test_user.id
+                user_id=persistent_test_user.id,
             )
             db.session.add(character)
 
@@ -112,12 +195,9 @@ class TestCharacterModelDatabase:
             athletics = Proficiency(
                 name="Athletics",
                 proficiency_type="skill",
-                associated_ability="strength"
+                associated_ability="strength",
             )
-            longswords = Proficiency(
-                name="Longswords",
-                proficiency_type="weapon"
-            )
+            longswords = Proficiency(name="Longswords", proficiency_type="weapon")
             db.session.add_all([athletics, longswords])
 
             # Create test language
@@ -131,6 +211,7 @@ class TestCharacterModelDatabase:
             character.languages.append(common)
 
             from project import db
+
             db.session.commit()
 
             # Verify relationships
@@ -146,6 +227,8 @@ class TestCharacterModelDatabase:
             db.session.delete(athletics)
             db.session.delete(longswords)
             db.session.delete(common)
+            db.session.delete(species)
+            db.session.delete(char_class)
             db.session.commit()
 
 
@@ -177,20 +260,72 @@ class TestD20SRDIntegration:
 class TestCharacterGeneration:
     """Slow tests for character generation that are local-only."""
 
-    def test_random_character_generation(self, app, populated_db):
+    def test_random_character_generation(self, app, persistent_test_user):
         """Test generating random characters with all combinations."""
         # This might be slow and is primarily for local testing
         with app.app_context():
-            races = ["Human", "Elf", "Dwarf", "Halfling"]
-            classes = ["Fighter", "Wizard", "Rogue", "Cleric"]
+            # Create test species
+            species_data = [
+                {
+                    "name": "Human",
+                    "ability_score_increases": {
+                        "str": 1,
+                        "dex": 1,
+                        "con": 1,
+                        "int": 1,
+                        "wis": 1,
+                        "cha": 1,
+                    },
+                },
+                {"name": "Elf", "ability_score_increases": {"dex": 2}},
+                {"name": "Dwarf", "ability_score_increases": {"con": 2}},
+                {"name": "Halfling", "ability_score_increases": {"dex": 2}},
+            ]
+
+            species_list = []
+            for data in species_data:
+                species = Species(
+                    name=data["name"],
+                    ability_score_increases=data["ability_score_increases"],
+                    traits=[],
+                    languages=["Common"],
+                    speed=30,
+                    size="Medium",
+                )
+                db.session.add(species)
+                species_list.append(species)
+
+            # Create test character classes
+            class_data = [
+                {"name": "Fighter", "hit_die": 10, "primary_ability": "Strength"},
+                {"name": "Wizard", "hit_die": 6, "primary_ability": "Intelligence"},
+                {"name": "Rogue", "hit_die": 8, "primary_ability": "Dexterity"},
+                {"name": "Cleric", "hit_die": 8, "primary_ability": "Wisdom"},
+            ]
+
+            class_list = []
+            for data in class_data:
+                char_class = CharacterClass(
+                    name=data["name"],
+                    hit_die=data["hit_die"],
+                    primary_ability=data["primary_ability"],
+                    saving_throw_proficiencies=[],
+                    skill_proficiencies=[],
+                    armor_proficiencies=[],
+                    weapon_proficiencies=[],
+                )
+                db.session.add(char_class)
+                class_list.append(char_class)
+
+            db.session.flush()
 
             characters_created = 0
-            for race in races:
-                for char_class in classes:
+            for species in species_list:
+                for char_class in class_list:
                     character = Character(
-                        name=f"Test {race} {char_class}",
-                        race=race,
-                        character_class=char_class,
+                        name=f"Test {species.name} {char_class.name}",
+                        species_id=species.id,
+                        class_id=char_class.id,
                         level=1,
                         strength=13,
                         dexterity=14,
@@ -198,14 +333,14 @@ class TestCharacterGeneration:
                         intelligence=10,
                         wisdom=15,
                         charisma=8,
-                        user_id=populated_db['user'].id
+                        user_id=persistent_test_user.id,
                     )
 
                     db.session.add(character)
                     characters_created += 1
 
             db.session.commit()
-            assert characters_created == len(races) * len(classes)
+            assert characters_created == len(species_list) * len(class_list)
 
 
 @pytest.mark.unit
@@ -215,12 +350,47 @@ class TestCharacterBackstoryFields:
     def test_backstory_field_assignment(self, app):
         """Test that all backstory fields can be assigned."""
         with app.app_context():
+            # Create test species
+            species = Species(
+                name="Human",
+                ability_score_increases={
+                    "str": 1,
+                    "dex": 1,
+                    "con": 1,
+                    "int": 1,
+                    "wis": 1,
+                    "cha": 1,
+                },
+                traits=["Extra Language", "Extra Skill"],
+                languages=["Common"],
+                speed=30,
+                size="Medium",
+            )
+            db.session.add(species)
+
+            # Create test character class
+            char_class = CharacterClass(
+                name="Fighter",
+                hit_die=10,
+                primary_ability="Strength",
+                saving_throw_proficiencies=[],
+                skill_proficiencies=[],
+                armor_proficiencies=[],
+                weapon_proficiencies=[],
+            )
+            db.session.add(char_class)
+            db.session.flush()
+
             character = Character(
                 name="Backstory Test Character",
-                race="Human",
-                character_class="Fighter",
-                strength=15, dexterity=14, constitution=13,
-                intelligence=12, wisdom=10, charisma=8
+                species_id=species.id,
+                class_id=char_class.id,
+                strength=15,
+                dexterity=14,
+                constitution=13,
+                intelligence=12,
+                wisdom=10,
+                charisma=8,
             )
 
             # Test all backstory fields
@@ -244,18 +414,46 @@ class TestCharacterBackstoryFields:
     def test_backstory_persistence(self, persistent_test_user, app):
         """Test that backstory fields persist in database using session-scoped fixtures."""
         with app.app_context():
+            # Create test species
+            species = Species(
+                name="Elf",
+                ability_score_increases={"dex": 2},
+                traits=["Darkvision", "Keen Senses", "Fey Ancestry", "Trance"],
+                languages=["Common", "Elvish"],
+                speed=30,
+                size="Medium",
+            )
+            db.session.add(species)
+
+            # Create test character class
+            char_class = CharacterClass(
+                name="Ranger",
+                hit_die=10,
+                primary_ability="Dexterity",
+                saving_throw_proficiencies=[],
+                skill_proficiencies=[],
+                armor_proficiencies=[],
+                weapon_proficiencies=[],
+            )
+            db.session.add(char_class)
+            db.session.flush()
+
             # Use the persistent test user that stays attached to session
             character = Character(
                 name="Persistent Backstory Character",
-                race="Elf",
-                character_class="Ranger",
+                species_id=species.id,
+                class_id=char_class.id,
                 level=1,
-                strength=13, dexterity=16, constitution=14,
-                intelligence=12, wisdom=15, charisma=8,
+                strength=13,
+                dexterity=16,
+                constitution=14,
+                intelligence=12,
+                wisdom=15,
+                charisma=8,
                 why_adventuring="Forest was destroyed by industry",
                 motivation="Environmental protection, justice",
                 origin="Ancient forest grove",
-                user_id=persistent_test_user.id  # No DetachedInstanceError!
+                user_id=persistent_test_user.id,  # No DetachedInstanceError!
             )
 
             db.session.add(character)
@@ -267,12 +465,18 @@ class TestCharacterBackstoryFields:
             reloaded_character = db.session.get(Character, character_id)
 
             # Verify all backstory fields persisted correctly
-            assert reloaded_character.why_adventuring == "Forest was destroyed by industry"
+            assert (
+                reloaded_character.why_adventuring == "Forest was destroyed by industry"
+            )
             assert reloaded_character.motivation == "Environmental protection, justice"
             assert reloaded_character.origin == "Ancient forest grove"
 
             # Clean up the character we created
+            species_to_delete = reloaded_character.species
+            char_class_to_delete = reloaded_character.char_class
             db.session.delete(reloaded_character)
+            db.session.delete(species_to_delete)
+            db.session.delete(char_class_to_delete)
             db.session.commit()
 
     def test_backstory_workflow_with_lifecycle(self, character_lifecycle_setup):
@@ -282,7 +486,7 @@ class TestCharacterBackstoryFields:
         # Step 1: Create character with initial backstory
         character = lifecycle.create_character(
             name="Evolving Hero",
-            race="Human",
+            species="Human",
             character_class="Paladin",
             why_adventuring="Seeking redemption for past sins",
             motivation="Honor, justice",
@@ -290,7 +494,7 @@ class TestCharacterBackstoryFields:
             class_origin="Divine calling after tragedy",
             attachments="Family heirloom sword",
             secret="Responsible for family's downfall",
-            attitude_origin="Stoic determination masking guilt"
+            attitude_origin="Stoic determination masking guilt",
         )
 
         # Verify initial backstory
@@ -333,9 +537,7 @@ class TestAdvancedCharacterScenarios:
 
         # Step 1: Create a new character
         character = lifecycle.create_character(
-            name="Aragorn",
-            race="Human",
-            character_class="Ranger"
+            name="Aragorn", species="Human", character_class="Ranger"
         )
         assert character.level == 1
         assert character.proficiency_bonus == 2
@@ -359,20 +561,20 @@ class TestAdvancedCharacterScenarios:
         party = campaign_party_setup
 
         # Verify party roles are properly distributed
-        assert party['tank'].character_class == 'Paladin'
-        assert party['dps'].character_class == 'Ranger'
-        assert party['healer'].character_class == 'Cleric'
-        assert party['utility'].character_class == 'Rogue'
+        assert party["tank"].char_class.name == "Paladin"
+        assert party["dps"].char_class.name == "Ranger"
+        assert party["healer"].char_class.name == "Cleric"
+        assert party["utility"].char_class.name == "Rogue"
 
         # Test party-wide statistics
         total_levels = sum(char.level for char in party.values())
         assert total_levels == 12  # 4 characters at level 3
 
         # Test role-specific abilities
-        assert party['tank'].strength >= 15  # Tank needs high STR
-        assert party['dps'].dexterity >= 16   # DPS needs high DEX
-        assert party['healer'].wisdom >= 15   # Healer needs high WIS
-        assert party['utility'].dexterity >= 17  # Rogue needs highest DEX
+        assert party["tank"].strength >= 15  # Tank needs high STR
+        assert party["dps"].dexterity >= 16  # DPS needs high DEX
+        assert party["healer"].wisdom >= 15  # Healer needs high WIS
+        assert party["utility"].dexterity >= 17  # Rogue needs highest DEX
 
         # Test that all characters belong to same user
         user_ids = {char.user_id for char in party.values()}
@@ -386,25 +588,26 @@ class TestAdvancedCharacterScenarios:
             # Create a mentor character
             mentor = lifecycle.create_character(
                 name="Gandalf the Grey",
-                race="Human",
+                species="Human",
                 character_class="Wizard",
-                level=20
+                level=20,
             )
 
             # Create a student character
             student = lifecycle.create_character(
                 name="Frodo Baggins",
-                race="Halfling",
+                species="Halfling",
                 character_class="Rogue",
-                level=1
+                level=1,
             )
 
             # In a real application, you might have mentor relationships
-            # This demonstrates how session-scoped fixtures enable complex testing
+            # This demonstrates how session-scoped fixtures enable complex
+            # testing
 
             # Verify both characters exist and can be queried together
             characters = Character.query.filter(
-                Character.name.in_(['Gandalf the Grey', 'Frodo Baggins'])
+                Character.name.in_(["Gandalf the Grey", "Frodo Baggins"])
             ).all()
             assert len(characters) == 2
 
@@ -414,17 +617,47 @@ class TestAdvancedCharacterScenarios:
 
             # Future: Test mentor bonuses, experience sharing, etc.
 
-    def test_character_data_integrity_across_operations(self, persistent_test_user, app):
+    def test_character_data_integrity_across_operations(
+        self, persistent_test_user, app
+    ):
         """Test that character data remains consistent across multiple operations."""
         with app.app_context():
+            # Create test species
+            species = Species(
+                name="Half-Elf",
+                ability_score_increases={"cha": 2, "str": 1, "dex": 1},
+                traits=["Darkvision", "Fey Ancestry", "Skill Versatility"],
+                languages=["Common", "Elvish"],
+                speed=30,
+                size="Medium",
+            )
+            db.session.add(species)
+
+            # Create test character class
+            char_class = CharacterClass(
+                name="Bard",
+                hit_die=8,
+                primary_ability="Charisma",
+                saving_throw_proficiencies=[],
+                skill_proficiencies=[],
+                armor_proficiencies=[],
+                weapon_proficiencies=[],
+            )
+            db.session.add(char_class)
+            db.session.flush()
+
             # Create character with complex backstory
             character = Character(
                 name="Complex Character",
-                race="Half-Elf",
-                character_class="Bard",
+                species_id=species.id,
+                class_id=char_class.id,
                 level=5,
-                strength=12, dexterity=16, constitution=14,
-                intelligence=13, wisdom=12, charisma=18,
+                strength=12,
+                dexterity=16,
+                constitution=14,
+                intelligence=13,
+                wisdom=12,
+                charisma=18,
                 # Complex backstory fields
                 why_adventuring="Seeking lost family heritage",
                 motivation="Family, knowledge, fame",
@@ -433,7 +666,7 @@ class TestAdvancedCharacterScenarios:
                 attachments="Father's lute, family signet ring",
                 secret="Actually heir to overthrown kingdom",
                 attitude_origin="Charming exterior hiding deep insecurity",
-                user_id=persistent_test_user.id
+                user_id=persistent_test_user.id,
             )
 
             db.session.add(character)

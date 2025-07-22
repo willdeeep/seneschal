@@ -6,7 +6,7 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <h1 class="mb-4">Create New Character</h1>
-        
+
         <form method="POST">
             <div class="card">
                 <div class="card-header">
@@ -23,7 +23,7 @@
                             <input type="text" class="form-control" id="player_name" name="player_name">
                         </div>
                     </div>
-                    
+                   
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="race" class="form-label">Race *</label>
@@ -63,7 +63,7 @@
                             <input type="number" class="form-control" id="level" name="level" value="1" min="1" max="20">
                         </div>
                     </div>
-                    
+                   
                     <div class="mb-3">
                         <label for="background" class="form-label">Background</label>
                         <textarea class="form-control" id="background" name="background" rows="3" placeholder="Character background and history..."></textarea>
@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateAvailableOptions() {
         const selectedRace = raceSelect.value;
         const selectedClass = classSelect.value;
-        
+
         if (selectedRace && selectedClass) {
             // Update proficiencies
             updateProficiencies(selectedRace, selectedClass);
@@ -397,8 +397,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.features && data.features.length > 0) {
                     let html = '<div class="row">';
                     data.features.forEach(feature => {
-                        const shortDesc = feature.description.length > 100 ? 
-                            feature.description.substring(0, 100) + '...' : 
+                        const shortDesc = feature.description.length > 100 ?
+                            feature.description.substring(0, 100) + '...' :
                             feature.description;
                         html += `
                             <div class="col-md-6 mb-2">
@@ -427,12 +427,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to update spells
     function updateSpells(characterClass) {
         const spellsSection = document.getElementById('spells-section');
-        
+
         // Only show spells for spellcasting classes
         const spellcastingClasses = ['Wizard', 'Sorcerer', 'Warlock', 'Bard', 'Cleric', 'Druid', 'Paladin', 'Ranger'];
         if (spellcastingClasses.includes(characterClass)) {
             spellsSection.style.display = 'block';
-            
+           
             fetch(`{{ url_for('characters.get_available_spells') }}?class=${characterClass}`)
                 .then(response => response.json())
                 .then(data => {
@@ -440,8 +440,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.spells && data.spells.length > 0) {
                         let html = '<div class="row">';
                         data.spells.forEach(spell => {
-                            const shortDesc = spell.description.length > 100 ? 
-                                spell.description.substring(0, 100) + '...' : 
+                            const shortDesc = spell.description.length > 100 ?
+                                spell.description.substring(0, 100) + '...' :
                                 spell.description;
                             html += `
                                 <div class="col-md-6 mb-2">

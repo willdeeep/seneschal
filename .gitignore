@@ -66,7 +66,6 @@ instance/
 
 # IDE - Selective VS Code exclusion
 # Keep shared debug configurations, exclude personal settings
-.vscode/settings.json
 .vscode/extensions.json
 .vscode/.ropeproject
 .idea/
@@ -90,9 +89,23 @@ desktop.ini
 .dockerignore
 
 # D&D Project Specific
-# Scraped data cache (if you want to regenerate)
-scraper/data/cache/
-scraper/data/temp/
+json_backups/*
+
+# 5e-bits database repository (large, can be re-downloaded)
+5e-database-repo/
+
+# Scraper and converter utilities (deprecated)
+scraper/
+*_converter.py
+csv_converter.py
+fivebits_converter.py
+
+# Development debugging scripts (generated/temporary)
+debug_character_validation.py
+examine_database.py
+fix_*.py
+migrate_*.py
+test_computed_properties.py
 
 # Log files
 *.log

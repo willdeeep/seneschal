@@ -1,0 +1,39 @@
+{
+    "python.defaultInterpreterPath": "./.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": ["--max-line-length=120", "--ignore=E501,W503"],
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": ["--line-length", "120"],
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": ["tests"],
+    "files.associations": {
+        "*.html": "jinja-html"
+    },
+    "emmet.includeLanguages": {
+        "jinja-html": "html"
+    },
+    "python.envFile": "${workspaceFolder}/.env",
+    "files.watcherExclude": {
+        "**/scraper/**": true,
+        "**/csv_exports/**": true,
+        "**/5e-database-repo/**": true,
+        "**/*_converter.py": true,
+        "**/debug_character_validation.py": true,
+        "**/examine_database.py": true,
+        "**/fix_*.py": true,
+        "**/migrate_*.py": true
+    },
+    "search.exclude": {
+        "**/scraper/**": true,
+        "**/csv_exports/**": true,
+        "**/5e-database-repo/**": true
+    },
+    "files.exclude": {
+        "**/scraper/**": true,
+        "**/csv_exports/**": true,
+        "**/5e-database-repo/**": true
+    }
+}

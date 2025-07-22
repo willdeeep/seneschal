@@ -6,14 +6,14 @@ from project import db
 
 def get_db():
     """Get database connection."""
-    if 'db' not in g:
+    if "db" not in g:
         g.db = db
     return g.db
 
 
 def close_db(e=None):
     """Close database connection."""
-    g.pop('db', None)
+    g.pop("db", None)
 
 
 def init_db():
@@ -21,9 +21,9 @@ def init_db():
     db.create_all()
 
 
-@click.command('init-db')
+@click.command("init-db")
 @with_appcontext
 def init_db_command():
     """Clear the existing data and create new tables."""
     init_db()
-    click.echo('Initialized the database.')
+    click.echo("Initialized the database.")
