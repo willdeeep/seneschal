@@ -1,426 +1,481 @@
-"""Database initialization script to populate D&D data."""
+#!/usr/bin/env python3
+"""
+Enhanced Database Initialization Script
+Robust data sourcing strategy for D&D 5e data.
+"""
+
+import os
+import sys
+import shutil
+import subprocess
+import logging
+from pathlib import Path
+from urllib.request import urlretrieve
+import zipfile
+import tempfile
+
+# Add current directory to Python path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from project import create_app, db
-from project.models import Proficiency, Language, Feature, Item
+from project.models import Species, CharacterClass
+from json_data_loader import FiveEDataLoader
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
-def init_proficiencies():
-    """Initialize basic D&D proficiencies."""
-    proficiencies = [
-        # Skills
-        ("Acrobatics", "skill"),
-        ("Animal Handling", "skill"),
-        ("Arcana", "skill"),
-        ("Athletics", "skill"),
-        ("Deception", "skill"),
-        ("History", "skill"),
-        ("Insight", "skill"),
-        ("Intimidation", "skill"),
-        ("Investigation", "skill"),
-        ("Medicine", "skill"),
-        ("Nature", "skill"),
-        ("Perception", "skill"),
-        ("Performance", "skill"),
-        ("Persuasion", "skill"),
-        ("Religion", "skill"),
-        ("Sleight of Hand", "skill"),
-        ("Stealth", "skill"),
-        ("Survival", "skill"),
-        # Weapons
-        ("Simple Weapons", "weapon"),
-        ("Martial Weapons", "weapon"),
-        ("Shortswords", "weapon"),
-        ("Longswords", "weapon"),
-        ("Rapiers", "weapon"),
-        ("Scimitars", "weapon"),
-        ("Shortbows", "weapon"),
-        ("Longbows", "weapon"),
-        ("Light Crossbows", "weapon"),
-        ("Hand Crossbows", "weapon"),
-        # Armor
-        ("Light Armor", "armor"),
-        ("Medium Armor", "armor"),
-        ("Heavy Armor", "armor"),
-        ("Shields", "armor"),
-        # Tools
-        ("Thieves' Tools", "tool"),
-        ("Herbalism Kit", "tool"),
-        ("Smith's Tools", "tool"),
-        ("Carpenter's Tools", "tool"),
-        ("Alchemist's Supplies", "tool"),
-        ("Disguise Kit", "tool"),
-        ("Forgery Kit", "tool"),
-        ("Gaming Set", "tool"),
-        ("Musical Instrument", "tool"),
-    ]
+class DataSourceManager:
+    """Manages the robust data sourcing strategy."""
+    
+    def __init__(self):
+        self.base_path = Path(__file__).parent
+        self.json_backups_path = self.base_path / "json_backups"
+        self.repo_path = self.base_path / "5e-database-repo"
+        self.source_url = "https://github.com/5e-bits/5e-database/archive/refs/heads/main.zip"
+        
+        # Required JSON files for database initialization
+        self.required_files = [
+            "5e-SRD-Races.json",
+            "5e-SRD-Classes.json",
+            "5e-SRD-Spells.json",
+            "5e-SRD-Equipment.json",
+            "5e-SRD-Monsters.json",
+            "5e-SRD-Skills.json",
+            "5e-SRD-Backgrounds.json",
+            "5e-SRD-Features.json",
+            "5e-SRD-Proficiencies.json",
+            "5e-SRD-Languages.json"
+        ]
+    
+    def check_json_backups(self):
+        """Check if all required JSON files exist in json_backups."""
+        if not self.json_backups_path.exists():
+            logger.info("json_backups directory doesn't exist")
+            return False
+        
+        missing_files = []
+        for filename in self.required_files:
+            file_path = self.json_backups_path / filename
+            if not file_path.exists():
+                missing_files.append(filename)
+        
+        if missing_files:
+            logger.info(f"Missing {len(missing_files)} files in json_backups: {missing_files[:3]}...")
+            return False
+        
+        logger.info("✅ All required JSON files found in json_backups")
+        return True
+    
+    def check_repo_data(self):
+        """Check if 5e-database-repo exists and has required files."""
+        if not self.repo_path.exists():
+            logger.info("5e-database-repo directory doesn't exist")
+            return False
+        
+        # Files are in src/2014/ directory in the new structure
+        src_path = self.repo_path / "src" / "2014"
+        if not src_path.exists():
+            logger.info("5e-database-repo/src/2014 directory doesn't exist")
+            return False
+        
+        missing_files = []
+        for filename in self.required_files:
+            file_path = src_path / filename
+            if not file_path.exists():
+                missing_files.append(filename)
+        
+        if missing_files:
+            logger.info(f"Missing {len(missing_files)} files in repo/src/2014: {missing_files[:3]}...")
+            return False
+        
+        logger.info("✅ All required JSON files found in 5e-database-repo/src/2014")
+        return True
+    
+    def copy_from_repo(self):
+        """Copy files from 5e-database-repo to json_backups and cleanup repo."""
+        logger.info("📂 Copying files from 5e-database-repo to json_backups...")
+        
+        # Create json_backups directory if it doesn't exist
+        self.json_backups_path.mkdir(exist_ok=True)
+        
+        # Files are in src/2014/ directory in the new structure
+        src_path = self.repo_path / "src" / "2014"
+        copied_count = 0
+        
+        for filename in self.required_files:
+            src_file = src_path / filename
+            dest_file = self.json_backups_path / filename
+            
+            if src_file.exists():
+                shutil.copy2(src_file, dest_file)
+                copied_count += 1
+                logger.debug(f"Copied {filename}")
+            else:
+                logger.warning(f"Source file not found: {filename}")
+        
+        logger.info(f"✅ Copied {copied_count}/{len(self.required_files)} files")
+        
+        # Cleanup repo directory
+        logger.info("🧹 Cleaning up 5e-database-repo directory...")
+        shutil.rmtree(self.repo_path)
+        logger.info("✅ Repository cleanup completed")
+        
+        return copied_count == len(self.required_files)
+    
+    def download_source_data(self):
+        """Download fresh data from GitHub and extract required files."""
+        logger.info("🌐 Downloading fresh data from 5e-bits/5e-database...")
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            zip_file = temp_path / "5e-database.zip"
+            
+            try:
+                # Download the repository
+                logger.info(f"Downloading from {self.source_url}...")
+                urlretrieve(self.source_url, zip_file)
+                logger.info("✅ Download completed")
+                
+                # Extract the zip file
+                logger.info("📦 Extracting archive...")
+                with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                    zip_ref.extractall(temp_path)
+                
+                # Find the extracted directory (it should be 5e-database-main)
+                extracted_dirs = [d for d in temp_path.iterdir() if d.is_dir()]
+                if not extracted_dirs:
+                    raise Exception("No directories found in extracted archive")
+                
+                extracted_path = extracted_dirs[0]
+                # Files are in src/2014/ directory in the new structure
+                src_path = extracted_path / "src" / "2014"
+                
+                if not src_path.exists():
+                    raise Exception("src/2014 directory not found in extracted archive")
+                
+                # Create json_backups directory
+                self.json_backups_path.mkdir(exist_ok=True)
+                
+                # Copy required files
+                copied_count = 0
+                for filename in self.required_files:
+                    src_file = src_path / filename
+                    dest_file = self.json_backups_path / filename
+                    
+                    if src_file.exists():
+                        shutil.copy2(src_file, dest_file)
+                        copied_count += 1
+                        logger.debug(f"Copied {filename}")
+                    else:
+                        logger.warning(f"File not found in download: {filename}")
+                
+                logger.info(f"✅ Successfully copied {copied_count}/{len(self.required_files)} files")
+                return copied_count == len(self.required_files)
+                
+            except Exception as e:
+                logger.error(f"❌ Download failed: {e}")
+                return False
+    
+    def ensure_data_available(self):
+        """Execute complete data sourcing strategy with cascading fallbacks."""
+        logger.info("🔍 Executing data sourcing strategy...")
+        
+        # Primary: Check json_backups folder
+        if self.check_json_backups():
+            logger.info("📁 Using existing json_backups data")
+            return True
+        
+        # Secondary: Check repo folder, copy to json_backups, delete repo
+        logger.info("📦 Checking for existing 5e-database-repo...")
+        if self.check_repo_data():
+            if self.copy_from_repo():
+                logger.info("📁 Successfully prepared data from existing repo")
+                return True
+            else:
+                logger.warning("⚠️  Copy from repo failed, continuing to download...")
+        
+        # Tertiary: Download fresh from GitHub
+        logger.info("🌐 No local data found, downloading fresh data...")
+        if self.download_source_data():
+            logger.info("🎉 Successfully downloaded and prepared fresh data")
+            return True
+        
+        # All strategies failed
+        logger.error("❌ All data sourcing strategies failed!")
+        logger.error("💡 Manual steps:")
+        logger.error("   1. Check internet connection")
+        logger.error("   2. Manually download: https://github.com/5e-bits/5e-database")
+        logger.error("   3. Extract and copy src/*.json files to json_backups/")
+        return False
 
-    for name, prof_type in proficiencies:
-        if not Proficiency.query.filter_by(name=name).first():
-            proficiency = Proficiency(name=name, proficiency_type=prof_type)
-            db.session.add(proficiency)
-
-
-def init_languages():
-    """Initialize basic D&D languages."""
-    languages = [
-        "Common",
-        "Dwarvish",
-        "Elvish",
-        "Giant",
-        "Gnomish",
-        "Goblin",
-        "Halfling",
-        "Orc",
-        "Abyssal",
-        "Celestial",
-        "Draconic",
-        "Deep Speech",
-        "Infernal",
-        "Primordial",
-        "Sylvan",
-        "Undercommon",
-    ]
-
-    for name in languages:
-        if not Language.query.filter_by(name=name).first():
-            language = Language(name=name)
-            db.session.add(language)
-
-
-def init_features():
-    """Initialize basic D&D features."""
-    features = [
-        # Racial Features
-        (
-            "Darkvision",
-            "You can see in dim light within 60 feet of you as if it were bright light.",
-            "Race",
-        ),
-        (
-            "Fey Ancestry",
-            "You have advantage on saving throws against being charmed, and magic cannot put you to sleep.",
-            "Race",
-        ),
-        (
-            "Lucky",
-            "When you roll a 1 on an attack roll, ability check, or saving throw, you can reroll the die.",
-            "Race",
-        ),
-        (
-            "Brave",
-            "You have advantage on saving throws against being frightened.",
-            "Race",
-        ),
-        (
-            "Halfling Nimbleness",
-            "You can move through the space of any creature that is of a size larger than yours.",
-            "Race",
-        ),
-        (
-            "Draconic Ancestry",
-            "You have draconic ancestry. Choose one type of dragon from the table.",
-            "Race",
-        ),
-        (
-            "Breath Weapon",
-            "You can use your action to exhale destructive energy.",
-            "Race",
-        ),
-        (
-            "Damage Resistance",
-            "You have resistance to the damage type associated with your draconic ancestry.",
-            "Race",
-        ),
-        # Class Features
-        ("Rage", "In battle, you fight with primal ferocity.", "Class"),
-        (
-            "Unarmored Defense",
-            "While you are not wearing any armor, your AC equals 10 + your Dex modifier.",
-            "Class",
-        ),
-        (
-            "Bardic Inspiration",
-            "You can inspire others through stirring words or music.",
-            "Class",
-        ),
-        (
-            "Spellcasting",
-            "You have learned to untangle and reshape the fabric of reality.",
-            "Class",
-        ),
-        (
-            "Channel Divinity",
-            "You gain the ability to channel divine energy directly from your deity.",
-            "Class",
-        ),
-        (
-            "Wild Shape",
-            "You can use your action to magically assume the shape of a beast.",
-            "Class",
-        ),
-        (
-            "Fighting Style",
-            "You adopt a particular style of fighting as your specialty.",
-            "Class",
-        ),
-        (
-            "Second Wind",
-            "You have a limited well of stamina that you can draw on.",
-            "Class",
-        ),
-        (
-            "Action Surge",
-            "You can push yourself beyond your normal limits for a moment.",
-            "Class",
-        ),
-        (
-            "Martial Arts",
-            "You gain the following benefits while you are unarmed or wielding only monk weapons.",
-            "Class",
-        ),
-        ("Ki", "Your training allows you to harness the mystic energy of ki.", "Class"),
-        (
-            "Divine Sense",
-            "You can detect the presence of strong evil or good.",
-            "Class",
-        ),
-        ("Lay on Hands", "Your blessed touch can heal wounds.", "Class"),
-        (
-            "Favored Enemy",
-            "You have studied, tracked, and learned to effectively fight a specific type of creature.",
-            "Class",
-        ),
-        (
-            "Natural Explorer",
-            "You are particularly familiar with one type of natural environment.",
-            "Class",
-        ),
-        (
-            "Sneak Attack",
-            "You know how to strike subtly and exploit a foe's distraction.",
-            "Class",
-        ),
-        (
-            "Thieves' Cant",
-            "You know thieves' cant, a secret mix of dialect, jargon, and code.",
-            "Class",
-        ),
-        (
-            "Sorcerous Origin",
-            "Choose a sorcerous origin, which describes the source of your innate magical power.",
-            "Class",
-        ),
-        (
-            "Font of Magic",
-            "At 2nd level, you tap into a deep wellspring of magic within yourself.",
-            "Class",
-        ),
-        (
-            "Otherworldly Patron",
-            "You have struck a pact with an otherworldly being.",
-            "Class",
-        ),
-        (
-            "Pact Magic",
-            "Your arcane research and the magic bestowed on you by your patron have given you facility with spells.",
-            "Class",
-        ),
-        (
-            "Arcane Recovery",
-            "You have learned to regain some of your magical energy by studying your spellbook.",
-            "Class",
-        ),
-        (
-            "Ritual Casting",
-            "You can cast a spell as a ritual if that spell has the ritual tag.",
-            "Class",
-        ),
-    ]
-
-    for name, description, source in features:
-        if not Feature.query.filter_by(name=name).first():
-            # Map source to feature_type
-            feature_type_map = {
-                "Race": "racial",
-                "Class": "class",
-                "Background": "background",
-            }
-            feature_type = feature_type_map.get(source, "general")
-
-            # Set source_class for class features
-            source_class = None
-            if source == "Class":
-                source_class = "General"  # Could be enhanced to specify actual classes
-
-            feature = Feature(
-                name=name,
-                description=description,
-                feature_type=feature_type,
-                source_class=source_class,
-            )
-            db.session.add(feature)
-
-
-def init_items():
-    """Initialize basic D&D equipment."""
-    items = [
-        # Weapons
-        ("Longsword", "weapon", 15, 3.0, "A versatile martial weapon."),
-        ("Shortsword", "weapon", 10, 2.0, "A light, finesse weapon."),
-        ("Dagger", "weapon", 2, 1.0, "A simple weapon that can be thrown."),
-        ("Handaxe", "weapon", 5, 2.0, "A light weapon that can be thrown."),
-        ("Javelin", "weapon", 5, 2.0, "A thrown weapon."),
-        ("Mace", "weapon", 5, 4.0, "A simple melee weapon."),
-        ("Rapier", "weapon", 25, 2.0, "A finesse weapon."),
-        ("Scimitar", "weapon", 25, 3.0, "A finesse, light weapon."),
-        ("Shortbow", "weapon", 25, 2.0, "A ranged weapon."),
-        ("Longbow", "weapon", 50, 2.0, "A ranged weapon with longer range."),
-        ("Light Crossbow", "weapon", 25, 5.0, "A ranged weapon."),
-        # Armor
-        (
-            "Leather Armor",
-            "armor",
-            10,
-            10.0,
-            "Light armor made of supple and thin materials.",
-        ),
-        ("Studded Leather", "armor", 45, 13.0, "Light armor with metal studs."),
-        (
-            "Chain Shirt",
-            "armor",
-            50,
-            20.0,
-            "Medium armor made of interlocking metal rings.",
-        ),
-        (
-            "Scale Mail",
-            "armor",
-            50,
-            45.0,
-            "Medium armor consisting of a coat and leggings.",
-        ),
-        (
-            "Chain Mail",
-            "armor",
-            75,
-            55.0,
-            "Heavy armor made of interlocking metal rings.",
-        ),
-        (
-            "Splint Armor",
-            "armor",
-            200,
-            60.0,
-            "Heavy armor made of narrow vertical strips.",
-        ),
-        (
-            "Plate Armor",
-            "armor",
-            1500,
-            65.0,
-            "Heavy armor consisting of shaped metal plates.",
-        ),
-        ("Shield", "armor", 10, 6.0, "A shield made from wood or metal."),
-        # Adventuring Gear
-        ("Backpack", "gear", 2, 5.0, "A leather pack carried on the back."),
-        ("Bedroll", "gear", 1, 7.0, "A sleeping bag and blanket."),
-        ("Blanket", "gear", 5, 3.0, "A thick quilt for warmth."),
-        ("Rope (50 feet)", "gear", 2, 10.0, "Hempen rope."),
-        ("Torch", "gear", 1, 1.0, "A torch burns for 1 hour."),
-        (
-            "Rations (1 day)",
-            "consumable",
-            2,
-            2.0,
-            "Dry foods suitable for extended travel.",
-        ),
-        ("Waterskin", "gear", 2, 5.0, "A waterskin can hold 4 pints of liquid."),
-        (
-            "Thieves' Tools",
-            "tool",
-            25,
-            1.0,
-            "Tools for picking locks and disarming traps.",
-        ),
-        (
-            "Healer's Kit",
-            "tool",
-            5,
-            3.0,
-            "A kit with bandages, splints, and other supplies.",
-        ),
-        (
-            "Tinderbox",
-            "gear",
-            5,
-            1.0,
-            "A small container holding flint, fire steel, and tinder.",
-        ),
-        ("Lantern", "gear", 5, 2.0, "A hooded lantern casts bright light."),
-        ("Oil (flask)", "consumable", 1, 1.0, "Oil usually comes in a clay flask."),
-        (
-            "Potion of Healing",
-            "consumable",
-            50,
-            0.5,
-            "A magic potion that restores hit points.",
-        ),
-        # Tools
-        ("Smith's Tools", "tool", 20, 8.0, "Tools for working with metal."),
-        ("Carpenter's Tools", "tool", 8, 6.0, "Tools for working with wood."),
-        (
-            "Alchemist's Supplies",
-            "tool",
-            50,
-            8.0,
-            "Equipment for creating alchemical items.",
-        ),
-        ("Herbalism Kit", "tool", 5, 3.0, "Tools for identifying and using herbs."),
-        ("Disguise Kit", "tool", 25, 3.0, "Cosmetics, hair dye, and props."),
-        ("Forgery Kit", "tool", 15, 5.0, "Paper, inks, and other supplies."),
-    ]
-
-    for name, item_type, cost, weight, description in items:
-        if not Item.query.filter_by(name=name).first():
-            item = Item(
-                name=name,
-                item_type=item_type,
-                cost_gp=cost,
-                weight_lbs=weight,
-                description=description,
-            )
-            db.session.add(item)
-
-
-def init_db():
-    """Initialize the database with basic D&D data."""
-    app = create_app()
-
-    with app.app_context():
-        # Create tables
+class DatabaseInitializer:
+    """Handles database initialization with user prompts and data population."""
+    
+    def __init__(self):
+        self.data_loader = FiveEDataLoader()
+    
+    def check_database_exists(self):
+        """Check if database already has data."""
+        try:
+            species_count = Species.query.count()
+            class_count = CharacterClass.query.count()
+            
+            if species_count > 0 or class_count > 0:
+                logger.info(f"📊 Existing data found: {species_count} species, {class_count} classes")
+                return True
+            
+            logger.info("📊 Database is empty")
+            return False
+        except Exception as e:
+            logger.debug(f"Database check failed (normal for first run): {e}")
+            return False
+    
+    def create_tables(self):
+        """Initialize database schema."""
+        logger.info("🏗️  Creating database tables...")
         db.create_all()
-
-        # Initialize data
-        print("Initializing proficiencies...")
-        init_proficiencies()
-
-        print("Initializing languages...")
-        init_languages()
-
-        print("Initializing features...")
-        init_features()
-
-        print("Initializing items...")
-        init_items()
-
-        # Commit all changes
+        logger.info("✅ Database tables created successfully")
+    
+    def populate_species(self):
+        """Load species data with terminology mapping."""
+        logger.info("🧬 Loading species data...")
+        
+        species_data = self.data_loader.get_species()
+        if not species_data:
+            logger.error("❌ No species data available")
+            return False
+        
+        loaded_count = 0
+        for species_info in species_data:
+            try:
+                # Parse ability score increases
+                ability_increases = {}
+                for bonus in species_info.get('ability_bonuses', []):
+                    ability_name = bonus.get('ability_score', {}).get('index', '')
+                    bonus_value = bonus.get('bonus', 0)
+                    if ability_name and bonus_value:
+                        ability_increases[ability_name] = bonus_value
+                
+                # Parse traits from various sources
+                traits = []
+                if 'traits' in species_info:
+                    traits.extend([trait.get('name', '') for trait in species_info['traits']])
+                
+                # Parse languages
+                languages = []
+                if 'languages' in species_info:
+                    languages.extend([lang.get('name', '') for lang in species_info['languages']])
+                
+                # Parse proficiencies
+                proficiencies = []
+                if 'starting_proficiencies' in species_info:
+                    proficiencies.extend([prof.get('name', '') for prof in species_info['starting_proficiencies']])
+                
+                # Create Species instance
+                species = Species(
+                    name=species_info.get('name', ''),
+                    ability_score_increases=ability_increases,
+                    traits=traits,
+                    languages=languages,
+                    proficiencies=proficiencies,
+                    speed=species_info.get('speed', 30),
+                    size=species_info.get('size', 'Medium'),
+                    source='5e-SRD',
+                    description=species_info.get('age', '') + ' ' + species_info.get('alignment', '')
+                )
+                
+                db.session.add(species)
+                loaded_count += 1
+                logger.debug(f"Loaded species: {species.name}")
+                
+            except Exception as e:
+                logger.warning(f"Failed to load species {species_info.get('name', 'unknown')}: {e}")
+        
         try:
             db.session.commit()
-            print("Database initialization completed successfully!")
+            logger.info(f"✅ Successfully loaded {loaded_count} species")
+            return True
         except Exception as e:
             db.session.rollback()
-            print(f"Error initializing database: {e}")
+            logger.error(f"❌ Failed to commit species data: {e}")
+            return False
+    
+    def populate_classes(self):
+        """Load character class data."""
+        logger.info("⚔️  Loading character class data...")
+        
+        class_data = self.data_loader.get_classes()
+        if not class_data:
+            logger.error("❌ No character class data available")
+            return False
+        
+        loaded_count = 0
+        for class_info in class_data:
+            try:
+                # Parse saving throws
+                saving_throws = []
+                if 'saving_throws' in class_info:
+                    saving_throws = [save.get('name', '') for save in class_info['saving_throws']]
+                
+                # Parse skill proficiencies from proficiency_choices
+                available_skills = []
+                skill_choices = 2  # default
+                
+                if 'proficiency_choices' in class_info:
+                    for choice in class_info['proficiency_choices']:
+                        if choice.get('type') == 'proficiencies':
+                            skill_choices = choice.get('choose', 2)
+                            options = choice.get('from', {}).get('options', [])
+                            for option in options:
+                                item = option.get('item', {})
+                                skill_name = item.get('name', '')
+                                if 'Skill:' in skill_name:
+                                    available_skills.append(skill_name.replace('Skill: ', ''))
+                
+                # Parse proficiencies
+                armor_profs = []
+                weapon_profs = []
+                
+                if 'proficiencies' in class_info:
+                    for prof in class_info['proficiencies']:
+                        prof_name = prof.get('name', '')
+                        if 'Armor' in prof_name:
+                            armor_profs.append(prof_name)
+                        elif 'Weapon' in prof_name or 'weapons' in prof_name.lower():
+                            weapon_profs.append(prof_name)
+                
+                # Determine primary ability and spellcasting
+                primary_ability = "Strength"  # default
+                spellcasting_ability = None
+                
+                # Basic mapping based on class name
+                class_name = class_info.get('name', '').lower()
+                if class_name in ['wizard', 'warlock']:
+                    primary_ability = "Intelligence"
+                    spellcasting_ability = "Intelligence"
+                elif class_name in ['sorcerer', 'bard']:
+                    primary_ability = "Charisma"
+                    spellcasting_ability = "Charisma"
+                elif class_name in ['cleric', 'druid', 'ranger']:
+                    primary_ability = "Wisdom"
+                    spellcasting_ability = "Wisdom"
+                elif class_name in ['rogue', 'ranger']:
+                    primary_ability = "Dexterity"
+                elif class_name in ['barbarian', 'fighter', 'paladin']:
+                    primary_ability = "Strength"
+                elif class_name in ['monk']:
+                    primary_ability = "Dexterity"
+                    spellcasting_ability = "Wisdom"
+                
+                # Create CharacterClass instance
+                char_class = CharacterClass(
+                    name=class_info.get('name', ''),
+                    hit_die=class_info.get('hit_die', 8),
+                    primary_ability=primary_ability,
+                    saving_throw_proficiencies=saving_throws,
+                    skill_proficiencies=available_skills,
+                    armor_proficiencies=armor_profs,
+                    weapon_proficiencies=weapon_profs,
+                    skill_choices=skill_choices,
+                    spellcasting_ability=spellcasting_ability,
+                    source='5e-SRD'
+                )
+                
+                db.session.add(char_class)
+                loaded_count += 1
+                logger.debug(f"Loaded class: {char_class.name}")
+                
+            except Exception as e:
+                logger.warning(f"Failed to load class {class_info.get('name', 'unknown')}: {e}")
+        
+        try:
+            db.session.commit()
+            logger.info(f"✅ Successfully loaded {loaded_count} character classes")
+            return True
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"❌ Failed to commit class data: {e}")
+            return False
+    
+    def initialize_database(self, force_rebuild=False):
+        """Complete database initialization process."""
+        logger.info("🎲 Starting database initialization...")
+        
+        # Create tables
+        self.create_tables()
+        
+        # Check for existing data
+        if not force_rebuild and self.check_database_exists():
+            response = input("\n⚠️  Database already contains data. Rebuild? [y/N]: ").lower().strip()
+            if response not in ['y', 'yes']:
+                logger.info("⏭️  Skipping database population (existing data preserved)")
+                return True
+        
+        # Clear existing data if rebuilding
+        if self.check_database_exists():
+            logger.info("🧹 Clearing existing database data...")
+            try:
+                # Clear in order of dependencies
+                CharacterClass.query.delete()
+                Species.query.delete()
+                db.session.commit()
+                logger.info("✅ Existing data cleared")
+            except Exception as e:
+                db.session.rollback()
+                logger.error(f"❌ Failed to clear existing data: {e}")
+                return False
+        
+        # Populate database
+        success = True
+        
+        if not self.populate_species():
+            success = False
+        
+        if not self.populate_classes():
+            success = False
+        
+        if success:
+            logger.info("🎉 Database initialization completed successfully!")
+        else:
+            logger.error("❌ Database initialization completed with errors")
+        
+        return success
 
+def main():
+    """Main initialization function with robust data sourcing."""
+    logger.info("🎲 D&D 5e Database Initialization")
+    logger.info("=" * 50)
+    
+    # Step 1: Ensure data is available
+    data_manager = DataSourceManager()
+    if not data_manager.ensure_data_available():
+        logger.error("💥 Cannot proceed without data files")
+        sys.exit(1)
+    
+    # Step 2: Initialize Flask app context
+    app = create_app()
+    
+    with app.app_context():
+        # Step 3: Initialize database
+        db_initializer = DatabaseInitializer()
+        
+        # Check command line arguments for force rebuild
+        force_rebuild = '--force' in sys.argv or '-f' in sys.argv
+        
+        if db_initializer.initialize_database(force_rebuild=force_rebuild):
+            logger.info("🎉 Initialization completed successfully!")
+            
+            # Show summary
+            species_count = Species.query.count()
+            class_count = CharacterClass.query.count()
+            logger.info(f"📊 Final counts: {species_count} species, {class_count} classes")
+        else:
+            logger.error("💥 Initialization failed!")
+            sys.exit(1)
 
 if __name__ == "__main__":
-    init_db()
+    main()
