@@ -62,12 +62,12 @@ def check_json_backups(self):
     """Check if all required JSON files exist in json_backups."""
     if not self.json_backups_path.exists():
         return False
-    
+
     missing_files = []
     for filename in self.required_files:
         if not (self.json_backups_path / filename).exists():
             missing_files.append(filename)
-    
+
     return len(missing_files) == 0
 ```
 
@@ -77,14 +77,14 @@ def check_json_backups(self):
 def copy_from_repo(self):
     """Copy files from 5e-database-repo to json_backups and cleanup repo."""
     src_path = self.repo_path / "src" / "2014"
-    
+
     # Copy required files
     for filename in self.required_files:
         src_file = src_path / filename
         dest_file = self.json_backups_path / filename
         if src_file.exists():
             shutil.copy2(src_file, dest_file)
-    
+
     # Cleanup repo directory
     shutil.rmtree(self.repo_path)
 ```
@@ -97,11 +97,11 @@ def download_source_data(self):
     with tempfile.TemporaryDirectory() as temp_dir:
         # Download repository zip
         urlretrieve(self.source_url, zip_file)
-        
+
         # Extract and copy required files
         with zipfile.ZipFile(zip_file, 'r') as zip_ref:
             zip_ref.extractall(temp_path)
-        
+
         # Copy files from src/2014/ directory
         for filename in self.required_files:
             shutil.copy2(src_file, dest_file)
@@ -165,7 +165,7 @@ except Exception as e:
 The system prompts users before overwriting existing data:
 
 ```
-⚠️  Database already contains data. Rebuild? [y/N]: 
+⚠️  Database already contains data. Rebuild? [y/N]:
 ```
 
 ## Configuration

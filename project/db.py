@@ -13,7 +13,7 @@ def get_db():
 
 def close_db(e=None):
     """Close database connection."""
-    g.pop("db", None)
+    g.pop("db", e)
 
 
 def init_db():

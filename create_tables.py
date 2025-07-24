@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Create database tables and populate with D&D data."""
 
-from init_db import init_proficiencies, init_languages, init_features, init_items
+from init_db import DataSourceManager, DatabaseInitializer
 from project.models import (
     User,
     Character,
@@ -9,11 +9,12 @@ from project.models import (
     Language,
     Feature,
     Item,
-    CharacterItem,
+    Species,
+    CharacterClass,
 )
 from project import create_app, db
+from sqlalchemy.exc import SQLAlchemyError
 import sys
-import os
 
 # Add the project directory to the Python path
 sys.path.insert(0, "/app")
@@ -29,28 +30,35 @@ def create_tables():
 
         print("Initializing D&D data...")
 
-        # Initialize reference data
-        init_proficiencies()
-        init_languages()
-        init_features()
-        init_items()
+        # Ensure data sources are available
+        data_manager = DataSourceManager()
+        if not data_manager.ensure_data_available():
+            print("Error: Cannot proceed without data files")
+            return False
 
-        try:
-            db.session.commit()
+        # Initialize database with D&D data
+        db_initializer = DatabaseInitializer()
+        init_success = db_initializer.initialize_database(force_rebuild=False)
+        if init_success:
             print("Database tables created and D&D data initialized successfully!")
 
             # Print summary
-            print(f"Proficiencies: {Proficiency.query.count()}")
-            print(f"Languages: {Language.query.count()}")
-            print(f"Features: {Feature.query.count()}")
-            print(f"Items: {Item.query.count()}")
+            try:
+                print(f"Users: {User.query.count()}")
+                print(f"Characters: {Character.query.count()}")
+                print(f"Species: {Species.query.count()}")
+                print(f"Character Classes: {CharacterClass.query.count()}")
+                print(f"Proficiencies: {Proficiency.query.count()}")
+                print(f"Languages: {Language.query.count()}")
+                print(f"Features: {Feature.query.count()}")
+                print(f"Items: {Item.query.count()}")
+            except SQLAlchemyError as e:
+                print(f"Warning: Could not retrieve counts: {e}")
 
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error: {e}")
-            return False
-
-        return True
+            return True
+        
+        print("Error: Database initialization failed")
+        return False
 
 
 if __name__ == "__main__":

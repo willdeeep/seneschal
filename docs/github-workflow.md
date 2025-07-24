@@ -184,7 +184,7 @@ Any other relevant information.
 2. **Create Feature Branch**
    ```bash
    git checkout -b feature/issue-number-brief-description
-   
+  
    # Examples:
    git checkout -b feature/24-background-proficiency-integration
    git checkout -b feature/10-spell-slot-management-ui

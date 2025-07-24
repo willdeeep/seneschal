@@ -42,7 +42,7 @@ The 5e-bits MongoDB database provides a comprehensive, well-structured alternati
 5. **Spells & Magic**
    - `5e-SRD-Spells.json` - Complete spell database
    - `5e-SRD-Magic-Schools.json` - Schools of magic
-   
+  
 6. **Monsters & NPCs**
    - `5e-SRD-Monsters.json` - Comprehensive bestiary
 
@@ -58,7 +58,7 @@ The 5e-bits MongoDB database provides a comprehensive, well-structured alternati
 ```json
 {
   "index": "acrobatics",
-  "name": "Acrobatics", 
+  "name": "Acrobatics",
   "desc": ["Full description text..."],
   "ability_score": {
     "index": "dex",
@@ -117,7 +117,7 @@ The 5e-bits MongoDB database provides a comprehensive, well-structured alternati
 
 The 5e-bits database provides:
 - ✅ **Superior Data Quality**: Complete, descriptive, well-structured
-- ✅ **Better Performance**: Local access, no network dependencies  
+- ✅ **Better Performance**: Local access, no network dependencies 
 - ✅ **Lower Maintenance**: Established, community-maintained solution
 - ✅ **Enhanced Features**: Rich metadata, cross-references, versioning
 - ✅ **Terminology Flexibility**: Easy species/subspecies renaming

@@ -65,24 +65,24 @@ The application factory pattern enables flexible configuration and testing:
 def create_app(test_config=None):
     """Create and configure Flask application."""
     app = Flask(__name__, instance_relative_config=True)
-    
+
     # Configuration
     app.config.from_mapping(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-secret-key"),
         SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///seneschal.sqlite"),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
-    
+
     # Initialize extensions
     db.init_app(app)
     login_manager.init_app(app)
-    
+
     # Register blueprints
     from project import auth, characters, main
     app.register_blueprint(auth.bp)
     app.register_blueprint(characters.bp)
     app.register_blueprint(main.bp)
-    
+
     return app
 ```
 
@@ -115,12 +115,12 @@ class Character(db.Model):
     race = db.Column(db.String(50), nullable=False)
     character_class = db.Column(db.String(50), nullable=False)
     level = db.Column(db.Integer, default=1)
-    
+
     # Ability Scores
     strength = db.Column(db.Integer, nullable=False)
     dexterity = db.Column(db.Integer, nullable=False)
     # ... other abilities
-    
+
     # Relationships
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     proficiencies = db.relationship('Proficiency', secondary=character_proficiencies)
@@ -215,7 +215,7 @@ def app():
         'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
         'SECRET_KEY': 'test-secret-key',
     })
-    
+
     with app.app_context():
         db.create_all()
         yield app
@@ -258,11 +258,11 @@ class FiveEDataLoader:
     def __init__(self, data_path=None):
         self.data_path = Path(data_path) if data_path else Path(__file__).parent / "json_backups"
         self._cache = {}
-    
+
     def get_species(self):
         """Load race/species data."""
         return self.load_json_file("5e-SRD-Races.json")
-    
+
     def get_classes(self):
         """Load character class data."""
         return self.load_json_file("5e-SRD-Classes.json")

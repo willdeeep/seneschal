@@ -2,7 +2,7 @@
 
 ## Migration Completed: CSV → JSON
 
-**Date**: July 22, 2025  
+**Date**: July 22, 2025 
 **Status**: ✅ **COMPLETE** - Successfully migrated from CSV to JSON storage
 
 ## What Changed
@@ -42,7 +42,7 @@
 ```
 json_backups/
 ├── 5e-SRD-Ability-Scores.json      # 6 ability scores
-├── 5e-SRD-Alignments.json          # 9 alignments  
+├── 5e-SRD-Alignments.json          # 9 alignments 
 ├── 5e-SRD-Backgrounds.json         # Character backgrounds
 ├── 5e-SRD-Classes.json             # 12 character classes
 ├── 5e-SRD-Conditions.json          # 15 game conditions
@@ -107,7 +107,7 @@ for option in starting_equipment:
 species = data_loader.get_species()
 # Data contains "species" not "race" terminology
 
-subspecies = data_loader.get_subspecies()  
+subspecies = data_loader.get_subspecies() 
 # Data contains "subspecies" not "subrace" terminology
 ```
 
@@ -121,7 +121,7 @@ class CharacterClass(db.Model):
     index = db.Column(db.String(50), unique=True)
     name = db.Column(db.String(50), nullable=False)
     hit_die = db.Column(db.Integer, nullable=False)
-    
+
     # Store complex nested data as JSON
     starting_equipment_options = db.Column(JSONB)
     proficiency_choices = db.Column(JSONB)
@@ -167,7 +167,7 @@ def get_class_equipment_options(class_index):
     class_data = data_loader.get_class_by_index(class_index)
     if not class_data:
         return jsonify({'error': 'Class not found'}), 404
-    
+
     equipment_options = class_data.get('starting_equipment_options', [])
     return jsonify(equipment_options)
 ```

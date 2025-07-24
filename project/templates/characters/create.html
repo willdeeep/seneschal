@@ -23,7 +23,7 @@
                             <input type="text" class="form-control" id="player_name" name="player_name">
                         </div>
                     </div>
-                   
+                  
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="race" class="form-label">Race *</label>
@@ -63,7 +63,7 @@
                             <input type="number" class="form-control" id="level" name="level" value="1" min="1" max="20">
                         </div>
                     </div>
-                   
+                  
                     <div class="mb-3">
                         <label for="background" class="form-label">Background</label>
                         <textarea class="form-control" id="background" name="background" rows="3" placeholder="Character background and history..."></textarea>
@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const spellcastingClasses = ['Wizard', 'Sorcerer', 'Warlock', 'Bard', 'Cleric', 'Druid', 'Paladin', 'Ranger'];
         if (spellcastingClasses.includes(characterClass)) {
             spellsSection.style.display = 'block';
-           
+          
             fetch(`{{ url_for('characters.get_available_spells') }}?class=${characterClass}`)
                 .then(response => response.json())
                 .then(data => {

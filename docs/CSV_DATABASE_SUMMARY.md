@@ -3,9 +3,9 @@
 ## Overview
 Complete conversion of 5e-bits database to CSV format with species/subspecies terminology.
 
-**Status**: ✅ **COMPLETE** - 25/25 data categories (100% coverage)  
-**Total Records**: 2,317 records across all categories  
-**Data Source**: 5e-bits community database (2014 SRD)  
+**Status**: ✅ **COMPLETE** - 25/25 data categories (100% coverage) 
+**Total Records**: 2,317 records across all categories 
+**Data Source**: 5e-bits community database (2014 SRD) 
 **Generated**: July 22, 2025
 
 ## Data Categories Coverage
@@ -70,7 +70,7 @@ Complete conversion of 5e-bits database to CSV format with species/subspecies te
 - **No Missing Data**: Every category listed in the assessment is now available as CSV
 - **Rich Metadata**: Each CSV includes data_source, data_version, and record_type columns
 
-### ✅ Species/Subspecies Terminology 
+### ✅ Species/Subspecies Terminology
 - **Terminology Conversion**: "Race" → "Species", "Subrace" → "Subspecies" throughout all data
 - **Consistent Naming**: Applied terminology mapping across all related fields and descriptions
 - **Future-Proof**: All references use modern, inclusive terminology
@@ -131,7 +131,7 @@ Complete conversion of 5e-bits database to CSV format with species/subspecies te
 ```
 csv_exports/
 ├── Core Game Mechanics (4 files)
-├── Character Creation (5 files)  
+├── Character Creation (5 files) 
 ├── Character Advancement (4 files)
 ├── Equipment & Magic (4 files)
 ├── Spells & Magic (2 files)
