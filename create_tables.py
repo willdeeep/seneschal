@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Create database tables and populate with D&D data."""
 
-from init_db import init_proficiencies, init_languages, init_features, init_items
+from init_db import DataSourceManager, DatabaseInitializer
 from project.models import (
     User,
     Character,
@@ -10,6 +10,8 @@ from project.models import (
     Feature,
     Item,
     CharacterItem,
+    Species,
+    CharacterClass,
 )
 from project import create_app, db
 import sys
@@ -29,28 +31,36 @@ def create_tables():
 
         print("Initializing D&D data...")
 
-        # Initialize reference data
-        init_proficiencies()
-        init_languages()
-        init_features()
-        init_items()
+        # Ensure data sources are available
+        data_manager = DataSourceManager()
+        if not data_manager.ensure_data_available():
+            print("Error: Cannot proceed without data files")
+            return False
 
-        try:
-            db.session.commit()
+        # Initialize database with D&D data
+        db_initializer = DatabaseInitializer()
+        success = db_initializer.initialize_database(force_rebuild=False)
+
+        if success:
             print("Database tables created and D&D data initialized successfully!")
 
             # Print summary
-            print(f"Proficiencies: {Proficiency.query.count()}")
-            print(f"Languages: {Language.query.count()}")
-            print(f"Features: {Feature.query.count()}")
-            print(f"Items: {Item.query.count()}")
+            try:
+                print(f"Users: {User.query.count()}")
+                print(f"Characters: {Character.query.count()}")
+                print(f"Species: {Species.query.count()}")
+                print(f"Character Classes: {CharacterClass.query.count()}")
+                print(f"Proficiencies: {Proficiency.query.count()}")
+                print(f"Languages: {Language.query.count()}")
+                print(f"Features: {Feature.query.count()}")
+                print(f"Items: {Item.query.count()}")
+            except Exception as e:
+                print(f"Warning: Could not retrieve counts: {e}")
 
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error: {e}")
+            return True
+        else:
+            print("Error: Database initialization failed")
             return False
-
-        return True
 
 
 if __name__ == "__main__":
