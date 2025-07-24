@@ -22,7 +22,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:13
@@ -38,24 +38,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
         python-version: '3.9'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    
+
     - name: Run tests
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost/test_seneschal
         SECRET_KEY: test-secret-key
       run: |
         pytest --cov=project --cov-report=xml
-    
+
     - name: Upload coverage
       uses: codecov/codecov-action@v3
       with:
@@ -235,12 +235,12 @@ repos:
     rev: 22.3.0
     hooks:
       - id: black
-  
+ 
   - repo: https://github.com/pycqa/flake8
     rev: 4.0.1
     hooks:
       - id: flake8
-  
+ 
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
     hooks:
@@ -275,7 +275,7 @@ deploy-staging:
   needs: test
   runs-on: ubuntu-latest
   if: github.ref == 'refs/heads/dev'
-  
+ 
   steps:
     - name: Deploy to staging
       run: |
@@ -290,7 +290,7 @@ deploy-production:
   needs: test
   runs-on: ubuntu-latest
   if: github.ref == 'refs/heads/main'
-  
+ 
   steps:
     - name: Deploy to production
       run: |

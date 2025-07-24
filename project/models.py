@@ -1,7 +1,7 @@
 """
 Models module for backward compatibility.
 
-This module maintains backward compatibility by importing all models from the 
+This module maintains backward compatibility by importing all models from the
 new modular structure. All existing imports should continue to work unchanged.
 
 For new code, consider importing directly from the specific model modules:

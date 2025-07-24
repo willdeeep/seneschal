@@ -5,7 +5,7 @@ These tests are marked as skip since they test features in development.
 """
 
 import pytest
-from project.models import Character, db
+from project.models import db
 from project import create_app
 
 
@@ -382,7 +382,7 @@ class TestCharacterSpeciesClassIntegration:
         THEN: The Character should have proper relationships and computed properties
         """
         with app.app_context():
-            from project.models import Species, CharacterClass, Character
+            from project.models import Species, CharacterClass
 
             lifecycle = character_lifecycle_setup
 
@@ -604,7 +604,7 @@ class TestSpeciesClassPersistence:
                 traits=["Lucky", "Brave", "Halfling Nimbleness"],
                 languages=["Common", "Halfling"],
                 speed=25,
-                size="Small", 
+                size="Small",
             )
             db.session.add(species)
 

@@ -9,13 +9,12 @@ from project.models import (
     Language,
     Feature,
     Item,
-    CharacterItem,
     Species,
     CharacterClass,
 )
 from project import create_app, db
+from sqlalchemy.exc import SQLAlchemyError
 import sys
-import os
 
 # Add the project directory to the Python path
 sys.path.insert(0, "/app")
@@ -39,9 +38,8 @@ def create_tables():
 
         # Initialize database with D&D data
         db_initializer = DatabaseInitializer()
-        success = db_initializer.initialize_database(force_rebuild=False)
-
-        if success:
+        init_success = db_initializer.initialize_database(force_rebuild=False)
+        if init_success:
             print("Database tables created and D&D data initialized successfully!")
 
             # Print summary
@@ -54,13 +52,13 @@ def create_tables():
                 print(f"Languages: {Language.query.count()}")
                 print(f"Features: {Feature.query.count()}")
                 print(f"Items: {Item.query.count()}")
-            except Exception as e:
+            except SQLAlchemyError as e:
                 print(f"Warning: Could not retrieve counts: {e}")
 
             return True
-        else:
-            print("Error: Database initialization failed")
-            return False
+        
+        print("Error: Database initialization failed")
+        return False
 
 
 if __name__ == "__main__":

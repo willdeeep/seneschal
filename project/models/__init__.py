@@ -30,17 +30,17 @@ __all__ = [
     # Database components
     'db',
     'character_proficiencies',
-    'character_languages', 
+    'character_languages',
     'character_features',
     'character_spells',
-    
+
     # Core models
     'User',
     'Character',
     'Species',
     'SubSpecies',
     'CharacterClass',
-    
+
     # Supporting models
     'Proficiency',
     'Language',
