@@ -6,6 +6,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from project import db
 from project.models import (
     Character,
+    Species,
+    CharacterClass,
+    SubSpecies,
     Proficiency,
     Language,
     Item,
@@ -33,8 +36,9 @@ def create():
         # Get form data
         name = request.form.get("name")
         player_name = request.form.get("player_name")
-        race = request.form.get("race")
-        character_class = request.form.get("character_class")
+        species_id = request.form.get("species_id")
+        subspecies_id = request.form.get("subspecies_id") if request.form.get("subspecies_id") else None
+        class_id = request.form.get("class_id")
         level = int(request.form.get("level", 1))
         background = request.form.get("background")
 
@@ -72,16 +76,23 @@ def create():
         attitude_origin = request.form.get("attitude_origin")
 
         # Validation
-        if not all([name, race, character_class]):
-            flash("Name, race, and class are required.", "error")
-            return render_template("characters/create.html")
+        if not all([name, species_id, class_id]):
+            flash("Name, species, and class are required.", "error")
+            species = Species.query.order_by(Species.name).all()
+            classes = CharacterClass.query.order_by(CharacterClass.name).all()
+            subspecies = SubSpecies.query.order_by(SubSpecies.name).all()
+            return render_template("characters/create.html",
+                                 species=species,
+                                 classes=classes,
+                                 subspecies=subspecies)
 
         # Create character
         character = Character(
             name=name,
             player_name=player_name,
-            race=race,
-            character_class=character_class,
+            species_id=int(species_id) if species_id else None,
+            subspecies_id=int(subspecies_id) if subspecies_id else None,
+            class_id=int(class_id) if class_id else None,
             level=level,
             background=background,
             strength=strength,
@@ -146,10 +157,23 @@ def create():
         except SQLAlchemyError:
             db.session.rollback()
             flash("An error occurred while creating the character.", "error")
-            return render_template("characters/create.html")
+            species = Species.query.order_by(Species.name).all()
+            classes = CharacterClass.query.order_by(CharacterClass.name).all()
+            subspecies = SubSpecies.query.order_by(SubSpecies.name).all()
+            return render_template("characters/create.html",
+                                 species=species,
+                                 classes=classes,
+                                 subspecies=subspecies)
 
     # GET request - show form with dynamic loading enabled
-    return render_template("characters/create.html")
+    species = Species.query.order_by(Species.name).all()
+    classes = CharacterClass.query.order_by(CharacterClass.name).all()
+    subspecies = SubSpecies.query.order_by(SubSpecies.name).all()
+    
+    return render_template("characters/create.html",
+                         species=species,
+                         classes=classes,
+                         subspecies=subspecies)
 
 
 @bp.route("/<int:character_id>")

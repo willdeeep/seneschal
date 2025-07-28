@@ -25,40 +25,34 @@
                     </div>
                   
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="race" class="form-label">Race *</label>
-                            <select class="form-control" id="race" name="race" required>
-                                <option value="">Select Race</option>
-                                <option value="Human">Human</option>
-                                <option value="Elf">Elf</option>
-                                <option value="Dwarf">Dwarf</option>
-                                <option value="Halfling">Halfling</option>
-                                <option value="Dragonborn">Dragonborn</option>
-                                <option value="Gnome">Gnome</option>
-                                <option value="Half-Elf">Half-Elf</option>
-                                <option value="Half-Orc">Half-Orc</option>
-                                <option value="Tiefling">Tiefling</option>
+                        <div class="col-md-3 mb-3">
+                            <label for="species_id" class="form-label">Species *</label>
+                            <select class="form-control" id="species_id" name="species_id" required>
+                                <option value="">Select Species</option>
+                                {% for species_option in species %}
+                                    <option value="{{ species_option.id }}">{{ species_option.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="character_class" class="form-label">Class *</label>
-                            <select class="form-control" id="character_class" name="character_class" required>
+                        <div class="col-md-3 mb-3">
+                            <label for="subspecies_id" class="form-label">Subspecies</label>
+                            <select class="form-control" id="subspecies_id" name="subspecies_id">
+                                <option value="">Select Subspecies (Optional)</option>
+                                {% for subspecies_option in subspecies %}
+                                    <option value="{{ subspecies_option.id }}" data-species-id="{{ subspecies_option.species_id }}">{{ subspecies_option.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="class_id" class="form-label">Class *</label>
+                            <select class="form-control" id="class_id" name="class_id" required>
                                 <option value="">Select Class</option>
-                                <option value="Barbarian">Barbarian</option>
-                                <option value="Bard">Bard</option>
-                                <option value="Cleric">Cleric</option>
-                                <option value="Druid">Druid</option>
-                                <option value="Fighter">Fighter</option>
-                                <option value="Monk">Monk</option>
-                                <option value="Paladin">Paladin</option>
-                                <option value="Ranger">Ranger</option>
-                                <option value="Rogue">Rogue</option>
-                                <option value="Sorcerer">Sorcerer</option>
-                                <option value="Warlock">Warlock</option>
-                                <option value="Wizard">Wizard</option>
+                                {% for class_option in classes %}
+                                    <option value="{{ class_option.id }}">{{ class_option.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="level" class="form-label">Level</label>
                             <input type="number" class="form-control" id="level" name="level" value="1" min="1" max="20">
                         </div>
