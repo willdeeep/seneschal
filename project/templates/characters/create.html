@@ -7,7 +7,35 @@
     <div class="col-lg-8">
         <h1 class="mb-4">Create New Character</h1>
 
-        <form method="POST">
+        <!-- Progress Indicator -->
+        <div class="card mb-4 border-info">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-chart-line text-info me-2"></i>
+                        <small class="text-muted">Progress: <span id="progress-percentage">0%</span> complete</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div id="auto-save-status" class="me-3">
+                            <small class="text-muted">
+                                <i class="fas fa-save me-1"></i>
+                                <span id="save-status-text">Not saved</span>
+                            </small>
+                        </div>
+                        <button type="button" class="btn btn-outline-info btn-sm" onclick="togglePreview()">
+                            <i class="fas fa-eye me-1"></i>
+                            <span id="preview-button-text">Show Preview</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-info" role="progressbar" id="progress-bar" 
+                         style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" id="character-form">
             <div class="card">
                 <div class="card-header">
                     <h5>Basic Information</h5>
@@ -289,33 +317,109 @@
                 </div>
             </div>
 
+            <!-- Character Preview Panel -->
+            <div class="card mt-4" id="character-preview-section" style="display: none;">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-eye me-2"></i>Character Preview</h5>
+                    <small>Live preview of your character as you build</small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Basic Information</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Name:</strong> <span id="preview-name">-</span></li>
+                                <li><strong>Species:</strong> <span id="preview-species">-</span></li>
+                                <li><strong>Subspecies:</strong> <span id="preview-subspecies">-</span></li>
+                                <li><strong>Class:</strong> <span id="preview-class">-</span></li>
+                                <li><strong>Level:</strong> <span id="preview-level">-</span></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Ability Scores</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <small><strong>STR:</strong> <span id="preview-str">-</span></small><br>
+                                    <small><strong>DEX:</strong> <span id="preview-dex">-</span></small><br>
+                                    <small><strong>CON:</strong> <span id="preview-con">-</span></small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>INT:</strong> <span id="preview-int">-</span></small><br>
+                                    <small><strong>WIS:</strong> <span id="preview-wis">-</span></small><br>
+                                    <small><strong>CHA:</strong> <span id="preview-cha">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="togglePreviewDetails()">
+                            <span id="preview-toggle-text">Show Details</span>
+                        </button>
+                    </div>
+                    <div id="preview-details" style="display: none;" class="mt-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Selected Proficiencies</h6>
+                                <div id="preview-proficiencies">
+                                    <small class="text-muted">None selected</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Known Languages</h6>
+                                <div id="preview-languages">
+                                    <small class="text-muted">None selected</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card mt-4" id="proficiencies-section">
                 <div class="card-header">
                     <h5>Available Proficiencies</h5>
-                    <small class="text-muted">Select race and class to see available proficiencies</small>
+                    <small class="text-muted">Select species and class to see available proficiencies</small>
                 </div>
                 <div class="card-body" id="proficiencies-list">
-                    <p class="text-muted">Please select a race and class first.</p>
+                    <div class="loading-spinner text-center" style="display: none;">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <small class="text-muted ms-2">Loading proficiencies...</small>
+                    </div>
+                    <p class="text-muted default-message">Please select a species and class first.</p>
                 </div>
             </div>
 
             <div class="card mt-4" id="languages-section">
                 <div class="card-header">
                     <h5>Available Languages</h5>
-                    <small class="text-muted">Select race and class to see available languages</small>
+                    <small class="text-muted">Select species and class to see available languages</small>
                 </div>
                 <div class="card-body" id="languages-list">
-                    <p class="text-muted">Please select a race and class first.</p>
+                    <div class="loading-spinner text-center" style="display: none;">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <small class="text-muted ms-2">Loading languages...</small>
+                    </div>
+                    <p class="text-muted default-message">Please select a species and class first.</p>
                 </div>
             </div>
 
             <div class="card mt-4" id="features-section">
                 <div class="card-header">
                     <h5>Available Features & Traits</h5>
-                    <small class="text-muted">Select race and class to see available features</small>
+                    <small class="text-muted">Select species and class to see available features</small>
                 </div>
                 <div class="card-body" id="features-list">
-                    <p class="text-muted">Please select a race and class first.</p>
+                    <div class="loading-spinner text-center" style="display: none;">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <small class="text-muted ms-2">Loading features...</small>
+                    </div>
+                    <p class="text-muted default-message">Please select a species and class first.</p>
                 </div>
             </div>
 
@@ -325,13 +429,49 @@
                     <small class="text-muted">Spells available to your class</small>
                 </div>
                 <div class="card-body" id="spells-list">
-                    <p class="text-muted">No spells available for this class.</p>
+                    <div class="loading-spinner text-center" style="display: none;">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <small class="text-muted ms-2">Loading spells...</small>
+                    </div>
+                    <p class="text-muted default-message">No spells available for this class.</p>
+                </div>
+            </div>
+
+            <!-- Enhanced Validation Feedback -->
+            <div class="card mt-4" id="validation-summary" style="display: none;">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Please Complete Required Fields
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul id="validation-errors" class="mb-0">
+                        <!-- Validation errors will be populated here -->
+                    </ul>
                 </div>
             </div>
 
             <div class="mt-4 mb-5">
-                <button type="submit" class="btn btn-primary btn-lg">Create Character</button>
-                <a href="{{ url_for('characters.index') }}" class="btn btn-secondary btn-lg">Cancel</a>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="submit" class="btn btn-primary btn-lg" id="submit-button">
+                            <span id="submit-text">Create Character</span>
+                            <div class="spinner-border spinner-border-sm ms-2" role="status" id="submit-spinner" style="display: none;">
+                                <span class="visually-hidden">Creating...</span>
+                            </div>
+                        </button>
+                        <a href="{{ url_for('characters.index') }}" class="btn btn-secondary btn-lg ms-2">Cancel</a>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted">
+                            <i class="fas fa-lightbulb me-1"></i>
+                            Tip: Your progress is automatically saved as you type
+                        </small>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -375,6 +515,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to update proficiencies
     function updateProficiencies(speciesId, classId) {
+        showLoadingState('proficiencies-list');
+        
         fetch(`{{ url_for('characters.get_available_proficiencies') }}?species_id=${speciesId}&class_id=${classId}`)
             .then(response => {
                 if (!response.ok) {
@@ -383,6 +525,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
+                hideLoadingState('proficiencies-list');
                 const proficienciesList = document.getElementById('proficiencies-list');
                 let html = '';
                 
@@ -430,6 +573,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 proficienciesList.innerHTML = html;
+                
+                // Add event listeners to newly created checkboxes for live preview updates
+                const profCheckboxes = proficienciesList.querySelectorAll('input[type="checkbox"]');
+                profCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        updateCharacterPreview();
+                        updateProgress();
+                    });
+                });
             })
             .catch(error => {
                 console.error('Error fetching proficiencies:', error);
@@ -439,6 +591,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to update languages
     function updateLanguages(speciesId, classId) {
+        showLoadingState('languages-list');
+        
         fetch(`{{ url_for('characters.get_available_languages') }}?species_id=${speciesId}&class_id=${classId}`)
             .then(response => {
                 if (!response.ok) {
@@ -447,6 +601,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
+                hideLoadingState('languages-list');
                 const languagesList = document.getElementById('languages-list');
                 let html = '';
                 
@@ -494,6 +649,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 languagesList.innerHTML = html;
+                
+                // Add event listeners to newly created checkboxes for live preview updates
+                const langCheckboxes = languagesList.querySelectorAll('input[type="checkbox"]');
+                langCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        updateCharacterPreview();
+                        updateProgress();
+                    });
+                });
             })
             .catch(error => {
                 console.error('Error fetching languages:', error);
@@ -583,16 +747,323 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Progressive Enhancement Features
+    
+    // Auto-save functionality
+    let autoSaveTimeout;
+    let lastSaveData = '';
+    
+    function autoSaveProgress() {
+        const formData = new FormData(document.getElementById('character-form'));
+        const formObj = Object.fromEntries(formData.entries());
+        const currentData = JSON.stringify(formObj);
+        
+        if (currentData !== lastSaveData) {
+            lastSaveData = currentData;
+            localStorage.setItem('character_draft', currentData);
+            updateSaveStatus('saving');
+            
+            // Simulate save delay
+            setTimeout(() => {
+                updateSaveStatus('saved');
+                updateProgress();
+            }, 500);
+        }
+    }
+    
+    function updateSaveStatus(status) {
+        const statusText = document.getElementById('save-status-text');
+        const statusIcon = document.querySelector('#auto-save-status i');
+        
+        switch(status) {
+            case 'saving':
+                statusText.textContent = 'Saving...';
+                statusIcon.className = 'fas fa-spinner fa-spin me-1';
+                break;
+            case 'saved':
+                statusText.textContent = 'Saved';
+                statusIcon.className = 'fas fa-check-circle text-success me-1';
+                break;
+            case 'error':
+                statusText.textContent = 'Save failed';
+                statusIcon.className = 'fas fa-exclamation-triangle text-warning me-1';
+                break;
+        }
+    }
+    
+    // Progress calculation
+    function updateProgress() {
+        const requiredFields = ['name', 'species_id', 'class_id', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+        const totalFields = requiredFields.length + 4; // +4 for proficiencies, languages, optional fields
+        
+        let completedFields = 0;
+        
+        // Check required fields
+        requiredFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (field && field.value && field.value.trim() !== '' && field.value !== '0') {
+                completedFields++;
+            }
+        });
+        
+        // Check if proficiencies are selected
+        const selectedProficiencies = document.querySelectorAll('input[name="proficiencies"]:checked').length;
+        if (selectedProficiencies > 0) completedFields++;
+        
+        // Check if languages are selected
+        const selectedLanguages = document.querySelectorAll('input[name="languages"]:checked').length;
+        if (selectedLanguages > 0) completedFields++;
+        
+        // Check optional fields (player_name, background, etc.)
+        const optionalFields = ['player_name', 'background'];
+        let optionalCompleted = 0;
+        optionalFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (field && field.value && field.value.trim() !== '') {
+                optionalCompleted++;
+            }
+        });
+        
+        if (optionalCompleted > 0) completedFields++;
+        
+        const percentage = Math.round((completedFields / totalFields) * 100);
+        document.getElementById('progress-text').textContent = percentage + '%';
+        document.getElementById('form-progress-bar').style.width = percentage + '%';
+        document.getElementById('form-progress-bar').setAttribute('aria-valuenow', percentage);
+        
+        // Update progress bar color based on completion
+        const progressBar = document.getElementById('form-progress-bar');
+        progressBar.className = 'progress-bar progress-bar-striped';
+        if (percentage < 30) {
+            progressBar.classList.add('bg-danger');
+        } else if (percentage < 70) {
+            progressBar.classList.add('bg-warning');
+        } else {
+            progressBar.classList.add('bg-success');
+        }
+        
+        // Show character preview if substantial progress is made
+        if (percentage >= 30) {
+            document.getElementById('character-preview-section').style.display = 'block';
+            updateCharacterPreview();
+        }
+    }
+    
+    // Character preview update
+    function updateCharacterPreview() {
+        // Basic information
+        document.getElementById('preview-name').textContent = document.getElementById('name').value || '-';
+        
+        const speciesSelect = document.getElementById('species_id');
+        document.getElementById('preview-species').textContent = 
+            speciesSelect.options[speciesSelect.selectedIndex]?.text || '-';
+        
+        const subspeciesSelect = document.getElementById('subspecies_id');
+        document.getElementById('preview-subspecies').textContent = 
+            subspeciesSelect.options[subspeciesSelect.selectedIndex]?.text || '-';
+        
+        const classSelect = document.getElementById('class_id');
+        document.getElementById('preview-class').textContent = 
+            classSelect.options[classSelect.selectedIndex]?.text || '-';
+        
+        document.getElementById('preview-level').textContent = document.getElementById('level').value || '-';
+        
+        // Ability scores with totals
+        const abilities = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+        abilities.forEach(ability => {
+            const baseScore = document.getElementById(ability === 'str' ? 'strength' : 
+                                                   ability === 'dex' ? 'dexterity' :
+                                                   ability === 'con' ? 'constitution' :
+                                                   ability === 'int' ? 'intelligence' :
+                                                   ability === 'wis' ? 'wisdom' : 'charisma').value || 0;
+            const total = document.getElementById(`${ability === 'str' ? 'strength' : 
+                                                  ability === 'dex' ? 'dexterity' :
+                                                  ability === 'con' ? 'constitution' :
+                                                  ability === 'int' ? 'intelligence' :
+                                                  ability === 'wis' ? 'wisdom' : 'charisma'}-total`);
+            const displayValue = total ? total.textContent : baseScore;
+            document.getElementById(`preview-${ability}`).textContent = displayValue;
+        });
+        
+        // Selected proficiencies
+        const selectedProfs = Array.from(document.querySelectorAll('input[name="proficiencies"]:checked'))
+            .map(input => input.nextElementSibling.textContent.trim());
+        const profContainer = document.getElementById('preview-proficiencies');
+        if (selectedProfs.length > 0) {
+            profContainer.innerHTML = selectedProfs.map(prof => `<small class="badge bg-secondary me-1">${prof}</small>`).join('');
+        } else {
+            profContainer.innerHTML = '<small class="text-muted">None selected</small>';
+        }
+        
+        // Selected languages
+        const selectedLangs = Array.from(document.querySelectorAll('input[name="languages"]:checked'))
+            .map(input => input.nextElementSibling.textContent.trim());
+        const langContainer = document.getElementById('preview-languages');
+        if (selectedLangs.length > 0) {
+            langContainer.innerHTML = selectedLangs.map(lang => `<small class="badge bg-info me-1">${lang}</small>`).join('');
+        } else {
+            langContainer.innerHTML = '<small class="text-muted">None selected</small>';
+        }
+    }
+    
+    // Enhanced loading states
+    function showLoadingState(containerId) {
+        const container = document.getElementById(containerId);
+        const spinner = container.querySelector('.loading-spinner');
+        const defaultMessage = container.querySelector('.default-message');
+        
+        if (spinner) spinner.style.display = 'block';
+        if (defaultMessage) defaultMessage.style.display = 'none';
+    }
+    
+    function hideLoadingState(containerId) {
+        const container = document.getElementById(containerId);
+        const spinner = container.querySelector('.loading-spinner');
+        
+        if (spinner) spinner.style.display = 'none';
+    }
+    
+    // Enhanced validation
+    function validateForm() {
+        const errors = [];
+        const requiredFields = [
+            { id: 'name', label: 'Character Name' },
+            { id: 'species_id', label: 'Species' },
+            { id: 'class_id', label: 'Character Class' },
+            { id: 'strength', label: 'Strength Score' },
+            { id: 'dexterity', label: 'Dexterity Score' },
+            { id: 'constitution', label: 'Constitution Score' },
+            { id: 'intelligence', label: 'Intelligence Score' },
+            { id: 'wisdom', label: 'Wisdom Score' },
+            { id: 'charisma', label: 'Charisma Score' }
+        ];
+        
+        requiredFields.forEach(field => {
+            const element = document.getElementById(field.id);
+            if (!element || !element.value.trim()) {
+                errors.push(field.label + ' is required');
+            }
+        });
+        
+        // Validate ability scores are in valid range
+        const abilityScores = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+        abilityScores.forEach(ability => {
+            const element = document.getElementById(ability);
+            if (element && element.value) {
+                const score = parseInt(element.value);
+                if (score < 1 || score > 20) {
+                    errors.push(`${ability.charAt(0).toUpperCase() + ability.slice(1)} must be between 1 and 20`);
+                }
+            }
+        });
+        
+        const validationSummary = document.getElementById('validation-summary');
+        const errorsList = document.getElementById('validation-errors');
+        
+        if (errors.length > 0) {
+            errorsList.innerHTML = errors.map(error => `<li>${error}</li>`).join('');
+            validationSummary.style.display = 'block';
+            validationSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        } else {
+            validationSummary.style.display = 'none';
+            return true;
+        }
+    }
+
+    // Global helper functions for UI interactions
+    window.togglePreview = function() {
+        const section = document.getElementById('character-preview-section');
+        const button = document.getElementById('preview-button-text');
+        
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+            button.textContent = 'Hide Preview';
+            updateCharacterPreview();
+        } else {
+            section.style.display = 'none';
+            button.textContent = 'Show Preview';
+        }
+    }
+    
+    window.togglePreviewDetails = function() {
+        const details = document.getElementById('preview-details');
+        const toggleText = document.getElementById('preview-toggle-text');
+        
+        if (details.style.display === 'none') {
+            details.style.display = 'block';
+            toggleText.textContent = 'Hide Details';
+        } else {
+            details.style.display = 'none';
+            toggleText.textContent = 'Show Details';
+        }
+    }
+
     // Add event listeners
     speciesSelect.addEventListener('change', function() {
         updateAvailableOptions();
         filterSubspecies();
         updateAbilityScores();
+        updateProgress();
     });
-    classSelect.addEventListener('change', updateAvailableOptions);
+    
+    classSelect.addEventListener('change', function() {
+        updateAvailableOptions();
+        updateProgress();
+    });
+
+    // Auto-save on input changes
+    const formInputs = document.querySelectorAll('#character-form input, #character-form select, #character-form textarea');
+    formInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(autoSaveProgress, 1000); // Save after 1 second of inactivity
+            updateProgress();
+        });
+    });
+
+    // Enhanced form submission
+    document.getElementById('character-form').addEventListener('submit', function(e) {
+        const submitButton = document.getElementById('submit-button');
+        const submitText = document.getElementById('submit-text');
+        const submitSpinner = document.getElementById('submit-spinner');
+        
+        if (!validateForm()) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Show loading state
+        submitButton.disabled = true;
+        submitText.textContent = 'Creating Character...';
+        submitSpinner.style.display = 'inline-block';
+        
+        // Clear any stored draft on successful submission
+        localStorage.removeItem('character_draft');
+    });
+
+    // Load draft on page load
+    const savedDraft = localStorage.getItem('character_draft');
+    if (savedDraft) {
+        try {
+            const draftData = JSON.parse(savedDraft);
+            Object.entries(draftData).forEach(([key, value]) => {
+                const field = document.querySelector(`[name="${key}"]`);
+                if (field) {
+                    field.value = value;
+                }
+            });
+            updateSaveStatus('saved');
+            updateProgress();
+        } catch (e) {
+            console.warn('Could not load saved draft:', e);
+            localStorage.removeItem('character_draft');
+        }
+    }
 
     // Initial update if both species and class are selected
     updateAvailableOptions();
+    updateProgress();
 });
 </script>
 {% endblock %}
