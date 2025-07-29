@@ -152,7 +152,7 @@ The project uses custom pytest markers for test organization:
 ```ini
 [pytest]
 markers =
-    unit: Unit tests that dont require external services
+    unit: Unit tests that do not require external services
     functional: Functional tests that may require database
     e2e: End-to-end tests
     slow: Tests that take a long time to run

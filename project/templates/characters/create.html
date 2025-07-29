@@ -153,32 +153,39 @@
             <div class="card mt-4">
                 <div class="card-header">
                     <h5>Ability Scores</h5>
+                    <small class="text-muted">Base scores + species bonuses = total</small>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-2 mb-3">
                             <label for="strength" class="form-label">Strength</label>
                             <input type="number" class="form-control" id="strength" name="strength" value="10" min="1" max="20">
+                            <small class="text-muted" id="strength-total">Total: 10 (+0)</small>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="dexterity" class="form-label">Dexterity</label>
                             <input type="number" class="form-control" id="dexterity" name="dexterity" value="10" min="1" max="20">
+                            <small class="text-muted" id="dexterity-total">Total: 10 (+0)</small>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="constitution" class="form-label">Constitution</label>
                             <input type="number" class="form-control" id="constitution" name="constitution" value="10" min="1" max="20">
+                            <small class="text-muted" id="constitution-total">Total: 10 (+0)</small>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="intelligence" class="form-label">Intelligence</label>
                             <input type="number" class="form-control" id="intelligence" name="intelligence" value="10" min="1" max="20">
+                            <small class="text-muted" id="intelligence-total">Total: 10 (+0)</small>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="wisdom" class="form-label">Wisdom</label>
                             <input type="number" class="form-control" id="wisdom" name="wisdom" value="10" min="1" max="20">
+                            <small class="text-muted" id="wisdom-total">Total: 10 (+0)</small>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="charisma" class="form-label">Charisma</label>
                             <input type="number" class="form-control" id="charisma" name="charisma" value="10" min="1" max="20">
+                            <small class="text-muted" id="charisma-total">Total: 10 (+0)</small>
                         </div>
                     </div>
                 </div>
@@ -479,6 +486,27 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     const speciesSelect = document.getElementById('species_id');
     const subspeciesSelect = document.getElementById('subspecies_id');
+    const classSelect = document.getElementById('class_id');
+    
+    // Ability score inputs
+    const abilityInputs = {
+        'str': document.getElementById('strength'),
+        'dex': document.getElementById('dexterity'),
+        'con': document.getElementById('constitution'),
+        'int': document.getElementById('intelligence'),
+        'wis': document.getElementById('wisdom'),
+        'cha': document.getElementById('charisma')
+    };
+    
+    // Ability score total displays
+    const abilityTotals = {
+        'str': document.getElementById('strength-total'),
+        'dex': document.getElementById('dexterity-total'),
+        'con': document.getElementById('constitution-total'),
+        'int': document.getElementById('intelligence-total'),
+        'wis': document.getElementById('wisdom-total'),
+        'cha': document.getElementById('charisma-total')
+    };
 
     function filterSubspecies() {
         const selectedSpeciesId = speciesSelect.value;
@@ -498,9 +526,81 @@ document.addEventListener('DOMContentLoaded', function() {
             subspeciesSelect.value = '';
         }
     }
+    
+    function calculateAbilityModifier(score) {
+        return Math.floor((score - 10) / 2);
+    }
+    
+    function updateAbilityScores() {
+        const speciesId = speciesSelect.value;
+        const subspeciesId = subspeciesSelect.value;
+        
+        if (speciesId) {
+            fetch(`{{ url_for('characters.get_ability_bonuses') }}?species_id=${speciesId}&subspecies_id=${subspeciesId || ''}`)
+                .then(response => response.json())
+                .then(data => {
+                    const bonuses = data.bonuses;
+                    
+                    // Update each ability score display
+                    Object.keys(abilityInputs).forEach(ability => {
+                        const baseScore = parseInt(abilityInputs[ability].value) || 10;
+                        const bonus = bonuses[ability] || 0;
+                        const totalScore = baseScore + bonus;
+                        const modifier = calculateAbilityModifier(totalScore);
+                        
+                        const modifierText = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+                        const bonusText = bonus > 0 ? ` (+${bonus} species)` : '';
+                        
+                        abilityTotals[ability].textContent = `Total: ${totalScore} (${modifierText})${bonusText}`;
+                        
+                        // Add visual styling based on bonuses
+                        if (bonus > 0) {
+                            abilityTotals[ability].className = 'text-success';
+                        } else {
+                            abilityTotals[ability].className = 'text-muted';
+                        }
+                    });
+                    
+                    // Update other character attributes if species info is available
+                    if (data.species_info) {
+                        const speedInput = document.getElementById('speed');
+                        if (speedInput && data.species_info.speed) {
+                            speedInput.value = data.species_info.speed;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching ability bonuses:', error);
+                });
+        } else {
+            // Reset to base values when no species selected
+            Object.keys(abilityInputs).forEach(ability => {
+                const baseScore = parseInt(abilityInputs[ability].value) || 10;
+                const modifier = calculateAbilityModifier(baseScore);
+                const modifierText = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+                
+                abilityTotals[ability].textContent = `Total: ${baseScore} (${modifierText})`;
+                abilityTotals[ability].className = 'text-muted';
+            });
+        }
+    }
 
-    speciesSelect.addEventListener('change', filterSubspecies);
-    filterSubspecies(); // Initial filter on page load
+    // Event listeners
+    speciesSelect.addEventListener('change', function() {
+        filterSubspecies();
+        updateAbilityScores();
+    });
+    
+    subspeciesSelect.addEventListener('change', updateAbilityScores);
+    
+    // Listen for changes to ability score inputs
+    Object.values(abilityInputs).forEach(input => {
+        input.addEventListener('input', updateAbilityScores);
+    });
+    
+    // Initial setup
+    filterSubspecies();
+    updateAbilityScores();
 });
 </script>
 {% endblock %}

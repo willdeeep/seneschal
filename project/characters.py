@@ -124,28 +124,28 @@ def create():
         # Handle proficiencies
         proficiency_ids = request.form.getlist("proficiencies")
         for prof_id in proficiency_ids:
-            proficiency = Proficiency.query.get(int(prof_id))
+            proficiency = db.session.get(Proficiency, int(prof_id))
             if proficiency:
                 character.proficiencies.append(proficiency)
 
         # Handle languages
         language_ids = request.form.getlist("languages")
         for lang_id in language_ids:
-            language = Language.query.get(int(lang_id))
+            language = db.session.get(Language, int(lang_id))
             if language:
                 character.languages.append(language)
 
         # Handle features
         feature_ids = request.form.getlist("features")
         for feat_id in feature_ids:
-            feature = Feature.query.get(int(feat_id))
+            feature = db.session.get(Feature, int(feat_id))
             if feature:
                 character.features.append(feature)
 
         # Handle spells
         spell_ids = request.form.getlist("spells")
         for spell_id in spell_ids:
-            spell = Spell.query.get(int(spell_id))
+            spell = db.session.get(Spell, int(spell_id))
             if spell:
                 character.spells.append(spell)
 
@@ -239,21 +239,21 @@ def edit(character_id):
         character.proficiencies = []
         proficiency_ids = request.form.getlist("proficiencies")
         for prof_id in proficiency_ids:
-            proficiency = Proficiency.query.get(int(prof_id))
+            proficiency = db.session.get(Proficiency, int(prof_id))
             if proficiency:
                 character.proficiencies.append(proficiency)
 
         character.languages = []
         language_ids = request.form.getlist("languages")
         for lang_id in language_ids:
-            language = Language.query.get(int(lang_id))
+            language = db.session.get(Language, int(lang_id))
             if language:
                 character.languages.append(language)
 
         character.features = []
         feature_ids = request.form.getlist("features")
         for feat_id in feature_ids:
-            feature = Feature.query.get(int(feat_id))
+            feature = db.session.get(Feature, int(feat_id))
             if feature:
                 character.features.append(feature)
 
@@ -654,3 +654,48 @@ def get_classes():
         "Wizard",
     ]
     return jsonify(classes)
+
+
+@bp.route("/ability-bonuses")
+@login_required
+def get_ability_bonuses():
+    """Get ability score bonuses for species and subspecies combination."""
+    species_id = request.args.get("species_id")
+    subspecies_id = request.args.get("subspecies_id")
+    
+    bonuses = {
+        "str": 0, "dex": 0, "con": 0, 
+        "int": 0, "wis": 0, "cha": 0
+    }
+    
+    species_info = {}
+    subspecies_info = {}
+    
+    if species_id:
+        species = db.session.get(Species, species_id)
+        if species:
+            species_info = {
+                "name": species.name,
+                "size": species.size,
+                "speed": species.speed,
+                "traits": species.traits or [],
+                "languages": species.languages or []
+            }
+            if species.ability_score_increases:
+                for ability, bonus in species.ability_score_increases.items():
+                    if ability in bonuses:
+                        bonuses[ability] += bonus
+    
+    if subspecies_id:
+        subspecies = db.session.get(SubSpecies, subspecies_id)
+        if subspecies and subspecies.additional_traits:
+            subspecies_info = {
+                "name": subspecies.name,
+                "additional_traits": subspecies.additional_traits
+            }
+    
+    return jsonify({
+        "bonuses": bonuses,
+        "species_info": species_info,
+        "subspecies_info": subspecies_info
+    })
