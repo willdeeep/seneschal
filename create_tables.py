@@ -56,7 +56,7 @@ def create_tables():
                 print(f"Warning: Could not retrieve counts: {e}")
 
             return True
-        
+
         print("Error: Database initialization failed")
         return False
 

@@ -534,7 +534,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateAbilityScores() {
         const speciesId = speciesSelect.value;
         const subspeciesId = subspeciesSelect.value;
-        
+
         if (speciesId) {
             fetch(`{{ url_for('characters.get_ability_bonuses') }}?species_id=${speciesId}&subspecies_id=${subspeciesId || ''}`)
                 .then(response => response.json())

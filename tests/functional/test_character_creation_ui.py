@@ -17,7 +17,7 @@ class TestCharacterCreationUI:
         """Test that character creation page loads with species and class data."""
         # Login first
         auth.login()
-        
+
         # Create test data
         with client.application.app_context():
             species = Species(
@@ -46,7 +46,7 @@ class TestCharacterCreationUI:
         # Test character creation page
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         # Check that species and class data is in the response
         response_text = response.get_data(as_text=True)
         assert "Test Elf" in response_text
@@ -54,7 +54,7 @@ class TestCharacterCreationUI:
         assert 'id="species_id"' in response_text
         assert 'id="class_id"' in response_text
         assert 'id="subspecies_id"' in response_text
-        
+
         # Cleanup
         with client.application.app_context():
             db.session.delete(db.session.get(Species, species_id))
@@ -65,7 +65,7 @@ class TestCharacterCreationUI:
         """Test the ability bonuses API endpoint."""
         # Login first
         auth.login()
-        
+
         # Create test species with ability bonuses
         with client.application.app_context():
             species = Species(
@@ -90,7 +90,7 @@ class TestCharacterCreationUI:
         # Test API endpoint without subspecies
         response = client.get(f'/characters/ability-bonuses?species_id={species_id}')
         assert response.status_code == 200
-        
+
         data = json.loads(response.get_data(as_text=True))
         assert 'bonuses' in data
         assert data['bonuses']['str'] == 2
@@ -102,7 +102,7 @@ class TestCharacterCreationUI:
         # Test API endpoint with subspecies
         response = client.get(f'/characters/ability-bonuses?species_id={species_id}&subspecies_id={subspecies_id}')
         assert response.status_code == 200
-        
+
         data = json.loads(response.get_data(as_text=True))
         assert 'bonuses' in data
         assert data['bonuses']['str'] == 2
@@ -114,7 +114,7 @@ class TestCharacterCreationUI:
         data = json.loads(response.get_data(as_text=True))
         assert data['bonuses']['str'] == 0
         assert data['bonuses']['dex'] == 0
-        
+
         # Cleanup
         with client.application.app_context():
             db.session.delete(db.session.get(SubSpecies, subspecies_id))
@@ -125,7 +125,7 @@ class TestCharacterCreationUI:
         """Test character creation form submission with species_id and class_id."""
         # Login first
         auth.login()
-        
+
         # Create test data
         with client.application.app_context():
             species = Species(
@@ -170,10 +170,10 @@ class TestCharacterCreationUI:
             'initiative': 2,
             'gold_pieces': 150
         }, follow_redirects=True)
-        
+
         assert response.status_code == 200
         assert b"Character Test Enhanced Character created successfully!" in response.data
-        
+
         # Verify character was created in database
         with client.application.app_context():
             from project.models import Character
@@ -194,7 +194,7 @@ class TestCharacterCreationUI:
         """Test form validation for required fields."""
         # Login first
         auth.login()
-        
+
         # Test missing required fields
         response = client.post('/characters/create', data={
             'name': 'Incomplete Character',
@@ -202,7 +202,7 @@ class TestCharacterCreationUI:
             'level': 1,
             'strength': 10
         })
-        
+
         assert response.status_code == 200
         assert b"Name, species, and class are required." in response.data
 
@@ -210,7 +210,7 @@ class TestCharacterCreationUI:
         """Test that subspecies data is properly passed to template."""
         # Login first
         auth.login()
-        
+
         # Create test data with subspecies
         with client.application.app_context():
             species = Species(
@@ -235,11 +235,11 @@ class TestCharacterCreationUI:
         # Test character creation page
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         response_text = response.get_data(as_text=True)
         assert "High Elf" in response_text
         assert f'data-species-id="{species_id}"' in response_text
-        
+
         # Cleanup
         with client.application.app_context():
             db.session.delete(db.session.get(SubSpecies, subspecies_id))
@@ -255,7 +255,7 @@ class TestCharacterCreationJavaScript:
         """Test that the ability bonuses API returns properly formatted JSON."""
         # Login first
         auth.login()
-        
+
         # Create test species
         with client.application.app_context():
             species = Species(
@@ -274,32 +274,32 @@ class TestCharacterCreationJavaScript:
         response = client.get(f'/characters/ability-bonuses?species_id={species_id}')
         assert response.status_code == 200
         assert response.content_type == 'application/json'
-        
+
         data = json.loads(response.get_data(as_text=True))
-        
+
         # Check that all required fields are present
         assert 'bonuses' in data
         assert 'species_info' in data
-        
+
         # Check bonuses structure
         expected_abilities = ['str', 'dex', 'con', 'int', 'wis', 'cha']
         for ability in expected_abilities:
             assert ability in data['bonuses']
             assert isinstance(data['bonuses'][ability], int)
-        
+
         # Check species info
         assert 'speed' in data['species_info']
         assert 'size' in data['species_info']
         assert 'traits' in data['species_info']
         assert 'languages' in data['species_info']
-        
+
         # Verify values
         assert data['bonuses']['str'] == 2
         assert data['bonuses']['wis'] == 1
         assert data['bonuses']['dex'] == 0
         assert data['species_info']['speed'] == 25
         assert data['species_info']['size'] == "Small"
-        
+
         # Cleanup
         with client.application.app_context():
             db.session.delete(db.session.get(Species, species_id))
@@ -309,22 +309,22 @@ class TestCharacterCreationJavaScript:
         """Test API gracefully handles missing or invalid parameters."""
         # Login first
         auth.login()
-        
+
         # Test with no parameters
         response = client.get('/characters/ability-bonuses')
         assert response.status_code == 200
         data = json.loads(response.get_data(as_text=True))
-        
+
         # Should return zero bonuses
         expected_abilities = ['str', 'dex', 'con', 'int', 'wis', 'cha']
         for ability in expected_abilities:
             assert data['bonuses'][ability] == 0
-        
+
         # Test with invalid species_id
         response = client.get('/characters/ability-bonuses?species_id=invalid')
         assert response.status_code == 200
         data = json.loads(response.get_data(as_text=True))
-        
+
         # Should return zero bonuses
         for ability in expected_abilities:
             assert data['bonuses'][ability] == 0
@@ -339,7 +339,7 @@ class TestAbilityScoreCalculations:
         # This would be the Python equivalent of the JavaScript calculateAbilityModifier function
         def calculate_ability_modifier(score):
             return (score - 10) // 2
-        
+
         # Test various scores
         test_cases = [
             (1, -5),   # Very low
@@ -351,7 +351,7 @@ class TestAbilityScoreCalculations:
             (18, 4),   # Very high
             (20, 5),   # Maximum normal
         ]
-        
+
         for score, expected_modifier in test_cases:
             assert calculate_ability_modifier(score) == expected_modifier
 
