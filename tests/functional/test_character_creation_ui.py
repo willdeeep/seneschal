@@ -212,7 +212,7 @@ class TestCharacterCreationUI:
         """Test enhanced form validation with detailed error messages."""
         # Login first
         auth.login()
-        
+
         # Test various validation scenarios
         test_cases = [
             {
@@ -236,12 +236,12 @@ class TestCharacterCreationUI:
                 'expected_errors': ['Current HP cannot exceed Maximum HP.']
             }
         ]
-        
+
         for test_case in test_cases:
             response = client.post('/characters/create', data=test_case['data'])
             assert response.status_code == 200
             response_text = response.get_data(as_text=True)
-            
+
             for expected_error in test_case['expected_errors']:
                 assert expected_error in response_text, f"Expected error '{expected_error}' not found in response"
 

@@ -620,7 +620,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const nameInput = document.getElementById('name');
         const name = nameInput.value.trim();
         const errorDiv = nameInput.parentNode.querySelector('.invalid-feedback') || createErrorDiv(nameInput);
-        
+
         if (!name) {
             showFieldError(nameInput, errorDiv, 'Character name is required.');
             return false;
@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateAbilityScore(inputElement, abilityName) {
         const score = parseInt(inputElement.value);
         const errorDiv = inputElement.parentNode.querySelector('.invalid-feedback') || createErrorDiv(inputElement);
-        
+
         if (isNaN(score) || score < 3 || score > 20) {
             showFieldError(inputElement, errorDiv, `${abilityName} must be between 3 and 20.`);
             return false;
@@ -654,9 +654,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentHpInput = document.getElementById('current_hp');
         const maxHp = parseInt(maxHpInput.value);
         const currentHp = parseInt(currentHpInput.value);
-        
+
         let valid = true;
-        
+
         // Validate max HP
         const maxErrorDiv = maxHpInput.parentNode.querySelector('.invalid-feedback') || createErrorDiv(maxHpInput);
         if (isNaN(maxHp) || maxHp < 1) {
@@ -665,7 +665,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             clearFieldError(maxHpInput, maxErrorDiv);
         }
-        
+
         // Validate current HP
         const currentErrorDiv = currentHpInput.parentNode.querySelector('.invalid-feedback') || createErrorDiv(currentHpInput);
         if (isNaN(currentHp) || currentHp < 0) {
@@ -677,13 +677,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             clearFieldError(currentHpInput, currentErrorDiv);
         }
-        
+
         return valid;
     }
     
     function validateRequiredSelects() {
         let valid = true;
-        
+
         // Validate species
         const speciesSelect = document.getElementById('species_id');
         const speciesErrorDiv = speciesSelect.parentNode.querySelector('.invalid-feedback') || createErrorDiv(speciesSelect);
@@ -693,7 +693,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             clearFieldError(speciesSelect, speciesErrorDiv);
         }
-        
+
         // Validate class
         const classSelect = document.getElementById('class_id');
         const classErrorDiv = classSelect.parentNode.querySelector('.invalid-feedback') || createErrorDiv(classSelect);
@@ -703,7 +703,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             clearFieldError(classSelect, classErrorDiv);
         }
-        
+
         return valid;
     }
     
@@ -728,16 +728,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form submission validation
     document.querySelector('form').addEventListener('submit', function(e) {
         let isValid = true;
-        
+
         // Clear any previous general errors
         const generalErrors = document.querySelectorAll('.alert-danger');
         generalErrors.forEach(error => error.remove());
-        
+
         // Validate all fields
         isValid = validateCharacterName() && isValid;
         isValid = validateRequiredSelects() && isValid;
         isValid = validateHP() && isValid;
-        
+
         // Validate ability scores
         const abilityScores = [
             {element: document.getElementById('strength'), name: 'Strength'},
@@ -747,11 +747,11 @@ document.addEventListener('DOMContentLoaded', function() {
             {element: document.getElementById('wisdom'), name: 'Wisdom'},
             {element: document.getElementById('charisma'), name: 'Charisma'}
         ];
-        
+
         abilityScores.forEach(ability => {
             isValid = validateAbilityScore(ability.element, ability.name) && isValid;
         });
-        
+
         if (!isValid) {
             e.preventDefault();
             // Scroll to first error
