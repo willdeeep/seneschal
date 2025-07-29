@@ -75,16 +75,83 @@ def create():
         secret = request.form.get("secret")
         attitude_origin = request.form.get("attitude_origin")
 
-        # Validation
-        if not all([name, species_id, class_id]):
-            flash("Name, species, and class are required.", "error")
+        # Enhanced validation
+        errors = []
+        
+        # Required field validation
+        if not name or not name.strip():
+            errors.append("Character name is required.")
+        elif len(name.strip()) < 2:
+            errors.append("Character name must be at least 2 characters long.")
+        elif len(name.strip()) > 50:
+            errors.append("Character name cannot exceed 50 characters.")
+            
+        if not species_id:
+            errors.append("Species selection is required.")
+        else:
+            # Validate species exists
+            species = db.session.get(Species, int(species_id))
+            if not species:
+                errors.append("Selected species is invalid.")
+                
+        if not class_id:
+            errors.append("Class selection is required.")
+        else:
+            # Validate class exists
+            char_class = db.session.get(CharacterClass, int(class_id))
+            if not char_class:
+                errors.append("Selected class is invalid.")
+                
+        # Validate subspecies if provided
+        if subspecies_id:
+            subspecies = db.session.get(SubSpecies, int(subspecies_id))
+            if not subspecies:
+                errors.append("Selected subspecies is invalid.")
+            elif subspecies.species_id != int(species_id):
+                errors.append("Selected subspecies does not belong to the chosen species.")
+        
+        # Validate ability scores
+        ability_scores = [strength, dexterity, constitution, intelligence, wisdom, charisma]
+        for i, score in enumerate(ability_scores):
+            ability_names = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
+            if score < 3 or score > 20:
+                errors.append(f"{ability_names[i]} must be between 3 and 20.")
+        
+        # Validate level
+        if level < 1 or level > 20:
+            errors.append("Level must be between 1 and 20.")
+            
+        # Validate HP values
+        if max_hp < 1:
+            errors.append("Maximum HP must be at least 1.")
+        if current_hp < 0:
+            errors.append("Current HP cannot be negative.")
+        if current_hp > max_hp:
+            errors.append("Current HP cannot exceed Maximum HP.")
+            
+        # Validate AC and other combat stats
+        if armor_class < 1 or armor_class > 30:
+            errors.append("Armor Class must be between 1 and 30.")
+        if initiative < -10 or initiative > 20:
+            errors.append("Initiative modifier must be between -10 and +20.")
+        if speed < 0 or speed > 120:
+            errors.append("Speed must be between 0 and 120 feet.")
+            
+        # Validate gold pieces
+        if gold_pieces < 0:
+            errors.append("Gold pieces cannot be negative.")
+
+        if errors:
+            for error in errors:
+                flash(error, "error")
             species = Species.query.order_by(Species.name).all()
             classes = CharacterClass.query.order_by(CharacterClass.name).all()
             subspecies = SubSpecies.query.order_by(SubSpecies.name).all()
             return render_template("characters/create.html",
                                  species=species,
                                  classes=classes,
-                                 subspecies=subspecies)
+                                 subspecies=subspecies,
+                                 form_data=request.form)
 
         # Create character
         character = Character(

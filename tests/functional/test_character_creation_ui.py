@@ -204,7 +204,46 @@ class TestCharacterCreationUI:
         })
 
         assert response.status_code == 200
-        assert b"Name, species, and class are required." in response.data
+        response_text = response.get_data(as_text=True)
+        assert "Species selection is required." in response_text
+        assert "Class selection is required." in response_text
+
+    def test_enhanced_form_validation_detailed(self, client, auth, test_user):
+        """Test enhanced form validation with detailed error messages."""
+        # Login first
+        auth.login()
+        
+        # Test various validation scenarios
+        test_cases = [
+            {
+                'data': {'name': '', 'species_id': '', 'class_id': ''},
+                'expected_errors': ['Character name is required.', 'Species selection is required.', 'Class selection is required.']
+            },
+            {
+                'data': {'name': 'A', 'species_id': '1', 'class_id': '1'},
+                'expected_errors': ['Character name must be at least 2 characters long.']
+            },
+            {
+                'data': {'name': 'Valid Name', 'species_id': '1', 'class_id': '1', 'strength': '25'},
+                'expected_errors': ['Strength must be between 3 and 20.']
+            },
+            {
+                'data': {'name': 'Valid Name', 'species_id': '1', 'class_id': '1', 'max_hp': '0'},
+                'expected_errors': ['Maximum HP must be at least 1.']
+            },
+            {
+                'data': {'name': 'Valid Name', 'species_id': '1', 'class_id': '1', 'current_hp': '10', 'max_hp': '5'},
+                'expected_errors': ['Current HP cannot exceed Maximum HP.']
+            }
+        ]
+        
+        for test_case in test_cases:
+            response = client.post('/characters/create', data=test_case['data'])
+            assert response.status_code == 200
+            response_text = response.get_data(as_text=True)
+            
+            for expected_error in test_case['expected_errors']:
+                assert expected_error in response_text, f"Expected error '{expected_error}' not found in response"
 
     def test_subspecies_data_in_template(self, client, auth, test_user):
         """Test that subspecies data is properly passed to template."""

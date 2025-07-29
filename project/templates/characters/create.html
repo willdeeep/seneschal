@@ -16,11 +16,14 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Character Name *</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ form_data.name if form_data else '' }}" required>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="player_name" class="form-label">Player Name</label>
-                            <input type="text" class="form-control" id="player_name" name="player_name">
+                            <input type="text" class="form-control" id="player_name" name="player_name"
+                                   value="{{ form_data.player_name if form_data else '' }}">
                         </div>
                     </div>
                  
@@ -30,16 +33,24 @@
                             <select class="form-control" id="species_id" name="species_id" required>
                                 <option value="">Select Species</option>
                                 {% for species_option in species %}
-                                    <option value="{{ species_option.id }}">{{ species_option.name }}</option>
+                                    <option value="{{ species_option.id }}" 
+                                            {% if form_data and form_data.species_id == species_option.id|string %}selected{% endif %}>
+                                        {{ species_option.name }}
+                                    </option>
                                 {% endfor %}
                             </select>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="subspecies_id" class="form-label">Subspecies</label>
                             <select class="form-control" id="subspecies_id" name="subspecies_id">
                                 <option value="">Select Subspecies (Optional)</option>
                                 {% for subspecies_option in subspecies %}
-                                    <option value="{{ subspecies_option.id }}" data-species-id="{{ subspecies_option.species_id }}">{{ subspecies_option.name }}</option>
+                                    <option value="{{ subspecies_option.id }}" 
+                                            data-species-id="{{ subspecies_option.species_id }}"
+                                            {% if form_data and form_data.subspecies_id == subspecies_option.id|string %}selected{% endif %}>
+                                        {{ subspecies_option.name }}
+                                    </option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -48,13 +59,18 @@
                             <select class="form-control" id="class_id" name="class_id" required>
                                 <option value="">Select Class</option>
                                 {% for class_option in classes %}
-                                    <option value="{{ class_option.id }}">{{ class_option.name }}</option>
+                                    <option value="{{ class_option.id }}"
+                                            {% if form_data and form_data.class_id == class_option.id|string %}selected{% endif %}>
+                                        {{ class_option.name }}
+                                    </option>
                                 {% endfor %}
                             </select>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="level" class="form-label">Level</label>
-                            <input type="number" class="form-control" id="level" name="level" value="1" min="1" max="20">
+                            <input type="number" class="form-control" id="level" name="level" 
+                                   value="{{ form_data.level if form_data else '1' }}" min="1" max="20">
                         </div>
                     </div>
                  
@@ -159,33 +175,45 @@
                     <div class="row">
                         <div class="col-md-2 mb-3">
                             <label for="strength" class="form-label">Strength</label>
-                            <input type="number" class="form-control" id="strength" name="strength" value="10" min="1" max="20">
+                            <input type="number" class="form-control" id="strength" name="strength" 
+                                   value="{{ form_data.strength if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="strength-total">Total: 10 (+0)</small>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="dexterity" class="form-label">Dexterity</label>
-                            <input type="number" class="form-control" id="dexterity" name="dexterity" value="10" min="1" max="20">
+                            <input type="number" class="form-control" id="dexterity" name="dexterity" 
+                                   value="{{ form_data.dexterity if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="dexterity-total">Total: 10 (+0)</small>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="constitution" class="form-label">Constitution</label>
-                            <input type="number" class="form-control" id="constitution" name="constitution" value="10" min="1" max="20">
+                            <input type="number" class="form-control" id="constitution" name="constitution" 
+                                   value="{{ form_data.constitution if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="constitution-total">Total: 10 (+0)</small>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="intelligence" class="form-label">Intelligence</label>
-                            <input type="number" class="form-control" id="intelligence" name="intelligence" value="10" min="1" max="20">
+                            <input type="number" class="form-control" id="intelligence" name="intelligence" 
+                                   value="{{ form_data.intelligence if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="intelligence-total">Total: 10 (+0)</small>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="wisdom" class="form-label">Wisdom</label>
-                            <input type="number" class="form-control" id="wisdom" name="wisdom" value="10" min="1" max="20">
+                            <input type="number" class="form-control" id="wisdom" name="wisdom" 
+                                   value="{{ form_data.wisdom if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="wisdom-total">Total: 10 (+0)</small>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="charisma" class="form-label">Charisma</label>
-                            <input type="number" class="form-control" id="charisma" name="charisma" value="10" min="1" max="20">
+                            <input type="number" class="form-control" id="charisma" name="charisma" 
+                                   value="{{ form_data.charisma if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="charisma-total">Total: 10 (+0)</small>
+                            <div class="invalid-feedback"></div>
                         </div>
                     </div>
                 </div>
@@ -199,19 +227,25 @@
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label for="max_hp" class="form-label">Max HP</label>
-                            <input type="number" class="form-control" id="max_hp" name="max_hp" value="8" min="1">
+                            <input type="number" class="form-control" id="max_hp" name="max_hp" 
+                                   value="{{ form_data.max_hp if form_data else '8' }}" min="1">
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="current_hp" class="form-label">Current HP</label>
-                            <input type="number" class="form-control" id="current_hp" name="current_hp" value="8" min="0">
+                            <input type="number" class="form-control" id="current_hp" name="current_hp" 
+                                   value="{{ form_data.current_hp if form_data else '8' }}" min="0">
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="armor_class" class="form-label">Armor Class</label>
-                            <input type="number" class="form-control" id="armor_class" name="armor_class" value="10" min="1">
+                            <input type="number" class="form-control" id="armor_class" name="armor_class" 
+                                   value="{{ form_data.armor_class if form_data else '10' }}" min="1">
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="speed" class="form-label">Speed (ft)</label>
-                            <input type="number" class="form-control" id="speed" name="speed" value="30" min="0">
+                            <input type="number" class="form-control" id="speed" name="speed" 
+                                   value="{{ form_data.speed if form_data else '30' }}" min="0">
                         </div>
                     </div>
                     <div class="row">
@@ -580,6 +614,167 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+
+    // Form validation functions
+    function validateCharacterName() {
+        const nameInput = document.getElementById('name');
+        const name = nameInput.value.trim();
+        const errorDiv = nameInput.parentNode.querySelector('.invalid-feedback') || createErrorDiv(nameInput);
+        
+        if (!name) {
+            showFieldError(nameInput, errorDiv, 'Character name is required.');
+            return false;
+        } else if (name.length < 2) {
+            showFieldError(nameInput, errorDiv, 'Character name must be at least 2 characters long.');
+            return false;
+        } else if (name.length > 50) {
+            showFieldError(nameInput, errorDiv, 'Character name cannot exceed 50 characters.');
+            return false;
+        } else {
+            clearFieldError(nameInput, errorDiv);
+            return true;
+        }
+    }
+    
+    function validateAbilityScore(inputElement, abilityName) {
+        const score = parseInt(inputElement.value);
+        const errorDiv = inputElement.parentNode.querySelector('.invalid-feedback') || createErrorDiv(inputElement);
+        
+        if (isNaN(score) || score < 3 || score > 20) {
+            showFieldError(inputElement, errorDiv, `${abilityName} must be between 3 and 20.`);
+            return false;
+        } else {
+            clearFieldError(inputElement, errorDiv);
+            return true;
+        }
+    }
+    
+    function validateHP() {
+        const maxHpInput = document.getElementById('max_hp');
+        const currentHpInput = document.getElementById('current_hp');
+        const maxHp = parseInt(maxHpInput.value);
+        const currentHp = parseInt(currentHpInput.value);
+        
+        let valid = true;
+        
+        // Validate max HP
+        const maxErrorDiv = maxHpInput.parentNode.querySelector('.invalid-feedback') || createErrorDiv(maxHpInput);
+        if (isNaN(maxHp) || maxHp < 1) {
+            showFieldError(maxHpInput, maxErrorDiv, 'Maximum HP must be at least 1.');
+            valid = false;
+        } else {
+            clearFieldError(maxHpInput, maxErrorDiv);
+        }
+        
+        // Validate current HP
+        const currentErrorDiv = currentHpInput.parentNode.querySelector('.invalid-feedback') || createErrorDiv(currentHpInput);
+        if (isNaN(currentHp) || currentHp < 0) {
+            showFieldError(currentHpInput, currentErrorDiv, 'Current HP cannot be negative.');
+            valid = false;
+        } else if (currentHp > maxHp) {
+            showFieldError(currentHpInput, currentErrorDiv, 'Current HP cannot exceed Maximum HP.');
+            valid = false;
+        } else {
+            clearFieldError(currentHpInput, currentErrorDiv);
+        }
+        
+        return valid;
+    }
+    
+    function validateRequiredSelects() {
+        let valid = true;
+        
+        // Validate species
+        const speciesSelect = document.getElementById('species_id');
+        const speciesErrorDiv = speciesSelect.parentNode.querySelector('.invalid-feedback') || createErrorDiv(speciesSelect);
+        if (!speciesSelect.value) {
+            showFieldError(speciesSelect, speciesErrorDiv, 'Species selection is required.');
+            valid = false;
+        } else {
+            clearFieldError(speciesSelect, speciesErrorDiv);
+        }
+        
+        // Validate class
+        const classSelect = document.getElementById('class_id');
+        const classErrorDiv = classSelect.parentNode.querySelector('.invalid-feedback') || createErrorDiv(classSelect);
+        if (!classSelect.value) {
+            showFieldError(classSelect, classErrorDiv, 'Class selection is required.');
+            valid = false;
+        } else {
+            clearFieldError(classSelect, classErrorDiv);
+        }
+        
+        return valid;
+    }
+    
+    function createErrorDiv(inputElement) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'invalid-feedback';
+        inputElement.parentNode.appendChild(errorDiv);
+        return errorDiv;
+    }
+    
+    function showFieldError(inputElement, errorDiv, message) {
+        inputElement.classList.add('is-invalid');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+    
+    function clearFieldError(inputElement, errorDiv) {
+        inputElement.classList.remove('is-invalid');
+        errorDiv.style.display = 'none';
+    }
+    
+    // Form submission validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Clear any previous general errors
+        const generalErrors = document.querySelectorAll('.alert-danger');
+        generalErrors.forEach(error => error.remove());
+        
+        // Validate all fields
+        isValid = validateCharacterName() && isValid;
+        isValid = validateRequiredSelects() && isValid;
+        isValid = validateHP() && isValid;
+        
+        // Validate ability scores
+        const abilityScores = [
+            {element: document.getElementById('strength'), name: 'Strength'},
+            {element: document.getElementById('dexterity'), name: 'Dexterity'},
+            {element: document.getElementById('constitution'), name: 'Constitution'},
+            {element: document.getElementById('intelligence'), name: 'Intelligence'},
+            {element: document.getElementById('wisdom'), name: 'Wisdom'},
+            {element: document.getElementById('charisma'), name: 'Charisma'}
+        ];
+        
+        abilityScores.forEach(ability => {
+            isValid = validateAbilityScore(ability.element, ability.name) && isValid;
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstError = document.querySelector('.is-invalid');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        }
+    });
+    
+    // Real-time validation
+    document.getElementById('name').addEventListener('blur', validateCharacterName);
+    document.getElementById('species_id').addEventListener('change', validateRequiredSelects);
+    document.getElementById('class_id').addEventListener('change', validateRequiredSelects);
+    document.getElementById('max_hp').addEventListener('input', validateHP);
+    document.getElementById('current_hp').addEventListener('input', validateHP);
+    
+    // Add real-time validation to ability scores
+    Object.entries(abilityInputs).forEach(([ability, element]) => {
+        const abilityName = ability.charAt(0).toUpperCase() + ability.slice(1);
+        element.addEventListener('input', () => validateAbilityScore(element, abilityName));
+    });
 
     // Event listeners
     speciesSelect.addEventListener('change', function() {
