@@ -169,7 +169,6 @@ def create():
     species = Species.query.order_by(Species.name).all()
     classes = CharacterClass.query.order_by(CharacterClass.name).all()
     subspecies = SubSpecies.query.order_by(SubSpecies.name).all()
-    
     return render_template("characters/create.html",
                          species=species,
                          classes=classes,
@@ -662,15 +661,12 @@ def get_ability_bonuses():
     """Get ability score bonuses for species and subspecies combination."""
     species_id = request.args.get("species_id")
     subspecies_id = request.args.get("subspecies_id")
-    
     bonuses = {
-        "str": 0, "dex": 0, "con": 0, 
+        "str": 0, "dex": 0, "con": 0,
         "int": 0, "wis": 0, "cha": 0
     }
-    
     species_info = {}
     subspecies_info = {}
-    
     if species_id:
         species = db.session.get(Species, species_id)
         if species:
@@ -685,7 +681,6 @@ def get_ability_bonuses():
                 for ability, bonus in species.ability_score_increases.items():
                     if ability in bonuses:
                         bonuses[ability] += bonus
-    
     if subspecies_id:
         subspecies = db.session.get(SubSpecies, subspecies_id)
         if subspecies and subspecies.additional_traits:
@@ -693,7 +688,6 @@ def get_ability_bonuses():
                 "name": subspecies.name,
                 "additional_traits": subspecies.additional_traits
             }
-    
     return jsonify({
         "bonuses": bonuses,
         "species_info": species_info,

@@ -39,7 +39,7 @@ class TestCharacterCreationUI:
             )
             db.session.add_all([species, char_class])
             db.session.commit()
-            
+
             species_id = species.id
             class_id = char_class.id
 
@@ -83,7 +83,7 @@ class TestCharacterCreationUI:
             )
             db.session.add_all([species, subspecies])
             db.session.commit()
-            
+
             species_id = species.id
             subspecies_id = subspecies.id
 
@@ -147,7 +147,7 @@ class TestCharacterCreationUI:
             )
             db.session.add_all([species, char_class])
             db.session.commit()
-            
+
             species_id = species.id
             class_id = char_class.id
 
@@ -183,7 +183,7 @@ class TestCharacterCreationUI:
             assert character.class_id == class_id
             assert character.species.name == "Test Human"
             assert character.char_class.name == "Test Fighter"
-            
+
             # Cleanup
             db.session.delete(character)
             db.session.delete(db.session.get(Species, species_id))
@@ -228,7 +228,7 @@ class TestCharacterCreationUI:
             )
             db.session.add_all([species, subspecies])
             db.session.commit()
-            
+
             species_id = species.id
             subspecies_id = subspecies.id
 
@@ -367,21 +367,21 @@ class TestAbilityScoreCalculations:
                 speed=30,
                 size="Medium"
             )
-            
+
             # Create subspecies with additional bonuses
             subspecies = SubSpecies(
-                name="Test Subspecies", 
+                name="Test Subspecies",
                 species=species,
                 additional_traits=["Extra Test"]
             )
-            
+
             db.session.add_all([species, subspecies])
             db.session.flush()
-            
+
             # Test that bonuses are properly calculated
             # (This would normally be done in the API endpoint)
             base_bonuses = species.ability_score_increases or {}
-            
+
             expected_bonuses = {
                 'str': base_bonuses.get('str', 0),
                 'dex': base_bonuses.get('dex', 0),
@@ -390,10 +390,10 @@ class TestAbilityScoreCalculations:
                 'wis': base_bonuses.get('wis', 0),
                 'cha': base_bonuses.get('cha', 0)
             }
-            
+
             assert expected_bonuses['str'] == 2
             assert expected_bonuses['con'] == 1
             assert expected_bonuses['dex'] == 0
-            
+
             # Cleanup
             db.session.rollback()
