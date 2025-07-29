@@ -339,51 +339,97 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const raceSelect = document.getElementById('race');
-    const classSelect = document.getElementById('character_class');
+    const speciesSelect = document.getElementById('species_id');
+    const classSelect = document.getElementById('class_id');
+    const subspeciesSelect = document.getElementById('subspecies_id');
 
-    // Function to update available options based on race and class selection
+    // Function to update available options based on species and class selection
     function updateAvailableOptions() {
-        const selectedRace = raceSelect.value;
+        const selectedSpecies = speciesSelect.value;
         const selectedClass = classSelect.value;
 
-        if (selectedRace && selectedClass) {
-            // Update proficiencies
-            updateProficiencies(selectedRace, selectedClass);
-            // Update languages
-            updateLanguages(selectedRace, selectedClass);
-            // Update features
-            updateFeatures(selectedRace, selectedClass);
-            // Update spells (if applicable)
-            updateSpells(selectedClass);
+        if (selectedSpecies && selectedClass) {
+            // Update proficiencies and languages
+            updateProficienciesAndLanguages();
+        } else {
+            // Clear sections if species or class not selected
+            document.getElementById('proficiencies-list').innerHTML = '<p class="text-muted">Please select both species and class first.</p>';
+            document.getElementById('languages-list').innerHTML = '<p class="text-muted">Please select both species and class first.</p>';
+        }
+    }
+
+    // Function to update proficiencies and languages when species/class changes
+    function updateProficienciesAndLanguages() {
+        const speciesId = speciesSelect.value;
+        const classId = document.getElementById('class_id').value;
+        
+        if (speciesId && classId) {
+            updateProficiencies(speciesId, classId);
+            updateLanguages(speciesId, classId);
+        } else {
+            // Clear sections if species or class not selected
+            document.getElementById('proficiencies-list').innerHTML = '<p class="text-muted">Please select both species and class first.</p>';
+            document.getElementById('languages-list').innerHTML = '<p class="text-muted">Please select both species and class first.</p>';
         }
     }
 
     // Function to update proficiencies
-    function updateProficiencies(race, characterClass) {
-        fetch(`{{ url_for('characters.get_available_proficiencies') }}?race=${race}&class=${characterClass}`)
-            .then(response => response.json())
+    function updateProficiencies(speciesId, classId) {
+        fetch(`{{ url_for('characters.get_available_proficiencies') }}?species_id=${speciesId}&class_id=${classId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 const proficienciesList = document.getElementById('proficiencies-list');
-                if (data.proficiencies && data.proficiencies.length > 0) {
-                    let html = '<div class="row">';
-                    data.proficiencies.forEach(prof => {
+                let html = '';
+                
+                // Required proficiencies
+                if (data.required && data.required.length > 0) {
+                    html += '<div class="mb-3">';
+                    html += '<h6 class="text-success">Required Proficiencies:</h6>';
+                    data.required.forEach(proficiency => {
                         html += `
-                            <div class="col-md-4 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="proficiencies" value="${prof.id}" id="prof_${prof.id}">
-                                    <label class="form-check-label" for="prof_${prof.id}">
-                                        ${prof.name} (${prof.type})
-                                    </label>
-                                </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="proficiencies" value="${proficiency.id}" 
+                                       id="prof_${proficiency.id}" checked disabled>
+                                <label class="form-check-label text-success" for="prof_${proficiency.id}">
+                                    ${proficiency.name} (${proficiency.category})
+                                </label>
                             </div>
                         `;
                     });
                     html += '</div>';
-                    proficienciesList.innerHTML = html;
-                } else {
-                    proficienciesList.innerHTML = '<p class="text-muted">No additional proficiencies available for this combination.</p>';
                 }
+                
+                // Optional proficiencies
+                if (data.optional && data.optional.length > 0) {
+                    html += '<div class="mb-3">';
+                    html += '<h6>Optional Proficiencies:</h6>';
+                    html += '<small class="text-muted">Choose from the following options:</small>';
+                    data.optional.forEach(proficiency => {
+                        html += `
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="proficiencies" value="${proficiency.id}" 
+                                       id="prof_${proficiency.id}">
+                                <label class="form-check-label" for="prof_${proficiency.id}">
+                                    ${proficiency.name} (${proficiency.category})
+                                </label>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+                
+                if (!html) {
+                    html = '<p class="text-muted">No proficiencies available for this combination.</p>';
+                }
+                
+                proficienciesList.innerHTML = html;
             })
             .catch(error => {
                 console.error('Error fetching proficiencies:', error);
@@ -392,30 +438,62 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to update languages
-    function updateLanguages(race, characterClass) {
-        fetch(`{{ url_for('characters.get_available_languages') }}?race=${race}&class=${characterClass}`)
-            .then(response => response.json())
+    function updateLanguages(speciesId, classId) {
+        fetch(`{{ url_for('characters.get_available_languages') }}?species_id=${speciesId}&class_id=${classId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 const languagesList = document.getElementById('languages-list');
-                if (data.languages && data.languages.length > 0) {
-                    let html = '<div class="row">';
-                    data.languages.forEach(lang => {
+                let html = '';
+                
+                // Base languages
+                if (data.base && data.base.length > 0) {
+                    html += '<div class="mb-3">';
+                    html += '<h6 class="text-success">Base Languages:</h6>';
+                    data.base.forEach(language => {
                         html += `
-                            <div class="col-md-4 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="languages" value="${lang.id}" id="lang_${lang.id}">
-                                    <label class="form-check-label" for="lang_${lang.id}">
-                                        ${lang.name}
-                                    </label>
-                                </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="languages" value="${language.id}" 
+                                       id="lang_${language.id}" checked disabled>
+                                <label class="form-check-label text-success" for="lang_${language.id}">
+                                    ${language.name}
+                                </label>
                             </div>
                         `;
                     });
                     html += '</div>';
-                    languagesList.innerHTML = html;
-                } else {
-                    languagesList.innerHTML = '<p class="text-muted">No additional languages available for this combination.</p>';
                 }
+                
+                // Optional languages
+                if (data.optional && data.optional.length > 0) {
+                    html += '<div class="mb-3">';
+                    html += '<h6>Optional Languages:</h6>';
+                    html += '<small class="text-muted">Choose from the following options:</small>';
+                    data.optional.forEach(language => {
+                        html += `
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="languages" value="${language.id}" 
+                                       id="lang_${language.id}">
+                                <label class="form-check-label" for="lang_${language.id}">
+                                    ${language.name}
+                                </label>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+                
+                if (!html) {
+                    html = '<p class="text-muted">No languages available for this combination.</p>';
+                }
+                
+                languagesList.innerHTML = html;
             })
             .catch(error => {
                 console.error('Error fetching languages:', error);
@@ -506,10 +584,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Add event listeners
-    raceSelect.addEventListener('change', updateAvailableOptions);
+    speciesSelect.addEventListener('change', function() {
+        updateAvailableOptions();
+        filterSubspecies();
+        updateAbilityScores();
+    });
     classSelect.addEventListener('change', updateAvailableOptions);
 
-    // Initial update if both race and class are selected
+    // Initial update if both species and class are selected
     updateAvailableOptions();
 });
 </script>

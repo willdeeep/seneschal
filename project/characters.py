@@ -446,159 +446,146 @@ def remove_item(item_id):
 @bp.route("/api/proficiencies")
 @login_required
 def get_available_proficiencies():
-    """Get proficiencies available for a race/class combination."""
-    race = request.args.get("race", "")
-    character_class = request.args.get("class", "")
-    proficiencies = []
-
-    # Race-specific proficiencies
-    race_proficiencies = {
-        "Elf": ["Longsword", "Shortbow", "Longbow", "Perception"],
-        "Dwarf": ["Battleaxe", "Handaxe", "Light Hammer", "Warhammer"],
-        "Human": [],  # Humans get flexible proficiencies
-        "Halfling": ["Sling"],
-        "Dragonborn": [],
-        "Gnome": [],
-        "Half-Elf": [],
-        "Half-Orc": [],
-        "Tiefling": [],
-    }
-
-    # Class-specific proficiencies
-    class_proficiencies = {
-        "Fighter": [
-            "Simple Weapons",
-            "Martial Weapons",
-            "Light Armor",
-            "Medium Armor",
-            "Heavy Armor",
-            "Shields",
-        ],
-        "Wizard": ["Dagger", "Dart", "Sling", "Quarterstaff", "Light Crossbow"],
-        "Rogue": [
-            "Simple Weapons",
-            "Hand Crossbow",
-            "Longsword",
-            "Rapier",
-            "Shortsword",
-            "Light Armor",
-            "Thieves' Tools",
-        ],
-        "Cleric": ["Simple Weapons", "Light Armor", "Medium Armor", "Shields"],
-        "Ranger": [
-            "Simple Weapons",
-            "Martial Weapons",
-            "Light Armor",
-            "Medium Armor",
-            "Shields",
-        ],
-        "Paladin": [
-            "Simple Weapons",
-            "Martial Weapons",
-            "Light Armor",
-            "Medium Armor",
-            "Heavy Armor",
-            "Shields",
-        ],
-        "Barbarian": [
-            "Simple Weapons",
-            "Martial Weapons",
-            "Light Armor",
-            "Medium Armor",
-            "Shields",
-        ],
-        "Bard": [
-            "Simple Weapons",
-            "Hand Crossbow",
-            "Longsword",
-            "Rapier",
-            "Shortsword",
-            "Light Armor",
-        ],
-        "Druid": [
-            "Light Armor",
-            "Medium Armor",
-            "Shields",
-            "Scimitar",
-            "Shortsword",
-            "Simple Weapons",
-        ],
-        "Monk": ["Simple Weapons", "Shortsword"],
-        "Sorcerer": ["Dagger", "Dart", "Sling", "Quarterstaff", "Light Crossbow"],
-        "Warlock": ["Simple Weapons", "Light Armor"],
-    }
-
-    # Combine race and class proficiencies
-    available_names = set()
-    available_names.update(race_proficiencies.get(race, []))
-    available_names.update(class_proficiencies.get(character_class, []))
-
-    # Get proficiencies from database that match available names
-    if available_names:
-        proficiencies = Proficiency.query.filter(
-            Proficiency.name.in_(available_names)
-        ).all()
-    else:
-        # If no specific restrictions, return all proficiencies
-        proficiencies = Proficiency.query.all()
-
-    return jsonify(
-        {
-            "proficiencies": [
-                {
-                    "id": prof.id,
-                    "name": prof.name,
-                    "type": prof.proficiency_type,
-                    "description": prof.description,
-                }
-                for prof in proficiencies
-            ]
-        }
-    )
+    """Get proficiencies available for a species/class combination."""
+    species_id = request.args.get("species_id")
+    class_id = request.args.get("class_id")
+    
+    available_proficiencies = []
+    base_proficiencies = set()
+    optional_proficiencies = set()
+    
+    # Get base proficiencies from species
+    if species_id:
+        species = db.session.get(Species, species_id)
+        if species and hasattr(species, 'proficiencies') and species.proficiencies:
+            base_proficiencies.update(species.proficiencies)
+    
+    # Get base proficiencies from class
+    if class_id:
+        char_class = db.session.get(CharacterClass, class_id)
+        if char_class:
+            # Add required class proficiencies
+            if char_class.skill_proficiencies:
+                base_proficiencies.update(char_class.skill_proficiencies)
+            if char_class.armor_proficiencies:
+                base_proficiencies.update(char_class.armor_proficiencies)
+            if char_class.weapon_proficiencies:
+                base_proficiencies.update(char_class.weapon_proficiencies)
+            
+            # For now, we'll show some optional skill proficiencies
+            # In a full implementation, this would be based on class rules
+            if char_class.name == "Fighter":
+                optional_proficiencies.update(["Acrobatics", "Animal Handling", "Athletics", 
+                                              "History", "Insight", "Intimidation", "Perception", "Survival"])
+            elif char_class.name == "Rogue":
+                optional_proficiencies.update(["Acrobatics", "Athletics", "Deception", "Insight", 
+                                              "Intimidation", "Investigation", "Perception", "Performance",
+                                              "Persuasion", "Sleight of Hand", "Stealth"])
+            elif char_class.name == "Wizard":
+                optional_proficiencies.update(["Arcana", "History", "Insight", "Investigation", 
+                                              "Medicine", "Religion"])
+    
+    # Create required and optional proficiency objects for the frontend
+    required_proficiencies = []
+    optional_proficiencies_list = []
+    
+    # Process base (required) proficiencies
+    for prof_name in base_proficiencies:
+        # Determine proficiency category based on name
+        category = "Skill"
+        if any(armor in prof_name for armor in ["Armor", "Shield", "Light", "Medium", "Heavy"]):
+            category = "Armor"
+        elif any(weapon in prof_name for weapon in ["Weapon", "Sword", "Bow", "Axe", "Hammer", "Simple", "Martial"]):
+            category = "Weapon"
+        elif "Tools" in prof_name or "Kit" in prof_name:
+            category = "Tool"
+            
+        required_proficiencies.append({
+            "id": f"req_{len(required_proficiencies) + 1}",
+            "name": prof_name,
+            "category": category
+        })
+    
+    # Process optional proficiencies (those that are not required)
+    for prof_name in optional_proficiencies:
+        if prof_name not in base_proficiencies:
+            # Determine proficiency category based on name
+            category = "Skill"
+            if any(armor in prof_name for armor in ["Armor", "Shield", "Light", "Medium", "Heavy"]):
+                category = "Armor"
+            elif any(weapon in prof_name for weapon in ["Weapon", "Sword", "Bow", "Axe", "Hammer", "Simple", "Martial"]):
+                category = "Weapon"
+            elif "Tools" in prof_name or "Kit" in prof_name:
+                category = "Tool"
+                
+            optional_proficiencies_list.append({
+                "id": f"opt_{len(optional_proficiencies_list) + 1}",
+                "name": prof_name,
+                "category": category
+            })
+    
+    return jsonify({
+        "required": required_proficiencies,
+        "optional": optional_proficiencies_list
+    })
 
 
-@bp.route("/api/languages")
+@bp.route("/api/languages") 
 @login_required
 def get_available_languages():
-    """Get languages available for a race/class combination."""
-    race = request.args.get("race", "")
-    character_class = request.args.get("class", "")
-    # Race-specific languages
-    race_languages = {
-        "Elf": ["Common", "Elvish"],
-        "Dwarf": ["Common", "Dwarvish"],
-        "Human": ["Common"],  # Humans get one additional language of choice
-        "Halfling": ["Common", "Halfling"],
-        "Dragonborn": ["Common", "Draconic"],
-        "Gnome": ["Common", "Gnomish"],
-        "Half-Elf": ["Common", "Elvish"],  # Plus one additional
-        "Half-Orc": ["Common", "Orc"],
-        "Tiefling": ["Common", "Infernal"],
-    }
+    """Get languages available for a species/class combination."""
+    species_id = request.args.get("species_id")
+    class_id = request.args.get("class_id")
+    
+    base_languages = set()
+    optional_languages = set()
+    
+    # Get base languages from species
+    if species_id:
+        species = db.session.get(Species, species_id)
+        if species and species.languages:
+            base_languages.update(species.languages)
+    
+    # Get additional languages from class (if any)
+    if class_id:
+        char_class = db.session.get(CharacterClass, class_id)
+        if char_class and char_class.name == "Druid":
+            base_languages.add("Druidic")
+    
+    # Standard optional languages for selection
+    standard_languages = [
+        "Common", "Dwarvish", "Elvish", "Giant", "Gnomish", "Goblin", "Halfling", "Orc"
+    ]
+    exotic_languages = [
+        "Abyssal", "Celestial", "Draconic", "Deep Speech", "Infernal", "Primordial", "Sylvan", "Undercommon"
+    ]
+    
+    # Add optional languages (excluding already known ones)
+    optional_languages.update(lang for lang in standard_languages if lang not in base_languages)
+    optional_languages.update(lang for lang in exotic_languages if lang not in base_languages)
+    
+    # Format for frontend as base and optional languages
+    base_language_list = []
+    optional_language_list = []
+    
+    # Process base languages
+    for lang in base_languages:
+        base_language_list.append({
+            "id": f"base_{len(base_language_list) + 1}",
+            "name": lang
+        })
+    
+    # Process optional languages
+    for lang in optional_languages:
+        optional_language_list.append({
+            "id": f"opt_{len(optional_language_list) + 1}",
+            "name": lang
+        })
 
-    # Some classes might provide additional languages
-    class_languages = {
-        "Druid": ["Druidic"],
-        "Cleric": [],  # Depends on domain
-        "Wizard": [],  # Can learn through study
-    }
-
-    base_languages = race_languages.get(race, ["Common"])
-    class_bonus = class_languages.get(character_class, [])
-    base_languages.extend(class_bonus)
-
-    # Get all languages for selection (players can choose additional ones)
-    all_languages = Language.query.all()
-
-    return jsonify(
-        {
-            "base_languages": base_languages,
-            "languages": [
-                {"id": lang.id, "name": lang.name, "description": lang.description}
-                for lang in all_languages
-            ],
-        }
-    )
+    return jsonify({
+        "base": base_language_list,
+        "optional": optional_language_list
+    })
 
 
 @bp.route("/api/features")
