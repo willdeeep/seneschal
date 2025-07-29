@@ -473,3 +473,34 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const speciesSelect = document.getElementById('species_id');
+    const subspeciesSelect = document.getElementById('subspecies_id');
+
+    function filterSubspecies() {
+        const selectedSpeciesId = speciesSelect.value;
+        Array.from(subspeciesSelect.options).forEach(option => {
+            if (!option.value) {
+                option.style.display = '';
+                return;
+            }
+            if (option.getAttribute('data-species-id') === selectedSpeciesId) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+        // Reset selection if current subspecies doesn't match
+        if (subspeciesSelect.value && subspeciesSelect.selectedOptions[0].style.display === 'none') {
+            subspeciesSelect.value = '';
+        }
+    }
+
+    speciesSelect.addEventListener('change', filterSubspecies);
+    filterSubspecies(); // Initial filter on page load
+});
+</script>
+{% endblock %}
