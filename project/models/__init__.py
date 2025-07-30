@@ -24,6 +24,8 @@ from .item import Item, CharacterItem
 from .feature import Feature
 from .spell import Spell, SpellSlot
 from .post import Post
+from .background import Background
+from .equipment import Equipment, CharacterEquipment
 
 # Define what gets imported with "from project.models import *"
 __all__ = [
@@ -50,4 +52,7 @@ __all__ = [
     'Spell',
     'SpellSlot',
     'Post',
+    'Background',
+    'Equipment',
+    'CharacterEquipment',
 ]

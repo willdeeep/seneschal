@@ -108,6 +108,7 @@ class Character(db.Model):
         db.Integer, db.ForeignKey("sub_species.id"), nullable=True
     )
     class_id = db.Column(db.Integer, db.ForeignKey("character_class.id"), nullable=True)
+    background_id = db.Column(db.Integer, db.ForeignKey("backgrounds.id"), nullable=True)
 
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(
@@ -151,6 +152,12 @@ class Character(db.Model):
     spell_slots = db.relationship(
         "SpellSlot", backref="character", lazy=True, cascade="all, delete-orphan"
     )
+
+    # Foreign key relationships (using backrefs from related models)
+    # species -> relationship defined in Species model with backref="species"
+    # subspecies -> relationship defined in SubSpecies model with backref="subspecies"  
+    # char_class -> relationship defined in CharacterClass model with backref="char_class"
+    char_background = db.relationship("Background", lazy="select", foreign_keys=[background_id])
 
     def get_ability_modifier(self, score):
         """Calculate ability modifier from ability score."""

@@ -15,6 +15,8 @@ from project.models import (
     CharacterItem,
     Feature,
     Spell,
+    Background,
+    Equipment,
 )
 
 bp = Blueprint("characters", __name__, url_prefix="/characters")
@@ -39,8 +41,9 @@ def create():
         species_id = request.form.get("species_id")
         subspecies_id = request.form.get("subspecies_id") if request.form.get("subspecies_id") else None
         class_id = request.form.get("class_id")
+        background_id = request.form.get("background_id") if request.form.get("background_id") else None
         level = int(request.form.get("level", 1))
-        background = request.form.get("background")
+        background = request.form.get("background")  # Keep for backward compatibility
 
         # Ability scores
         strength = int(request.form.get("strength", 10))
@@ -160,6 +163,7 @@ def create():
             species_id=int(species_id) if species_id else None,
             subspecies_id=int(subspecies_id) if subspecies_id else None,
             class_id=int(class_id) if class_id else None,
+            background_id=int(background_id) if background_id else None,
             level=level,
             background=background,
             strength=strength,
@@ -236,10 +240,12 @@ def create():
     species = Species.query.order_by(Species.name).all()
     classes = CharacterClass.query.order_by(CharacterClass.name).all()
     subspecies = SubSpecies.query.order_by(SubSpecies.name).all()
+    backgrounds = Background.query.order_by(Background.name).all()
     return render_template("characters/create.html",
                          species=species,
                          classes=classes,
-                         subspecies=subspecies)
+                         subspecies=subspecies,
+                         backgrounds=backgrounds)
 
 
 @bp.route("/<int:character_id>")
@@ -808,3 +814,316 @@ def get_ability_bonuses():
         "species_info": species_info,
         "subspecies_info": subspecies_info
     })
+
+
+# Advanced Character Customization API Endpoints
+
+@bp.route("/api/backgrounds")
+def api_backgrounds():
+    """Get available character backgrounds."""
+    from project.models import Background
+    
+    backgrounds = Background.query.all()
+    return jsonify([{
+        "id": bg.id,
+        "name": bg.name,
+        "description": bg.description,
+        "skill_proficiencies": bg.skill_proficiencies,
+        "tool_proficiencies": bg.tool_proficiencies,
+        "languages": bg.languages,
+        "equipment": bg.equipment,
+        "feature_name": bg.feature_name,
+        "feature_description": bg.feature_description,
+        "starting_gold": bg.starting_gold
+    } for bg in backgrounds])
+
+
+@bp.route("/api/equipment")
+def api_equipment():
+    """Get equipment based on class and background."""
+    from project.models import Equipment, CharacterClass, Background
+    
+    class_id = request.args.get("class_id", type=int)
+    background_id = request.args.get("background_id", type=int)
+    category = request.args.get("category")  # Optional filter
+    
+    equipment = []
+    
+    if class_id:
+        char_class = db.session.get(CharacterClass, class_id)
+        if char_class:
+            # Get class-appropriate equipment
+            class_equipment = Equipment.get_starting_equipment_for_class(char_class.name)
+            equipment.extend(class_equipment)
+    
+    if background_id:
+        background = db.session.get(Background, background_id)
+        if background and background.equipment:
+            # Get background equipment
+            bg_equipment = Equipment.query.filter(
+                Equipment.name.in_(background.equipment)
+            ).all()
+            equipment.extend(bg_equipment)
+    
+    if category:
+        equipment = [item for item in equipment if item.category.lower() == category.lower()]
+    
+    # Remove duplicates
+    equipment = list({item.id: item for item in equipment}.values())
+    
+    return jsonify([{
+        "id": item.id,
+        "name": item.name,
+        "category": item.category,
+        "cost_cp": item.cost_cp,
+        "weight": item.weight,
+        "description": item.description,
+        "damage_dice": item.damage_dice,
+        "damage_type": item.damage_type,
+        "armor_class": item.armor_class
+    } for item in equipment])
+
+
+@bp.route("/api/cantrips")
+def api_cantrips():
+    """Get available cantrips for a character class."""
+    class_id = request.args.get("class_id", type=int)
+    
+    if not class_id:
+        return jsonify({"error": "class_id parameter is required"}), 400
+    
+    char_class = db.session.get(CharacterClass, class_id)
+    if not char_class:
+        return jsonify({"error": "Invalid class_id"}), 400
+    
+    # Get cantrips available to this class
+    cantrips = Spell.query.filter(
+        Spell.level == 0,
+        Spell.class_lists.contains(char_class.name.lower())
+    ).all()
+    
+    return jsonify([{
+        "id": spell.id,
+        "name": spell.name,
+        "school": spell.school,
+        "casting_time": spell.casting_time,
+        "range": spell.spell_range,
+        "components": spell.components,
+        "duration": spell.duration,
+        "description": spell.description
+    } for spell in cantrips])
+
+
+@bp.route("/api/starting-spells")
+def api_starting_spells():
+    """Get starting spells for a character class at level 1."""
+    class_id = request.args.get("class_id", type=int)
+    
+    if not class_id:
+        return jsonify({"error": "class_id parameter is required"}), 400
+    
+    char_class = db.session.get(CharacterClass, class_id)
+    if not char_class:
+        return jsonify({"error": "Invalid class_id"}), 400
+    
+    # Get 1st level spells available to this class
+    spells = Spell.query.filter(
+        Spell.level == 1,
+        Spell.class_lists.contains(char_class.name.lower())
+    ).all()
+    
+    # Determine spell limits based on class
+    spell_limits = {
+        "Wizard": {"known": 6, "can_choose": True},
+        "Sorcerer": {"known": 2, "can_choose": True},
+        "Bard": {"known": 4, "can_choose": True},
+        "Warlock": {"known": 2, "can_choose": True},
+        "Cleric": {"known": -1, "can_choose": False},  # Prepares from full list
+        "Druid": {"known": -1, "can_choose": False},   # Prepares from full list
+    }
+    
+    limits = spell_limits.get(char_class.name, {"known": 0, "can_choose": False})
+    
+    return jsonify({
+        "spells": [{
+            "id": spell.id,
+            "name": spell.name,
+            "school": spell.school,
+            "casting_time": spell.casting_time,
+            "range": spell.spell_range,
+            "components": spell.components,
+            "duration": spell.duration,
+            "description": spell.description,
+            "is_ritual": spell.is_ritual
+        } for spell in spells],
+        "limits": limits
+    })
+
+
+@bp.route("/api/ability-score-methods")
+def api_ability_score_methods():
+    """Get available ability score generation methods."""
+    methods = {
+        "standard_array": {
+            "name": "Standard Array",
+            "description": "Use the standard array: 15, 14, 13, 12, 10, 8",
+            "values": [15, 14, 13, 12, 10, 8],
+            "point_buy": False
+        },
+        "point_buy": {
+            "name": "Point Buy",
+            "description": "Purchase ability scores using a point system (27 points)",
+            "base_cost": 27,
+            "min_score": 8,
+            "max_score": 15,
+            "point_buy": True
+        },
+        "rolling": {
+            "name": "Rolling",
+            "description": "Roll 4d6, drop lowest, six times",
+            "point_buy": False,
+            "requires_rolling": True
+        },
+        "custom": {
+            "name": "Custom",
+            "description": "Enter custom ability scores (DM approval may be required)",
+            "point_buy": False,
+            "custom": True
+        }
+    }
+    
+    return jsonify(methods)
+
+
+@bp.route("/api/character-optimization")
+def api_character_optimization():
+    """Get character build optimization suggestions."""
+    species_id = request.args.get("species_id", type=int)
+    class_id = request.args.get("class_id", type=int)
+    background_id = request.args.get("background_id", type=int)
+    
+    if not species_id or not class_id:
+        return jsonify({"error": "species_id and class_id are required"}), 400
+    
+    species = db.session.get(Species, species_id)
+    char_class = db.session.get(CharacterClass, class_id)
+    background = db.session.get(Background, background_id) if background_id else None
+    
+    if not species or not char_class:
+        return jsonify({"error": "Invalid species_id or class_id"}), 400
+    
+    # Basic optimization suggestions
+    suggestions = {
+        "recommended_abilities": _get_recommended_abilities(char_class, species),
+        "recommended_proficiencies": _get_recommended_proficiencies(char_class, background),
+        "synergies": _get_species_class_synergies(species, char_class),
+        "warnings": _get_build_warnings(species, char_class)
+    }
+    
+    return jsonify(suggestions)
+
+
+def _get_recommended_abilities(char_class, species):
+    """Get recommended ability score priorities."""
+    class_priorities = {
+        "Fighter": ["Strength", "Constitution", "Dexterity"],
+        "Wizard": ["Intelligence", "Constitution", "Dexterity"],
+        "Rogue": ["Dexterity", "Constitution", "Intelligence"],
+        "Cleric": ["Wisdom", "Constitution", "Strength"],
+        "Ranger": ["Dexterity", "Wisdom", "Constitution"],
+        "Bard": ["Charisma", "Dexterity", "Constitution"],
+        "Sorcerer": ["Charisma", "Constitution", "Dexterity"],
+        "Warlock": ["Charisma", "Constitution", "Dexterity"],
+        "Barbarian": ["Strength", "Constitution", "Dexterity"],
+        "Druid": ["Wisdom", "Constitution", "Dexterity"],
+        "Monk": ["Dexterity", "Wisdom", "Constitution"],
+        "Paladin": ["Strength", "Charisma", "Constitution"]
+    }
+    
+    priorities = class_priorities.get(char_class.name, ["Constitution"])
+    
+    # Factor in species bonuses
+    if species.ability_score_increases:
+        species_bonuses = list(species.ability_score_increases.keys())
+        # Move species-boosted abilities higher in priority
+        for ability in species_bonuses:
+            ability_full = {
+                "str": "Strength", "dex": "Dexterity", "con": "Constitution",
+                "int": "Intelligence", "wis": "Wisdom", "cha": "Charisma"
+            }.get(ability, ability)
+            
+            if ability_full in priorities:
+                priorities.remove(ability_full)
+                priorities.insert(0, ability_full)
+    
+    return priorities
+
+
+def _get_recommended_proficiencies(char_class, background):
+    """Get recommended skill proficiencies."""
+    recommendations = []
+    
+    if char_class.skill_proficiencies:
+        # Recommend skills that match class primary ability
+        primary_skills = {
+            "Strength": ["Athletics"],
+            "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"],
+            "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"],
+            "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"],
+            "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"]
+        }
+
+        if char_class.primary_ability in primary_skills:
+            class_skills = set(char_class.skill_proficiencies)
+            recommended_skills = set(primary_skills[char_class.primary_ability])
+            recommendations.extend(list(class_skills.intersection(recommended_skills)))
+    
+    return recommendations
+
+
+def _get_species_class_synergies(species, char_class):
+    """Identify positive synergies between species and class."""
+    synergies = []
+    
+    if species.ability_score_increases and char_class.primary_ability:
+        primary_short = {
+            "Strength": "str", "Dexterity": "dex", "Constitution": "con",
+            "Intelligence": "int", "Wisdom": "wis", "Charisma": "cha"
+        }.get(char_class.primary_ability, "")
+
+        if primary_short in species.ability_score_increases:
+            synergies.append({
+                "type": "ability_synergy",
+                "description": f"{species.name} gets a bonus to {char_class.primary_ability}, which is {char_class.name}'s primary ability"
+            })
+    
+    # Check for matching proficiencies
+    if species.proficiencies and char_class.skill_proficiencies:
+        matching_profs = set(species.proficiencies).intersection(set(char_class.skill_proficiencies))
+        if matching_profs:
+            synergies.append({
+                "type": "proficiency_synergy",
+                "description": f"Both {species.name} and {char_class.name} provide {', '.join(matching_profs)} proficiency"
+            })
+    
+    return synergies
+
+
+def _get_build_warnings(species, char_class):
+    """Identify potential issues with the species/class combination."""
+    warnings = []
+    
+    # Check for ability score conflicts
+    if species.ability_score_increases and char_class.primary_ability:
+        primary_short = {
+            "Strength": "str", "Dexterity": "dex", "Constitution": "con",
+            "Intelligence": "int", "Wisdom": "wis", "Charisma": "cha"
+        }.get(char_class.primary_ability, "")
+
+        if primary_short not in species.ability_score_increases:
+            warnings.append({
+                "type": "ability_mismatch",
+                "description": f"{species.name} doesn't boost {char_class.primary_ability}, which may make this build less optimal"
+            })
+    
+    return warnings
