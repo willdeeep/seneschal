@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-info" role="progressbar" id="progress-bar" 
+                    <div class="progress-bar bg-info" role="progressbar" id="progress-bar"
                          style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Character Name *</label>
-                            <input type="text" class="form-control" id="name" name="name" 
+                            <input type="text" class="form-control" id="name" name="name"
                                    value="{{ form_data.name if form_data else '' }}" required>
                             <div class="invalid-feedback"></div>
                         </div>
@@ -54,14 +54,14 @@
                                    value="{{ form_data.player_name if form_data else '' }}">
                         </div>
                     </div>
-                 
+                
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label for="species_id" class="form-label">Species *</label>
                             <select class="form-control" id="species_id" name="species_id" required>
                                 <option value="">Select Species</option>
                                 {% for species_option in species %}
-                                    <option value="{{ species_option.id }}" 
+                                    <option value="{{ species_option.id }}"
                                             {% if form_data and form_data.species_id == species_option.id|string %}selected{% endif %}>
                                         {{ species_option.name }}
                                     </option>
@@ -74,7 +74,7 @@
                             <select class="form-control" id="subspecies_id" name="subspecies_id">
                                 <option value="">Select Subspecies (Optional)</option>
                                 {% for subspecies_option in subspecies %}
-                                    <option value="{{ subspecies_option.id }}" 
+                                    <option value="{{ subspecies_option.id }}"
                                             data-species-id="{{ subspecies_option.species_id }}"
                                             {% if form_data and form_data.subspecies_id == subspecies_option.id|string %}selected{% endif %}>
                                         {{ subspecies_option.name }}
@@ -97,11 +97,11 @@
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="level" class="form-label">Level</label>
-                            <input type="number" class="form-control" id="level" name="level" 
+                            <input type="number" class="form-control" id="level" name="level"
                                    value="{{ form_data.level if form_data else '1' }}" min="1" max="20">
                         </div>
                     </div>
-                 
+                
                     <div class="mb-3">
                         <label for="background" class="form-label">Background</label>
                         <textarea class="form-control" id="background" name="background" rows="3" placeholder="Character background and history..."></textarea>
@@ -203,42 +203,42 @@
                     <div class="row">
                         <div class="col-md-2 mb-3">
                             <label for="strength" class="form-label">Strength</label>
-                            <input type="number" class="form-control" id="strength" name="strength" 
+                            <input type="number" class="form-control" id="strength" name="strength"
                                    value="{{ form_data.strength if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="strength-total">Total: 10 (+0)</small>
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="dexterity" class="form-label">Dexterity</label>
-                            <input type="number" class="form-control" id="dexterity" name="dexterity" 
+                            <input type="number" class="form-control" id="dexterity" name="dexterity"
                                    value="{{ form_data.dexterity if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="dexterity-total">Total: 10 (+0)</small>
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="constitution" class="form-label">Constitution</label>
-                            <input type="number" class="form-control" id="constitution" name="constitution" 
+                            <input type="number" class="form-control" id="constitution" name="constitution"
                                    value="{{ form_data.constitution if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="constitution-total">Total: 10 (+0)</small>
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="intelligence" class="form-label">Intelligence</label>
-                            <input type="number" class="form-control" id="intelligence" name="intelligence" 
+                            <input type="number" class="form-control" id="intelligence" name="intelligence"
                                    value="{{ form_data.intelligence if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="intelligence-total">Total: 10 (+0)</small>
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="wisdom" class="form-label">Wisdom</label>
-                            <input type="number" class="form-control" id="wisdom" name="wisdom" 
+                            <input type="number" class="form-control" id="wisdom" name="wisdom"
                                    value="{{ form_data.wisdom if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="wisdom-total">Total: 10 (+0)</small>
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label for="charisma" class="form-label">Charisma</label>
-                            <input type="number" class="form-control" id="charisma" name="charisma" 
+                            <input type="number" class="form-control" id="charisma" name="charisma"
                                    value="{{ form_data.charisma if form_data else '10' }}" min="3" max="20">
                             <small class="text-muted" id="charisma-total">Total: 10 (+0)</small>
                             <div class="invalid-feedback"></div>
@@ -255,24 +255,24 @@
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label for="max_hp" class="form-label">Max HP</label>
-                            <input type="number" class="form-control" id="max_hp" name="max_hp" 
+                            <input type="number" class="form-control" id="max_hp" name="max_hp"
                                    value="{{ form_data.max_hp if form_data else '8' }}" min="1">
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="current_hp" class="form-label">Current HP</label>
-                            <input type="number" class="form-control" id="current_hp" name="current_hp" 
+                            <input type="number" class="form-control" id="current_hp" name="current_hp"
                                    value="{{ form_data.current_hp if form_data else '8' }}" min="0">
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="armor_class" class="form-label">Armor Class</label>
-                            <input type="number" class="form-control" id="armor_class" name="armor_class" 
+                            <input type="number" class="form-control" id="armor_class" name="armor_class"
                                    value="{{ form_data.armor_class if form_data else '10' }}" min="1">
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="speed" class="form-label">Speed (ft)</label>
-                            <input type="number" class="form-control" id="speed" name="speed" 
+                            <input type="number" class="form-control" id="speed" name="speed"
                                    value="{{ form_data.speed if form_data else '30' }}" min="0">
                         </div>
                     </div>
@@ -483,6 +483,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const classSelect = document.getElementById('class_id');
     const subspeciesSelect = document.getElementById('subspecies_id');
 
+    // Function to handle proficiency selection limits
+    function handleProficiencySelection(checkbox) {
+        const maxSelections = parseInt(checkbox.getAttribute('data-max')) || 2;
+        const selectedProficiencies = document.querySelectorAll('.optional-proficiency:checked');
+
+        if (selectedProficiencies.length > maxSelections) {
+            // Prevent selection beyond limit
+            checkbox.checked = false;
+            alert(`You can only select up to ${maxSelections} skill proficiencies for this class.`);
+        }
+
+        updateProficiencyCounter();
+    }
+
+    // Function to update proficiency counter
+    function updateProficiencyCounter() {
+        const selectedProficiencies = document.querySelectorAll('.optional-proficiency:checked');
+        const counterElement = document.getElementById('proficiency-count');
+        if (counterElement) {
+            counterElement.textContent = selectedProficiencies.length;
+        }
+    }
+
     // Function to update available options based on species and class selection
     function updateAvailableOptions() {
         const selectedSpecies = speciesSelect.value;
@@ -502,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateProficienciesAndLanguages() {
         const speciesId = speciesSelect.value;
         const classId = document.getElementById('class_id').value;
-        
+
         if (speciesId && classId) {
             updateProficiencies(speciesId, classId);
             updateLanguages(speciesId, classId);
@@ -516,7 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to update proficiencies
     function updateProficiencies(speciesId, classId) {
         showLoadingState('proficiencies-list');
-        
+
         fetch(`{{ url_for('characters.get_available_proficiencies') }}?species_id=${speciesId}&class_id=${classId}`)
             .then(response => {
                 if (!response.ok) {
@@ -528,7 +551,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 hideLoadingState('proficiencies-list');
                 const proficienciesList = document.getElementById('proficiencies-list');
                 let html = '';
-                
+
                 // Required proficiencies
                 if (data.required && data.required.length > 0) {
                     html += '<div class="mb-3">';
@@ -536,8 +559,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     data.required.forEach(proficiency => {
                         html += `
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" 
-                                       name="proficiencies" value="${proficiency.id}" 
+                                <input class="form-check-input" type="checkbox"
+                                       name="proficiencies" value="${proficiency.id}"
                                        id="prof_${proficiency.id}" checked disabled>
                                 <label class="form-check-label text-success" for="prof_${proficiency.id}">
                                     ${proficiency.name} (${proficiency.category})
@@ -547,18 +570,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     html += '</div>';
                 }
-                
+
                 // Optional proficiencies
                 if (data.optional && data.optional.length > 0) {
+                    const maxSelections = data.max_selections || 2;
                     html += '<div class="mb-3">';
                     html += '<h6>Optional Proficiencies:</h6>';
-                    html += '<small class="text-muted">Choose from the following options:</small>';
+                    html += `<small class="text-muted">Choose up to ${maxSelections} from the following options:</small>`;
+                    html += `<div class="mb-2"><small class="text-info">Selected: <span id="proficiency-count">0</span>/${maxSelections}</small></div>`;
                     data.optional.forEach(proficiency => {
                         html += `
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" 
-                                       name="proficiencies" value="${proficiency.id}" 
-                                       id="prof_${proficiency.id}">
+                                <input class="form-check-input optional-proficiency" type="checkbox"
+                                       name="proficiencies" value="${proficiency.id}"
+                                       id="prof_${proficiency.id}" data-max="${maxSelections}">
                                 <label class="form-check-label" for="prof_${proficiency.id}">
                                     ${proficiency.name} (${proficiency.category})
                                 </label>
@@ -567,21 +592,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     html += '</div>';
                 }
-                
+
                 if (!html) {
                     html = '<p class="text-muted">No proficiencies available for this combination.</p>';
                 }
-                
+
                 proficienciesList.innerHTML = html;
-                
+
                 // Add event listeners to newly created checkboxes for live preview updates
                 const profCheckboxes = proficienciesList.querySelectorAll('input[type="checkbox"]');
                 profCheckboxes.forEach(checkbox => {
                     checkbox.addEventListener('change', function() {
+                        // Handle proficiency selection limits
+                        if (checkbox.classList.contains('optional-proficiency')) {
+                            handleProficiencySelection(checkbox);
+                        }
                         updateCharacterPreview();
                         updateProgress();
                     });
                 });
+
+                // Initialize proficiency counter
+                updateProficiencyCounter();
             })
             .catch(error => {
                 console.error('Error fetching proficiencies:', error);
@@ -592,7 +624,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to update languages
     function updateLanguages(speciesId, classId) {
         showLoadingState('languages-list');
-        
+
         fetch(`{{ url_for('characters.get_available_languages') }}?species_id=${speciesId}&class_id=${classId}`)
             .then(response => {
                 if (!response.ok) {
@@ -604,7 +636,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 hideLoadingState('languages-list');
                 const languagesList = document.getElementById('languages-list');
                 let html = '';
-                
+
                 // Base languages
                 if (data.base && data.base.length > 0) {
                     html += '<div class="mb-3">';
@@ -612,8 +644,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     data.base.forEach(language => {
                         html += `
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" 
-                                       name="languages" value="${language.id}" 
+                                <input class="form-check-input" type="checkbox"
+                                       name="languages" value="${language.id}"
                                        id="lang_${language.id}" checked disabled>
                                 <label class="form-check-label text-success" for="lang_${language.id}">
                                     ${language.name}
@@ -623,7 +655,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     html += '</div>';
                 }
-                
+
                 // Optional languages
                 if (data.optional && data.optional.length > 0) {
                     html += '<div class="mb-3">';
@@ -632,8 +664,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     data.optional.forEach(language => {
                         html += `
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" 
-                                       name="languages" value="${language.id}" 
+                                <input class="form-check-input" type="checkbox"
+                                       name="languages" value="${language.id}"
                                        id="lang_${language.id}">
                                 <label class="form-check-label" for="lang_${language.id}">
                                     ${language.name}
@@ -643,13 +675,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     html += '</div>';
                 }
-                
+
                 if (!html) {
                     html = '<p class="text-muted">No languages available for this combination.</p>';
                 }
-                
+
                 languagesList.innerHTML = html;
-                
+
                 // Add event listeners to newly created checkboxes for live preview updates
                 const langCheckboxes = languagesList.querySelectorAll('input[type="checkbox"]');
                 langCheckboxes.forEach(checkbox => {
@@ -709,7 +741,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const spellcastingClasses = ['Wizard', 'Sorcerer', 'Warlock', 'Bard', 'Cleric', 'Druid', 'Paladin', 'Ranger'];
         if (spellcastingClasses.includes(characterClass)) {
             spellsSection.style.display = 'block';
-         
+        
             fetch(`{{ url_for('characters.get_available_spells') }}?class=${characterClass}`)
                 .then(response => response.json())
                 .then(data => {
@@ -748,21 +780,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Progressive Enhancement Features
-    
+
     // Auto-save functionality
     let autoSaveTimeout;
     let lastSaveData = '';
-    
+
     function autoSaveProgress() {
         const formData = new FormData(document.getElementById('character-form'));
         const formObj = Object.fromEntries(formData.entries());
         const currentData = JSON.stringify(formObj);
-        
+
         if (currentData !== lastSaveData) {
             lastSaveData = currentData;
             localStorage.setItem('character_draft', currentData);
             updateSaveStatus('saving');
-            
+
             // Simulate save delay
             setTimeout(() => {
                 updateSaveStatus('saved');
@@ -770,11 +802,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         }
     }
-    
+
     function updateSaveStatus(status) {
         const statusText = document.getElementById('save-status-text');
         const statusIcon = document.querySelector('#auto-save-status i');
-        
+
         switch(status) {
             case 'saving':
                 statusText.textContent = 'Saving...';
@@ -790,14 +822,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
         }
     }
-    
+
     // Progress calculation
     function updateProgress() {
         const requiredFields = ['name', 'species_id', 'class_id', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
         const totalFields = requiredFields.length + 4; // +4 for proficiencies, languages, optional fields
-        
+
         let completedFields = 0;
-        
+
         // Check required fields
         requiredFields.forEach(fieldName => {
             const field = document.getElementById(fieldName);
@@ -805,15 +837,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 completedFields++;
             }
         });
-        
+
         // Check if proficiencies are selected
         const selectedProficiencies = document.querySelectorAll('input[name="proficiencies"]:checked').length;
         if (selectedProficiencies > 0) completedFields++;
-        
+
         // Check if languages are selected
         const selectedLanguages = document.querySelectorAll('input[name="languages"]:checked').length;
         if (selectedLanguages > 0) completedFields++;
-        
+
         // Check optional fields (player_name, background, etc.)
         const optionalFields = ['player_name', 'background'];
         let optionalCompleted = 0;
@@ -823,16 +855,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 optionalCompleted++;
             }
         });
-        
+
         if (optionalCompleted > 0) completedFields++;
-        
+
         const percentage = Math.round((completedFields / totalFields) * 100);
-        document.getElementById('progress-text').textContent = percentage + '%';
-        document.getElementById('form-progress-bar').style.width = percentage + '%';
-        document.getElementById('form-progress-bar').setAttribute('aria-valuenow', percentage);
-        
+        document.getElementById('progress-percentage').textContent = percentage + '%';
+        document.getElementById('progress-bar').style.width = percentage + '%';
+        document.getElementById('progress-bar').setAttribute('aria-valuenow', percentage);
+
         // Update progress bar color based on completion
-        const progressBar = document.getElementById('form-progress-bar');
+        const progressBar = document.getElementById('progress-bar');
         progressBar.className = 'progress-bar progress-bar-striped';
         if (percentage < 30) {
             progressBar.classList.add('bg-danger');
@@ -841,42 +873,42 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             progressBar.classList.add('bg-success');
         }
-        
+
         // Show character preview if substantial progress is made
         if (percentage >= 30) {
             document.getElementById('character-preview-section').style.display = 'block';
             updateCharacterPreview();
         }
     }
-    
+
     // Character preview update
     function updateCharacterPreview() {
         // Basic information
         document.getElementById('preview-name').textContent = document.getElementById('name').value || '-';
-        
+
         const speciesSelect = document.getElementById('species_id');
-        document.getElementById('preview-species').textContent = 
+        document.getElementById('preview-species').textContent =
             speciesSelect.options[speciesSelect.selectedIndex]?.text || '-';
-        
+
         const subspeciesSelect = document.getElementById('subspecies_id');
-        document.getElementById('preview-subspecies').textContent = 
+        document.getElementById('preview-subspecies').textContent =
             subspeciesSelect.options[subspeciesSelect.selectedIndex]?.text || '-';
-        
+
         const classSelect = document.getElementById('class_id');
-        document.getElementById('preview-class').textContent = 
+        document.getElementById('preview-class').textContent =
             classSelect.options[classSelect.selectedIndex]?.text || '-';
-        
+
         document.getElementById('preview-level').textContent = document.getElementById('level').value || '-';
-        
+
         // Ability scores with totals
         const abilities = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
         abilities.forEach(ability => {
-            const baseScore = document.getElementById(ability === 'str' ? 'strength' : 
+            const baseScore = document.getElementById(ability === 'str' ? 'strength' :
                                                    ability === 'dex' ? 'dexterity' :
                                                    ability === 'con' ? 'constitution' :
                                                    ability === 'int' ? 'intelligence' :
                                                    ability === 'wis' ? 'wisdom' : 'charisma').value || 0;
-            const total = document.getElementById(`${ability === 'str' ? 'strength' : 
+            const total = document.getElementById(`${ability === 'str' ? 'strength' :
                                                   ability === 'dex' ? 'dexterity' :
                                                   ability === 'con' ? 'constitution' :
                                                   ability === 'int' ? 'intelligence' :
@@ -884,7 +916,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const displayValue = total ? total.textContent : baseScore;
             document.getElementById(`preview-${ability}`).textContent = displayValue;
         });
-        
+
         // Selected proficiencies
         const selectedProfs = Array.from(document.querySelectorAll('input[name="proficiencies"]:checked'))
             .map(input => input.nextElementSibling.textContent.trim());
@@ -894,7 +926,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             profContainer.innerHTML = '<small class="text-muted">None selected</small>';
         }
-        
+
         // Selected languages
         const selectedLangs = Array.from(document.querySelectorAll('input[name="languages"]:checked'))
             .map(input => input.nextElementSibling.textContent.trim());
@@ -905,24 +937,24 @@ document.addEventListener('DOMContentLoaded', function() {
             langContainer.innerHTML = '<small class="text-muted">None selected</small>';
         }
     }
-    
+
     // Enhanced loading states
     function showLoadingState(containerId) {
         const container = document.getElementById(containerId);
         const spinner = container.querySelector('.loading-spinner');
         const defaultMessage = container.querySelector('.default-message');
-        
+
         if (spinner) spinner.style.display = 'block';
         if (defaultMessage) defaultMessage.style.display = 'none';
     }
-    
+
     function hideLoadingState(containerId) {
         const container = document.getElementById(containerId);
         const spinner = container.querySelector('.loading-spinner');
-        
+
         if (spinner) spinner.style.display = 'none';
     }
-    
+
     // Enhanced validation
     function validateForm() {
         const errors = [];
@@ -937,14 +969,14 @@ document.addEventListener('DOMContentLoaded', function() {
             { id: 'wisdom', label: 'Wisdom Score' },
             { id: 'charisma', label: 'Charisma Score' }
         ];
-        
+
         requiredFields.forEach(field => {
             const element = document.getElementById(field.id);
             if (!element || !element.value.trim()) {
                 errors.push(field.label + ' is required');
             }
         });
-        
+
         // Validate ability scores are in valid range
         const abilityScores = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
         abilityScores.forEach(ability => {
@@ -956,10 +988,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         const validationSummary = document.getElementById('validation-summary');
         const errorsList = document.getElementById('validation-errors');
-        
+
         if (errors.length > 0) {
             errorsList.innerHTML = errors.map(error => `<li>${error}</li>`).join('');
             validationSummary.style.display = 'block';
@@ -975,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.togglePreview = function() {
         const section = document.getElementById('character-preview-section');
         const button = document.getElementById('preview-button-text');
-        
+
         if (section.style.display === 'none') {
             section.style.display = 'block';
             button.textContent = 'Hide Preview';
@@ -985,11 +1017,11 @@ document.addEventListener('DOMContentLoaded', function() {
             button.textContent = 'Show Preview';
         }
     }
-    
+
     window.togglePreviewDetails = function() {
         const details = document.getElementById('preview-details');
         const toggleText = document.getElementById('preview-toggle-text');
-        
+
         if (details.style.display === 'none') {
             details.style.display = 'block';
             toggleText.textContent = 'Hide Details';
@@ -1006,7 +1038,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateAbilityScores();
         updateProgress();
     });
-    
+
     classSelect.addEventListener('change', function() {
         updateAvailableOptions();
         updateProgress();
@@ -1020,6 +1052,11 @@ document.addEventListener('DOMContentLoaded', function() {
             autoSaveTimeout = setTimeout(autoSaveProgress, 1000); // Save after 1 second of inactivity
             updateProgress();
         });
+
+        // Also listen for change events (for checkboxes and selects)
+        input.addEventListener('change', function() {
+            updateProgress();
+        });
     });
 
     // Enhanced form submission
@@ -1027,17 +1064,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const submitButton = document.getElementById('submit-button');
         const submitText = document.getElementById('submit-text');
         const submitSpinner = document.getElementById('submit-spinner');
-        
+
         if (!validateForm()) {
             e.preventDefault();
             return false;
         }
-        
+
         // Show loading state
         submitButton.disabled = true;
         submitText.textContent = 'Creating Character...';
         submitSpinner.style.display = 'inline-block';
-        
+
         // Clear any stored draft on successful submission
         localStorage.removeItem('character_draft');
     });
@@ -1064,6 +1101,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial update if both species and class are selected
     updateAvailableOptions();
     updateProgress();
+    filterSubspecies(); // Filter subspecies on page load
 });
 </script>
 {% endblock %}
@@ -1123,19 +1161,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     const bonuses = data.bonuses;
-                   
+                  
                     // Update each ability score display
                     Object.keys(abilityInputs).forEach(ability => {
                         const baseScore = parseInt(abilityInputs[ability].value) || 10;
                         const bonus = bonuses[ability] || 0;
                         const totalScore = baseScore + bonus;
                         const modifier = calculateAbilityModifier(totalScore);
-                       
+                      
                         const modifierText = modifier >= 0 ? `+${modifier}` : `${modifier}`;
                         const bonusText = bonus > 0 ? ` (+${bonus} species)` : '';
-                       
+                      
                         abilityTotals[ability].textContent = `Total: ${totalScore} (${modifierText})${bonusText}`;
-                       
+                      
                         // Add visual styling based on bonuses
                         if (bonus > 0) {
                             abilityTotals[ability].className = 'text-success';
@@ -1143,7 +1181,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             abilityTotals[ability].className = 'text-muted';
                         }
                     });
-                   
+                  
                     // Update other character attributes if species info is available
                     if (data.species_info) {
                         const speedInput = document.getElementById('speed');
@@ -1161,7 +1199,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const baseScore = parseInt(abilityInputs[ability].value) || 10;
                 const modifier = calculateAbilityModifier(baseScore);
                 const modifierText = modifier >= 0 ? `+${modifier}` : `${modifier}`;
-               
+              
                 abilityTotals[ability].textContent = `Total: ${baseScore} (${modifierText})`;
                 abilityTotals[ability].className = 'text-muted';
             });
@@ -1188,7 +1226,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return true;
         }
     }
-    
+
     function validateAbilityScore(inputElement, abilityName) {
         const score = parseInt(inputElement.value);
         const errorDiv = inputElement.parentNode.querySelector('.invalid-feedback') || createErrorDiv(inputElement);
@@ -1201,7 +1239,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return true;
         }
     }
-    
+
     function validateHP() {
         const maxHpInput = document.getElementById('max_hp');
         const currentHpInput = document.getElementById('current_hp');
@@ -1233,7 +1271,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return valid;
     }
-    
+
     function validateRequiredSelects() {
         let valid = true;
 
@@ -1259,25 +1297,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return valid;
     }
-    
+
     function createErrorDiv(inputElement) {
         const errorDiv = document.createElement('div');
         errorDiv.className = 'invalid-feedback';
         inputElement.parentNode.appendChild(errorDiv);
         return errorDiv;
     }
-    
+
     function showFieldError(inputElement, errorDiv, message) {
         inputElement.classList.add('is-invalid');
         errorDiv.textContent = message;
         errorDiv.style.display = 'block';
     }
-    
+
     function clearFieldError(inputElement, errorDiv) {
         inputElement.classList.remove('is-invalid');
         errorDiv.style.display = 'none';
     }
-    
+
     // Form submission validation
     document.querySelector('form').addEventListener('submit', function(e) {
         let isValid = true;
@@ -1315,14 +1353,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    
+
     // Real-time validation
     document.getElementById('name').addEventListener('blur', validateCharacterName);
     document.getElementById('species_id').addEventListener('change', validateRequiredSelects);
     document.getElementById('class_id').addEventListener('change', validateRequiredSelects);
     document.getElementById('max_hp').addEventListener('input', validateHP);
     document.getElementById('current_hp').addEventListener('input', validateHP);
-    
+
     // Add real-time validation to ability scores
     Object.entries(abilityInputs).forEach(([ability, element]) => {
         const abilityName = ability.charAt(0).toUpperCase() + ability.slice(1);

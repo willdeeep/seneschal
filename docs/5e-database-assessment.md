@@ -42,7 +42,7 @@ The 5e-bits MongoDB database provides a comprehensive, well-structured alternati
 5. **Spells & Magic**
    - `5e-SRD-Spells.json` - Complete spell database
    - `5e-SRD-Magic-Schools.json` - Schools of magic
- 
+
 6. **Monsters & NPCs**
    - `5e-SRD-Monsters.json` - Comprehensive bestiary
 

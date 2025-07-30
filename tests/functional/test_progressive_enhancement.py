@@ -20,10 +20,10 @@ class TestProgressiveEnhancement:
         # Sign up and login
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         # Check that progress indicator elements are present
         html = response.get_data(as_text=True)
         assert 'id="progress-percentage"' in html
@@ -34,15 +34,15 @@ class TestProgressiveEnhancement:
         """Test that character preview elements are present."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         # Check for preview section
         assert 'id="character-preview-section"' in html
         assert 'Character Preview' in html
-        
+
         # Check for preview fields
         assert 'id="preview-name"' in html
         assert 'id="preview-species"' in html
@@ -55,10 +55,10 @@ class TestProgressiveEnhancement:
         """Test that loading spinners are present for dynamic content."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         # Check for loading spinners in each dynamic section
         assert 'Loading proficiencies...' in html
@@ -70,10 +70,10 @@ class TestProgressiveEnhancement:
         """Test that enhanced validation elements are present."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         # Check for validation summary
         assert 'id="validation-summary"' in html
@@ -84,10 +84,10 @@ class TestProgressiveEnhancement:
         """Test that submit button has enhanced loading states."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         # Check for enhanced submit button elements
         assert 'id="submit-button"' in html
@@ -99,10 +99,10 @@ class TestProgressiveEnhancement:
         """Test that auto-save tip is shown to users."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         assert 'automatically saved as you type' in html
         assert 'fa-lightbulb' in html
@@ -111,10 +111,10 @@ class TestProgressiveEnhancement:
         """Test preview toggle button functionality."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         # Check for preview toggle elements
         assert 'onclick="togglePreview()"' in html
@@ -125,10 +125,10 @@ class TestProgressiveEnhancement:
         """Test that accessibility features are implemented."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         # Check for ARIA attributes
         assert 'aria-valuenow' in html
@@ -141,10 +141,10 @@ class TestProgressiveEnhancement:
         """Test that form has proper ID for JavaScript interaction."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         assert 'id="character-form"' in html
 
@@ -152,10 +152,10 @@ class TestProgressiveEnhancement:
         """Test enhanced error handling elements."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         # Check for enhanced error display
         assert 'invalid-feedback' in html
@@ -165,10 +165,10 @@ class TestProgressiveEnhancement:
         """Test that progressive enhancement JavaScript functions are included."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         # Check for key JavaScript functions
         assert 'function updateProgress()' in html
@@ -184,10 +184,10 @@ class TestProgressiveEnhancement:
         """Test that localStorage integration is implemented."""
         auth.signup()
         auth.login()
-        
+
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
         # Check for localStorage functionality
         assert 'localStorage.setItem' in html
@@ -202,13 +202,13 @@ class TestProgressiveEnhancementIntegration:
         """Test the complete form flow with progressive enhancements."""
         auth.signup()
         auth.login()
-        
+
         # First, verify the form loads with all enhancement elements
         response = client.get('/characters/create')
         assert response.status_code == 200
-        
+
         html = response.get_data(as_text=True)
-        
+
         # Verify all progressive enhancement elements are present
         assert 'id="progress-percentage"' in html
         assert 'id="character-preview-section"' in html
@@ -216,7 +216,7 @@ class TestProgressiveEnhancementIntegration:
         assert 'id="validation-summary"' in html
         assert 'function updateProgress()' in html
         assert 'function autoSaveProgress()' in html
-        
+
         # Test form submission with valid data using our seed data
         form_data = {
             'name': 'Test Character',
@@ -230,14 +230,14 @@ class TestProgressiveEnhancementIntegration:
             'wisdom': '10',
             'charisma': '8'
         }
-        
+
         response = client.post('/characters/create', data=form_data, follow_redirects=True)
         assert response.status_code == 200
-        
+
         # Check if form submission was successful
         final_url = response.request.path
         html = response.get_data(as_text=True)
-        
+
         # If we're still on create page, check for validation errors
         if final_url == '/characters/create':
             print("Form submission stayed on create page")
@@ -253,13 +253,13 @@ class TestProgressiveEnhancementIntegration:
         """Test that API endpoints work for dynamic loading states."""
         auth.signup()
         auth.login()
-        
+
         # Test proficiencies API
         response = client.get('/characters/api/proficiencies?species_id=1&class_id=1')
         assert response.status_code == 200
         data = response.get_json()
         assert 'required' in data or 'optional' in data
-        
+
         # Test languages API
         response = client.get('/characters/api/languages?species_id=1&class_id=1')
         assert response.status_code == 200

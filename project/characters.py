@@ -442,6 +442,34 @@ def remove_item(item_id):
     return redirect(url_for("characters.inventory", character_id=character.id))
 
 
+def get_max_skill_proficiencies(class_id):
+    """Get the maximum number of skill proficiencies a class can choose."""
+    if not class_id:
+        return 2
+
+    char_class = db.session.get(CharacterClass, class_id)
+    if not char_class:
+        return 2
+
+    # D&D 5e skill proficiency limits by class
+    skill_limits = {
+        "Fighter": 2,
+        "Rogue": 4,  # Rogues get more skills
+        "Wizard": 2,
+        "Cleric": 2,
+        "Barbarian": 2,
+        "Bard": 3,   # Bards are versatile
+        "Druid": 2,
+        "Monk": 2,
+        "Paladin": 2,
+        "Ranger": 3, # Rangers get more skills
+        "Sorcerer": 2,
+        "Warlock": 2
+    }
+
+    return skill_limits.get(char_class.name, 2)
+
+
 # API endpoints for dynamic character creation
 @bp.route("/api/proficiencies")
 @login_required
@@ -449,17 +477,17 @@ def get_available_proficiencies():
     """Get proficiencies available for a species/class combination."""
     species_id = request.args.get("species_id")
     class_id = request.args.get("class_id")
-    
+
     available_proficiencies = []
     base_proficiencies = set()
     optional_proficiencies = set()
-    
+
     # Get base proficiencies from species
     if species_id:
         species = db.session.get(Species, species_id)
         if species and hasattr(species, 'proficiencies') and species.proficiencies:
             base_proficiencies.update(species.proficiencies)
-    
+
     # Get base proficiencies from class
     if class_id:
         char_class = db.session.get(CharacterClass, class_id)
@@ -471,24 +499,53 @@ def get_available_proficiencies():
                 base_proficiencies.update(char_class.armor_proficiencies)
             if char_class.weapon_proficiencies:
                 base_proficiencies.update(char_class.weapon_proficiencies)
-            
-            # For now, we'll show some optional skill proficiencies
-            # In a full implementation, this would be based on class rules
+
+            # Add class-specific optional skill proficiencies based on D&D 5e rules
             if char_class.name == "Fighter":
-                optional_proficiencies.update(["Acrobatics", "Animal Handling", "Athletics", 
+                optional_proficiencies.update(["Acrobatics", "Animal Handling", "Athletics",
                                               "History", "Insight", "Intimidation", "Perception", "Survival"])
             elif char_class.name == "Rogue":
-                optional_proficiencies.update(["Acrobatics", "Athletics", "Deception", "Insight", 
+                optional_proficiencies.update(["Acrobatics", "Athletics", "Deception", "Insight",
                                               "Intimidation", "Investigation", "Perception", "Performance",
                                               "Persuasion", "Sleight of Hand", "Stealth"])
             elif char_class.name == "Wizard":
-                optional_proficiencies.update(["Arcana", "History", "Insight", "Investigation", 
+                optional_proficiencies.update(["Arcana", "History", "Insight", "Investigation",
                                               "Medicine", "Religion"])
-    
+            elif char_class.name == "Cleric":
+                optional_proficiencies.update(["History", "Insight", "Medicine", "Persuasion", "Religion"])
+            elif char_class.name == "Barbarian":
+                optional_proficiencies.update(["Animal Handling", "Athletics", "Intimidation",
+                                              "Nature", "Perception", "Survival"])
+            elif char_class.name == "Bard":
+                optional_proficiencies.update(["Deception", "History", "Investigation", "Persuasion",
+                                              "Sleight of Hand", "Stealth"])
+            elif char_class.name == "Druid":
+                optional_proficiencies.update(["Arcana", "Animal Handling", "Insight", "Medicine",
+                                              "Nature", "Perception", "Religion", "Survival"])
+            elif char_class.name == "Monk":
+                optional_proficiencies.update(["Acrobatics", "Athletics", "History", "Insight",
+                                              "Religion", "Stealth"])
+            elif char_class.name == "Paladin":
+                optional_proficiencies.update(["Athletics", "Insight", "Intimidation", "Medicine",
+                                              "Persuasion", "Religion"])
+            elif char_class.name == "Ranger":
+                optional_proficiencies.update(["Animal Handling", "Athletics", "Insight", "Investigation",
+                                              "Nature", "Perception", "Stealth", "Survival"])
+            elif char_class.name == "Sorcerer":
+                optional_proficiencies.update(["Arcana", "Deception", "Insight", "Intimidation",
+                                              "Persuasion", "Religion"])
+            elif char_class.name == "Warlock":
+                optional_proficiencies.update(["Arcana", "Deception", "History", "Intimidation",
+                                              "Investigation", "Nature", "Religion"])
+
+    # If no specific proficiencies found, add some general ones
+    if not optional_proficiencies:
+        optional_proficiencies.update(["Athletics", "Insight", "Perception", "Persuasion"])
+
     # Create required and optional proficiency objects for the frontend
     required_proficiencies = []
     optional_proficiencies_list = []
-    
+
     # Process base (required) proficiencies
     for prof_name in base_proficiencies:
         # Determine proficiency category based on name
@@ -499,13 +556,13 @@ def get_available_proficiencies():
             category = "Weapon"
         elif "Tools" in prof_name or "Kit" in prof_name:
             category = "Tool"
-            
+
         required_proficiencies.append({
             "id": f"req_{len(required_proficiencies) + 1}",
             "name": prof_name,
             "category": category
         })
-    
+
     # Process optional proficiencies (those that are not required)
     for prof_name in optional_proficiencies:
         if prof_name not in base_proficiencies:
@@ -517,41 +574,45 @@ def get_available_proficiencies():
                 category = "Weapon"
             elif "Tools" in prof_name or "Kit" in prof_name:
                 category = "Tool"
-                
+
             optional_proficiencies_list.append({
                 "id": f"opt_{len(optional_proficiencies_list) + 1}",
                 "name": prof_name,
                 "category": category
             })
-    
+
+    max_skill_selections = get_max_skill_proficiencies(class_id)
+
     return jsonify({
         "required": required_proficiencies,
-        "optional": optional_proficiencies_list
+        "optional": optional_proficiencies_list,
+        "max_selections": max_skill_selections,
+        "skill_count": max_skill_selections
     })
 
 
-@bp.route("/api/languages") 
+@bp.route("/api/languages")
 @login_required
 def get_available_languages():
     """Get languages available for a species/class combination."""
     species_id = request.args.get("species_id")
     class_id = request.args.get("class_id")
-    
+
     base_languages = set()
     optional_languages = set()
-    
+
     # Get base languages from species
     if species_id:
         species = db.session.get(Species, species_id)
         if species and species.languages:
             base_languages.update(species.languages)
-    
+
     # Get additional languages from class (if any)
     if class_id:
         char_class = db.session.get(CharacterClass, class_id)
         if char_class and char_class.name == "Druid":
             base_languages.add("Druidic")
-    
+
     # Standard optional languages for selection
     standard_languages = [
         "Common", "Dwarvish", "Elvish", "Giant", "Gnomish", "Goblin", "Halfling", "Orc"
@@ -559,22 +620,22 @@ def get_available_languages():
     exotic_languages = [
         "Abyssal", "Celestial", "Draconic", "Deep Speech", "Infernal", "Primordial", "Sylvan", "Undercommon"
     ]
-    
+
     # Add optional languages (excluding already known ones)
     optional_languages.update(lang for lang in standard_languages if lang not in base_languages)
     optional_languages.update(lang for lang in exotic_languages if lang not in base_languages)
-    
+
     # Format for frontend as base and optional languages
     base_language_list = []
     optional_language_list = []
-    
+
     # Process base languages
     for lang in base_languages:
         base_language_list.append({
             "id": f"base_{len(base_language_list) + 1}",
             "name": lang
         })
-    
+
     # Process optional languages
     for lang in optional_languages:
         optional_language_list.append({

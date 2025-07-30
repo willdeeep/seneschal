@@ -3,8 +3,8 @@ Test cases for enhanced character creation UI functionality.
 Tests dynamic species/class selection, ability score calculations, and form interactions.
 """
 
-import pytest
 import json
+import pytest
 from project.models import Species, CharacterClass, SubSpecies
 from project import db
 
