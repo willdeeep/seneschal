@@ -305,7 +305,7 @@ Foreign Key Relationships (Many-to-One):
 │ id (PK)                 |                     |                     |       │  │
 │ user_id (FK) ───────────┼─────────────────────┼─────────────────────┼───────┼──┘
 │ species_id (FK) ────────┘                     |                     |       |
-│ subspecies_id (FK) ─────────────────────────┐ |                     |       | 
+│ subspecies_id (FK) ─────────────────────────┐ |                     |       |
 │ class_id (FK) ──────────────────────────────┼─┘                     |       |
 │ background_id (FK) ─────────────────────────┼───────────────────────┘       |
 │ name, level, ability_scores...              │                               |

@@ -822,7 +822,7 @@ def get_ability_bonuses():
 def api_backgrounds():
     """Get available character backgrounds."""
     from project.models import Background
-    
+
     backgrounds = Background.query.all()
     return jsonify([{
         "id": bg.id,
@@ -842,20 +842,20 @@ def api_backgrounds():
 def api_equipment():
     """Get equipment based on class and background."""
     from project.models import Equipment, CharacterClass, Background
-    
+
     class_id = request.args.get("class_id", type=int)
     background_id = request.args.get("background_id", type=int)
     category = request.args.get("category")  # Optional filter
-    
+
     equipment = []
-    
+
     if class_id:
         char_class = db.session.get(CharacterClass, class_id)
         if char_class:
             # Get class-appropriate equipment
             class_equipment = Equipment.get_starting_equipment_for_class(char_class.name)
             equipment.extend(class_equipment)
-    
+
     if background_id:
         background = db.session.get(Background, background_id)
         if background and background.equipment:
@@ -864,13 +864,13 @@ def api_equipment():
                 Equipment.name.in_(background.equipment)
             ).all()
             equipment.extend(bg_equipment)
-    
+
     if category:
         equipment = [item for item in equipment if item.category.lower() == category.lower()]
-    
+
     # Remove duplicates
     equipment = list({item.id: item for item in equipment}.values())
-    
+
     return jsonify([{
         "id": item.id,
         "name": item.name,
@@ -888,20 +888,20 @@ def api_equipment():
 def api_cantrips():
     """Get available cantrips for a character class."""
     class_id = request.args.get("class_id", type=int)
-    
+
     if not class_id:
         return jsonify({"error": "class_id parameter is required"}), 400
-    
+
     char_class = db.session.get(CharacterClass, class_id)
     if not char_class:
         return jsonify({"error": "Invalid class_id"}), 400
-    
+
     # Get cantrips available to this class
     cantrips = Spell.query.filter(
         Spell.level == 0,
         Spell.class_lists.contains(char_class.name.lower())
     ).all()
-    
+
     return jsonify([{
         "id": spell.id,
         "name": spell.name,
@@ -918,20 +918,20 @@ def api_cantrips():
 def api_starting_spells():
     """Get starting spells for a character class at level 1."""
     class_id = request.args.get("class_id", type=int)
-    
+
     if not class_id:
         return jsonify({"error": "class_id parameter is required"}), 400
-    
+
     char_class = db.session.get(CharacterClass, class_id)
     if not char_class:
         return jsonify({"error": "Invalid class_id"}), 400
-    
+
     # Get 1st level spells available to this class
     spells = Spell.query.filter(
         Spell.level == 1,
         Spell.class_lists.contains(char_class.name.lower())
     ).all()
-    
+
     # Determine spell limits based on class
     spell_limits = {
         "Wizard": {"known": 6, "can_choose": True},
@@ -941,9 +941,9 @@ def api_starting_spells():
         "Cleric": {"known": -1, "can_choose": False},  # Prepares from full list
         "Druid": {"known": -1, "can_choose": False},   # Prepares from full list
     }
-    
+
     limits = spell_limits.get(char_class.name, {"known": 0, "can_choose": False})
-    
+
     return jsonify({
         "spells": [{
             "id": spell.id,
@@ -991,7 +991,7 @@ def api_ability_score_methods():
             "custom": True
         }
     }
-    
+
     return jsonify(methods)
 
 
@@ -1001,17 +1001,17 @@ def api_character_optimization():
     species_id = request.args.get("species_id", type=int)
     class_id = request.args.get("class_id", type=int)
     background_id = request.args.get("background_id", type=int)
-    
+
     if not species_id or not class_id:
         return jsonify({"error": "species_id and class_id are required"}), 400
-    
+
     species = db.session.get(Species, species_id)
     char_class = db.session.get(CharacterClass, class_id)
     background = db.session.get(Background, background_id) if background_id else None
-    
+
     if not species or not char_class:
         return jsonify({"error": "Invalid species_id or class_id"}), 400
-    
+
     # Basic optimization suggestions
     suggestions = {
         "recommended_abilities": _get_recommended_abilities(char_class, species),
@@ -1019,7 +1019,7 @@ def api_character_optimization():
         "synergies": _get_species_class_synergies(species, char_class),
         "warnings": _get_build_warnings(species, char_class)
     }
-    
+
     return jsonify(suggestions)
 
 
@@ -1039,9 +1039,9 @@ def _get_recommended_abilities(char_class, species):
         "Monk": ["Dexterity", "Wisdom", "Constitution"],
         "Paladin": ["Strength", "Charisma", "Constitution"]
     }
-    
+
     priorities = class_priorities.get(char_class.name, ["Constitution"])
-    
+
     # Factor in species bonuses
     if species.ability_score_increases:
         species_bonuses = list(species.ability_score_increases.keys())
@@ -1051,18 +1051,18 @@ def _get_recommended_abilities(char_class, species):
                 "str": "Strength", "dex": "Dexterity", "con": "Constitution",
                 "int": "Intelligence", "wis": "Wisdom", "cha": "Charisma"
             }.get(ability, ability)
-            
+           
             if ability_full in priorities:
                 priorities.remove(ability_full)
                 priorities.insert(0, ability_full)
-    
+
     return priorities
 
 
 def _get_recommended_proficiencies(char_class, background):
     """Get recommended skill proficiencies."""
     recommendations = []
-    
+
     if char_class.skill_proficiencies:
         # Recommend skills that match class primary ability
         primary_skills = {
@@ -1077,14 +1077,14 @@ def _get_recommended_proficiencies(char_class, background):
             class_skills = set(char_class.skill_proficiencies)
             recommended_skills = set(primary_skills[char_class.primary_ability])
             recommendations.extend(list(class_skills.intersection(recommended_skills)))
-    
+
     return recommendations
 
 
 def _get_species_class_synergies(species, char_class):
     """Identify positive synergies between species and class."""
     synergies = []
-    
+
     if species.ability_score_increases and char_class.primary_ability:
         primary_short = {
             "Strength": "str", "Dexterity": "dex", "Constitution": "con",
@@ -1096,7 +1096,7 @@ def _get_species_class_synergies(species, char_class):
                 "type": "ability_synergy",
                 "description": f"{species.name} gets a bonus to {char_class.primary_ability}, which is {char_class.name}'s primary ability"
             })
-    
+
     # Check for matching proficiencies
     if species.proficiencies and char_class.skill_proficiencies:
         matching_profs = set(species.proficiencies).intersection(set(char_class.skill_proficiencies))
@@ -1105,14 +1105,14 @@ def _get_species_class_synergies(species, char_class):
                 "type": "proficiency_synergy",
                 "description": f"Both {species.name} and {char_class.name} provide {', '.join(matching_profs)} proficiency"
             })
-    
+
     return synergies
 
 
 def _get_build_warnings(species, char_class):
     """Identify potential issues with the species/class combination."""
     warnings = []
-    
+
     # Check for ability score conflicts
     if species.ability_score_increases and char_class.primary_ability:
         primary_short = {
@@ -1125,5 +1125,5 @@ def _get_build_warnings(species, char_class):
                 "type": "ability_mismatch",
                 "description": f"{species.name} doesn't boost {char_class.primary_ability}, which may make this build less optimal"
             })
-    
+
     return warnings

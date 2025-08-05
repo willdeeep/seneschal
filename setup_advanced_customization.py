@@ -13,7 +13,7 @@ from project.models import Background, Equipment, User
 def create_tables():
     """Create the new tables for advanced character customization."""
     app = create_app()
-    
+
     with app.app_context():
         # Create all tables
         db.create_all()
@@ -23,7 +23,7 @@ def create_tables():
 def seed_backgrounds():
     """Seed basic D&D 5e backgrounds."""
     app = create_app()
-    
+
     with app.app_context():
         backgrounds_data = [
             {
@@ -101,11 +101,11 @@ def seed_backgrounds():
 def seed_equipment():
     """Seed basic D&D 5e equipment."""
     app = create_app()
-    
+
     with app.app_context():
         equipment_data = [
             # Weapons
-            {"name": "Dagger", "category": "Weapon", "cost_cp": 200, "weight": 1.0, 
+            {"name": "Dagger", "category": "Weapon", "cost_cp": 200, "weight": 1.0,
              "damage_dice": "1d4", "damage_type": "Piercing", "weapon_properties": ["Finesse", "Light", "Thrown"]},
             {"name": "Shortsword", "category": "Weapon", "cost_cp": 1000, "weight": 2.0,
              "damage_dice": "1d6", "damage_type": "Piercing", "weapon_properties": ["Finesse", "Light"]},
@@ -119,7 +119,7 @@ def seed_equipment():
              "damage_dice": "1d8", "damage_type": "Piercing", "weapon_properties": ["Ammunition", "Loading", "Two-Handed"]},
             {"name": "Quarterstaff", "category": "Weapon", "cost_cp": 20, "weight": 4.0,
              "damage_dice": "1d6", "damage_type": "Bludgeoning", "weapon_properties": ["Versatile"]},
-            
+           
             # Armor
             {"name": "Leather Armor", "category": "Armor", "cost_cp": 1000, "weight": 10.0,
              "armor_class": 11, "max_dex_bonus": None, "stealth_disadvantage": False},
@@ -129,13 +129,13 @@ def seed_equipment():
              "armor_class": 14, "max_dex_bonus": 2, "stealth_disadvantage": True},
             {"name": "Shield", "category": "Armor", "cost_cp": 1000, "weight": 6.0,
              "armor_class": 2, "description": "+2 AC when wielded"},
-            
+           
             # Tools
             {"name": "Thieves' Tools", "category": "Tool", "cost_cp": 2500, "weight": 1.0,
              "description": "Includes lockpicks and other tools for thievery"},
             {"name": "Component Pouch", "category": "Tool", "cost_cp": 2500, "weight": 2.0,
              "description": "Contains material components for spellcasting"},
-            
+           
             # Equipment Packs
             {"name": "Explorer's Pack", "category": "Equipment Pack", "cost_cp": 1000, "weight": 10.0,
              "description": "Includes backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope"},
@@ -145,7 +145,7 @@ def seed_equipment():
              "description": "Includes backpack, book of lore, bottle of ink, ink pen, 10 sheets of parchment, little bag of sand, small knife"},
             {"name": "Priest's Pack", "category": "Equipment Pack", "cost_cp": 1900, "weight": 12.0,
              "description": "Includes backpack, blanket, 10 candles, tinderbox, alms box, 2 blocks of incense, censer, vestments, 2 days of rations, waterskin"},
-            
+           
             # Miscellaneous
             {"name": "Spellbook", "category": "Spellcasting Focus", "cost_cp": 5000, "weight": 3.0,
              "description": "Required for wizards to prepare and cast spells"},
@@ -166,7 +166,7 @@ def seed_equipment():
 def create_test_user():
     """Create a test user for API testing and development."""
     app = create_app()
-    
+
     with app.app_context():
         # Check if test user already exists
         test_user = User.query.filter_by(email='test@example.com').first()
@@ -186,7 +186,7 @@ def create_test_user():
 
         print("Test user created successfully!")
         print("  Name: Test User")
-        print("  Email: test@example.com") 
+        print("  Email: test@example.com")
         print("  Password: testpass123")
 
 

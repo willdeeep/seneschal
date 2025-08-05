@@ -370,9 +370,9 @@ class TestCharacterOptimization:
                     character_class=char_class,
                     level=1
                 )
-            
+           
                 character = lifecycle.create_character(**optimal_build)
-            
+           
                 # Test progression through levels
                 for level in range(2, 6):
                     character = lifecycle.level_up_character(character, level)

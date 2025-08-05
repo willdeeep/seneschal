@@ -54,7 +54,7 @@
                                    value="{{ form_data.player_name if form_data else '' }}">
                         </div>
                     </div>
-                
+               
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label for="species_id" class="form-label">Species *</label>
@@ -101,7 +101,7 @@
                                    value="{{ form_data.level if form_data else '1' }}" min="1" max="20">
                         </div>
                     </div>
-                
+               
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="background_id" class="form-label">Background *</label>
@@ -126,7 +126,7 @@
                             </div>
                         </div>
                     </div>
-                
+               
                     <div class="mb-3">
                         <label for="background" class="form-label">Background Story</label>
                         <textarea class="form-control" id="background" name="background" rows="3" placeholder="Character background and history..."></textarea>
@@ -254,7 +254,7 @@
                             </div>
                         </div>
                     </div>
-                    
+                   
                     <div id="point-buy-interface" style="display: none;">
                         <div class="alert alert-info">
                             <strong>Point Buy Calculator</strong><br>
@@ -264,7 +264,7 @@
                             <!-- Point buy controls will be populated by JavaScript -->
                         </div>
                     </div>
-                    
+                   
                     <div id="rolling-interface" style="display: none;">
                         <div class="alert alert-warning">
                             <strong>Rolling Results</strong><br>
@@ -1298,19 +1298,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     const bonuses = data.bonuses;
-                  
+                 
                     // Update each ability score display
                     Object.keys(abilityInputs).forEach(ability => {
                         const baseScore = parseInt(abilityInputs[ability].value) || 10;
                         const bonus = bonuses[ability] || 0;
                         const totalScore = baseScore + bonus;
                         const modifier = calculateAbilityModifier(totalScore);
-                      
+                     
                         const modifierText = modifier >= 0 ? `+${modifier}` : `${modifier}`;
                         const bonusText = bonus > 0 ? ` (+${bonus} species)` : '';
-                      
+                     
                         abilityTotals[ability].textContent = `Total: ${totalScore} (${modifierText})${bonusText}`;
-                      
+                     
                         // Add visual styling based on bonuses
                         if (bonus > 0) {
                             abilityTotals[ability].className = 'text-success';
@@ -1318,7 +1318,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             abilityTotals[ability].className = 'text-muted';
                         }
                     });
-                  
+                 
                     // Update other character attributes if species info is available
                     if (data.species_info) {
                         const speedInput = document.getElementById('speed');
@@ -1336,7 +1336,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const baseScore = parseInt(abilityInputs[ability].value) || 10;
                 const modifier = calculateAbilityModifier(baseScore);
                 const modifierText = modifier >= 0 ? `+${modifier}` : `${modifier}`;
-              
+             
                 abilityTotals[ability].textContent = `Total: ${baseScore} (${modifierText})`;
                 abilityTotals[ability].className = 'text-muted';
             });
@@ -1511,7 +1511,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadEquipment();
     });
     subspeciesSelect.addEventListener('change', updateAbilityScores);
-    
+
     // Class change handler
     const classSelect = document.getElementById('class_id');
     classSelect.addEventListener('change', function() {
@@ -1520,7 +1520,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadSpells();
         checkIfSpellcaster();
     });
-    
+
     // Background change handler
     const backgroundSelect = document.getElementById('background_id');
     if (backgroundSelect) {
@@ -1529,18 +1529,18 @@ document.addEventListener('DOMContentLoaded', function() {
             loadEquipment();
         });
     }
-    
+
     // Ability score method change handler
     const abilityMethodSelect = document.getElementById('ability_method');
     if (abilityMethodSelect) {
         abilityMethodSelect.addEventListener('change', handleAbilityMethodChange);
     }
-    
+
     // Listen for changes to ability score inputs
     Object.values(abilityInputs).forEach(input => {
         input.addEventListener('input', updateAbilityScores);
     });
-    
+
     // Initial setup
     filterSubspecies();
     updateAbilityScores();
@@ -1556,19 +1556,19 @@ function loadBackgroundDetails() {
     const backgroundDescription = document.getElementById('background-description');
     const backgroundProficiencies = document.getElementById('background-proficiencies');
     const backgroundFeature = document.getElementById('background-feature');
-    
+
     if (!backgroundSelect.value) {
         backgroundDetails.style.display = 'none';
         return;
     }
-    
+
     fetch(`/characters/api/backgrounds`)
         .then(response => response.json())
         .then(data => {
             const background = data.find(bg => bg.id == backgroundSelect.value);
             if (background) {
                 backgroundDescription.textContent = background.description || '';
-                
+               
                 let profText = '';
                 if (background.skill_proficiencies && background.skill_proficiencies.length > 0) {
                     profText += `Skills: ${background.skill_proficiencies.join(', ')}`;
@@ -1578,11 +1578,11 @@ function loadBackgroundDetails() {
                     profText += `Tools: ${background.tool_proficiencies.join(', ')}`;
                 }
                 backgroundProficiencies.textContent = profText;
-                
+               
                 if (background.feature_name) {
                     backgroundFeature.innerHTML = `<strong>${background.feature_name}:</strong> ${background.feature_description || ''}`;
                 }
-                
+               
                 backgroundDetails.style.display = 'block';
             }
         })
@@ -1595,36 +1595,36 @@ function loadEquipment() {
     const classSelect = document.getElementById('class_id');
     const backgroundSelect = document.getElementById('background_id');
     const equipmentList = document.getElementById('equipment-list');
-    
+
     if (!classSelect.value && !backgroundSelect.value) {
         equipmentList.innerHTML = '<p class="text-muted default-message">Please select a class and background first.</p>';
         return;
     }
-    
+
     const spinner = equipmentList.querySelector('.loading-spinner');
     if (spinner) spinner.style.display = 'block';
-    
+
     const params = new URLSearchParams();
     if (classSelect.value) params.append('class_id', classSelect.value);
     if (backgroundSelect.value) params.append('background_id', backgroundSelect.value);
-    
+
     fetch(`/characters/api/equipment?${params}`)
         .then(response => response.json())
         .then(data => {
             if (spinner) spinner.style.display = 'none';
-            
+           
             if (data.length === 0) {
                 equipmentList.innerHTML = '<p class="text-muted">No starting equipment available.</p>';
                 return;
             }
-            
+           
             // Group equipment by category
             const grouped = data.reduce((acc, item) => {
                 if (!acc[item.category]) acc[item.category] = [];
                 acc[item.category].push(item);
                 return acc;
             }, {});
-            
+           
             let html = '';
             Object.entries(grouped).forEach(([category, items]) => {
                 html += `<h6 class="text-primary mt-3">${category}</h6>`;
@@ -1644,7 +1644,7 @@ function loadEquipment() {
                 });
                 html += '</div>';
             });
-            
+           
             equipmentList.innerHTML = html;
         })
         .catch(error => {
@@ -1657,15 +1657,15 @@ function loadEquipment() {
 function checkIfSpellcaster() {
     const classSelect = document.getElementById('class_id');
     const spellsSection = document.getElementById('spells-section');
-    
+
     if (!classSelect.value) {
         spellsSection.style.display = 'none';
         return;
     }
-    
+
     const spellcastingClasses = ['Wizard', 'Sorcerer', 'Bard', 'Cleric', 'Druid', 'Warlock', 'Ranger', 'Paladin'];
     const selectedClass = classSelect.options[classSelect.selectedIndex].text;
-    
+
     if (spellcastingClasses.includes(selectedClass)) {
         spellsSection.style.display = 'block';
         loadSpells();
@@ -1678,9 +1678,9 @@ function loadSpells() {
     const classSelect = document.getElementById('class_id');
     const cantripsList = document.getElementById('cantrips-list');
     const spellsList = document.getElementById('first-level-spells-list');
-    
+
     if (!classSelect.value) return;
-    
+
     // Load cantrips
     fetch(`/characters/api/cantrips?class_id=${classSelect.value}`)
         .then(response => response.json())
@@ -1689,7 +1689,7 @@ function loadSpells() {
                 cantripsList.innerHTML = '<p class="text-muted">No cantrips available.</p>';
                 return;
             }
-            
+           
             let html = '';
             data.forEach(cantrip => {
                 html += `
@@ -1710,7 +1710,7 @@ function loadSpells() {
             console.error('Error loading cantrips:', error);
             cantripsList.innerHTML = '<p class="text-danger">Error loading cantrips.</p>';
         });
-    
+
     // Load 1st level spells
     fetch(`/characters/api/starting-spells?class_id=${classSelect.value}`)
         .then(response => response.json())
@@ -1719,14 +1719,14 @@ function loadSpells() {
                 spellsList.innerHTML = '<p class="text-muted">No spells available.</p>';
                 return;
             }
-            
+           
             let html = '';
             if (data.limits.known > 0) {
                 html += `<div class="alert alert-info small mb-2">Select up to ${data.limits.known} spells to know</div>`;
             } else if (data.limits.can_choose === false) {
                 html += `<div class="alert alert-info small mb-2">You can prepare spells from this entire list</div>`;
             }
-            
+           
             data.spells.forEach(spell => {
                 html += `
                     <div class="mb-2">
@@ -1752,20 +1752,20 @@ function handleAbilityMethodChange() {
     const methodSelect = document.getElementById('ability_method');
     const pointBuyInterface = document.getElementById('point-buy-interface');
     const rollingInterface = document.getElementById('rolling-interface');
-    
+
     // Hide all help texts first
     document.querySelectorAll('[id$="-help"]').forEach(el => el.style.display = 'none');
-    
+
     // Hide all interfaces
     pointBuyInterface.style.display = 'none';
     rollingInterface.style.display = 'none';
-    
+
     if (!methodSelect.value) return;
-    
+
     // Show appropriate help text
     const helpElement = document.getElementById(`${methodSelect.value.replace('_', '-')}-help`);
     if (helpElement) helpElement.style.display = 'block';
-    
+
     // Show appropriate interface
     switch (methodSelect.value) {
         case 'point_buy':
@@ -1790,7 +1790,7 @@ function setStandardArray() {
     // Set standard array values
     const standardScores = [15, 14, 13, 12, 10, 8];
     const abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
-    
+
     // For now, just assign in order - in a real implementation, user would choose assignment
     abilities.forEach((ability, index) => {
         const input = document.getElementById(ability);
@@ -1798,7 +1798,7 @@ function setStandardArray() {
             input.value = standardScores[index];
         }
     });
-    
+
     updateAbilityScores();
 }
 </script>

@@ -155,7 +155,7 @@ class Character(db.Model):
 
     # Foreign key relationships (using backrefs from related models)
     # species -> relationship defined in Species model with backref="species"
-    # subspecies -> relationship defined in SubSpecies model with backref="subspecies"  
+    # subspecies -> relationship defined in SubSpecies model with backref="subspecies" 
     # char_class -> relationship defined in CharacterClass model with backref="char_class"
     char_background = db.relationship("Background", lazy="select", foreign_keys=[background_id])
 
