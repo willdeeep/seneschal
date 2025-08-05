@@ -80,8 +80,8 @@ def auth(client):
     """Authentication helper for tests."""
 
     class AuthActions:
-        """Handles authentication actions for tests.
-        """
+        """Handles authentication actions for tests."""
+
         def __init__(self, client):
             self._client = client
 
@@ -173,8 +173,8 @@ def character_lifecycle_setup(app, persistent_test_user):
     """
 
     class CharacterLifecycle:
-        """Handles the lifecycle of a character for testing purposes.
-        """
+        """Handles the lifecycle of a character for testing purposes."""
+
         def __init__(self, user):
             self.user = user
             self.characters = []

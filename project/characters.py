@@ -16,7 +16,6 @@ from project.models import (
     Feature,
     Spell,
     Background,
-    Equipment,
 )
 
 bp = Blueprint("characters", __name__, url_prefix="/characters")
@@ -39,9 +38,17 @@ def create():
         name = request.form.get("name")
         player_name = request.form.get("player_name")
         species_id = request.form.get("species_id")
-        subspecies_id = request.form.get("subspecies_id") if request.form.get("subspecies_id") else None
+        subspecies_id = (
+            request.form.get("subspecies_id")
+            if request.form.get("subspecies_id")
+            else None
+        )
         class_id = request.form.get("class_id")
-        background_id = request.form.get("background_id") if request.form.get("background_id") else None
+        background_id = (
+            request.form.get("background_id")
+            if request.form.get("background_id")
+            else None
+        )
         level = int(request.form.get("level", 1))
         background = request.form.get("background")  # Keep for backward compatibility
 
@@ -111,12 +118,28 @@ def create():
             if not subspecies:
                 errors.append("Selected subspecies is invalid.")
             elif subspecies.species_id != int(species_id):
-                errors.append("Selected subspecies does not belong to the chosen species.")
+                errors.append(
+                    "Selected subspecies does not belong to the chosen species."
+                )
 
         # Validate ability scores
-        ability_scores = [strength, dexterity, constitution, intelligence, wisdom, charisma]
+        ability_scores = [
+            strength,
+            dexterity,
+            constitution,
+            intelligence,
+            wisdom,
+            charisma,
+        ]
         for i, score in enumerate(ability_scores):
-            ability_names = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
+            ability_names = [
+                "Strength",
+                "Dexterity",
+                "Constitution",
+                "Intelligence",
+                "Wisdom",
+                "Charisma",
+            ]
             if score < 3 or score > 20:
                 errors.append(f"{ability_names[i]} must be between 3 and 20.")
 
@@ -150,11 +173,13 @@ def create():
             species = Species.query.order_by(Species.name).all()
             classes = CharacterClass.query.order_by(CharacterClass.name).all()
             subspecies = SubSpecies.query.order_by(SubSpecies.name).all()
-            return render_template("characters/create.html",
-                                 species=species,
-                                 classes=classes,
-                                 subspecies=subspecies,
-                                 form_data=request.form)
+            return render_template(
+                "characters/create.html",
+                species=species,
+                classes=classes,
+                subspecies=subspecies,
+                form_data=request.form,
+            )
 
         # Create character
         character = Character(
@@ -231,21 +256,25 @@ def create():
             species = Species.query.order_by(Species.name).all()
             classes = CharacterClass.query.order_by(CharacterClass.name).all()
             subspecies = SubSpecies.query.order_by(SubSpecies.name).all()
-            return render_template("characters/create.html",
-                                 species=species,
-                                 classes=classes,
-                                 subspecies=subspecies)
+            return render_template(
+                "characters/create.html",
+                species=species,
+                classes=classes,
+                subspecies=subspecies,
+            )
 
     # GET request - show form with dynamic loading enabled
     species = Species.query.order_by(Species.name).all()
     classes = CharacterClass.query.order_by(CharacterClass.name).all()
     subspecies = SubSpecies.query.order_by(SubSpecies.name).all()
     backgrounds = Background.query.order_by(Background.name).all()
-    return render_template("characters/create.html",
-                         species=species,
-                         classes=classes,
-                         subspecies=subspecies,
-                         backgrounds=backgrounds)
+    return render_template(
+        "characters/create.html",
+        species=species,
+        classes=classes,
+        subspecies=subspecies,
+        backgrounds=backgrounds,
+    )
 
 
 @bp.route("/<int:character_id>")
@@ -464,13 +493,13 @@ def get_max_skill_proficiencies(class_id):
         "Wizard": 2,
         "Cleric": 2,
         "Barbarian": 2,
-        "Bard": 3,   # Bards are versatile
+        "Bard": 3,  # Bards are versatile
         "Druid": 2,
         "Monk": 2,
         "Paladin": 2,
-        "Ranger": 3, # Rangers get more skills
+        "Ranger": 3,  # Rangers get more skills
         "Sorcerer": 2,
-        "Warlock": 2
+        "Warlock": 2,
     }
 
     return skill_limits.get(char_class.name, 2)
@@ -491,7 +520,7 @@ def get_available_proficiencies():
     # Get base proficiencies from species
     if species_id:
         species = db.session.get(Species, species_id)
-        if species and hasattr(species, 'proficiencies') and species.proficiencies:
+        if species and hasattr(species, "proficiencies") and species.proficiencies:
             base_proficiencies.update(species.proficiencies)
 
     # Get base proficiencies from class
@@ -508,45 +537,148 @@ def get_available_proficiencies():
 
             # Add class-specific optional skill proficiencies based on D&D 5e rules
             if char_class.name == "Fighter":
-                optional_proficiencies.update(["Acrobatics", "Animal Handling", "Athletics",
-                                              "History", "Insight", "Intimidation", "Perception", "Survival"])
+                optional_proficiencies.update(
+                    [
+                        "Acrobatics",
+                        "Animal Handling",
+                        "Athletics",
+                        "History",
+                        "Insight",
+                        "Intimidation",
+                        "Perception",
+                        "Survival",
+                    ]
+                )
             elif char_class.name == "Rogue":
-                optional_proficiencies.update(["Acrobatics", "Athletics", "Deception", "Insight",
-                                              "Intimidation", "Investigation", "Perception", "Performance",
-                                              "Persuasion", "Sleight of Hand", "Stealth"])
+                optional_proficiencies.update(
+                    [
+                        "Acrobatics",
+                        "Athletics",
+                        "Deception",
+                        "Insight",
+                        "Intimidation",
+                        "Investigation",
+                        "Perception",
+                        "Performance",
+                        "Persuasion",
+                        "Sleight of Hand",
+                        "Stealth",
+                    ]
+                )
             elif char_class.name == "Wizard":
-                optional_proficiencies.update(["Arcana", "History", "Insight", "Investigation",
-                                              "Medicine", "Religion"])
+                optional_proficiencies.update(
+                    [
+                        "Arcana",
+                        "History",
+                        "Insight",
+                        "Investigation",
+                        "Medicine",
+                        "Religion",
+                    ]
+                )
             elif char_class.name == "Cleric":
-                optional_proficiencies.update(["History", "Insight", "Medicine", "Persuasion", "Religion"])
+                optional_proficiencies.update(
+                    ["History", "Insight", "Medicine", "Persuasion", "Religion"]
+                )
             elif char_class.name == "Barbarian":
-                optional_proficiencies.update(["Animal Handling", "Athletics", "Intimidation",
-                                              "Nature", "Perception", "Survival"])
+                optional_proficiencies.update(
+                    [
+                        "Animal Handling",
+                        "Athletics",
+                        "Intimidation",
+                        "Nature",
+                        "Perception",
+                        "Survival",
+                    ]
+                )
             elif char_class.name == "Bard":
-                optional_proficiencies.update(["Deception", "History", "Investigation", "Persuasion",
-                                              "Sleight of Hand", "Stealth"])
+                optional_proficiencies.update(
+                    [
+                        "Deception",
+                        "History",
+                        "Investigation",
+                        "Persuasion",
+                        "Sleight of Hand",
+                        "Stealth",
+                    ]
+                )
             elif char_class.name == "Druid":
-                optional_proficiencies.update(["Arcana", "Animal Handling", "Insight", "Medicine",
-                                              "Nature", "Perception", "Religion", "Survival"])
+                optional_proficiencies.update(
+                    [
+                        "Arcana",
+                        "Animal Handling",
+                        "Insight",
+                        "Medicine",
+                        "Nature",
+                        "Perception",
+                        "Religion",
+                        "Survival",
+                    ]
+                )
             elif char_class.name == "Monk":
-                optional_proficiencies.update(["Acrobatics", "Athletics", "History", "Insight",
-                                              "Religion", "Stealth"])
+                optional_proficiencies.update(
+                    [
+                        "Acrobatics",
+                        "Athletics",
+                        "History",
+                        "Insight",
+                        "Religion",
+                        "Stealth",
+                    ]
+                )
             elif char_class.name == "Paladin":
-                optional_proficiencies.update(["Athletics", "Insight", "Intimidation", "Medicine",
-                                              "Persuasion", "Religion"])
+                optional_proficiencies.update(
+                    [
+                        "Athletics",
+                        "Insight",
+                        "Intimidation",
+                        "Medicine",
+                        "Persuasion",
+                        "Religion",
+                    ]
+                )
             elif char_class.name == "Ranger":
-                optional_proficiencies.update(["Animal Handling", "Athletics", "Insight", "Investigation",
-                                              "Nature", "Perception", "Stealth", "Survival"])
+                optional_proficiencies.update(
+                    [
+                        "Animal Handling",
+                        "Athletics",
+                        "Insight",
+                        "Investigation",
+                        "Nature",
+                        "Perception",
+                        "Stealth",
+                        "Survival",
+                    ]
+                )
             elif char_class.name == "Sorcerer":
-                optional_proficiencies.update(["Arcana", "Deception", "Insight", "Intimidation",
-                                              "Persuasion", "Religion"])
+                optional_proficiencies.update(
+                    [
+                        "Arcana",
+                        "Deception",
+                        "Insight",
+                        "Intimidation",
+                        "Persuasion",
+                        "Religion",
+                    ]
+                )
             elif char_class.name == "Warlock":
-                optional_proficiencies.update(["Arcana", "Deception", "History", "Intimidation",
-                                              "Investigation", "Nature", "Religion"])
+                optional_proficiencies.update(
+                    [
+                        "Arcana",
+                        "Deception",
+                        "History",
+                        "Intimidation",
+                        "Investigation",
+                        "Nature",
+                        "Religion",
+                    ]
+                )
 
     # If no specific proficiencies found, add some general ones
     if not optional_proficiencies:
-        optional_proficiencies.update(["Athletics", "Insight", "Perception", "Persuasion"])
+        optional_proficiencies.update(
+            ["Athletics", "Insight", "Perception", "Persuasion"]
+        )
 
     # Create required and optional proficiency objects for the frontend
     required_proficiencies = []
@@ -556,45 +688,79 @@ def get_available_proficiencies():
     for prof_name in base_proficiencies:
         # Determine proficiency category based on name
         category = "Skill"
-        if any(armor in prof_name for armor in ["Armor", "Shield", "Light", "Medium", "Heavy"]):
+        if any(
+            armor in prof_name
+            for armor in ["Armor", "Shield", "Light", "Medium", "Heavy"]
+        ):
             category = "Armor"
-        elif any(weapon in prof_name for weapon in ["Weapon", "Sword", "Bow", "Axe", "Hammer", "Simple", "Martial"]):
+        elif any(
+            weapon in prof_name
+            for weapon in [
+                "Weapon",
+                "Sword",
+                "Bow",
+                "Axe",
+                "Hammer",
+                "Simple",
+                "Martial",
+            ]
+        ):
             category = "Weapon"
         elif "Tools" in prof_name or "Kit" in prof_name:
             category = "Tool"
 
-        required_proficiencies.append({
-            "id": f"req_{len(required_proficiencies) + 1}",
-            "name": prof_name,
-            "category": category
-        })
+        required_proficiencies.append(
+            {
+                "id": f"req_{len(required_proficiencies) + 1}",
+                "name": prof_name,
+                "category": category,
+            }
+        )
 
     # Process optional proficiencies (those that are not required)
     for prof_name in optional_proficiencies:
         if prof_name not in base_proficiencies:
             # Determine proficiency category based on name
             category = "Skill"
-            if any(armor in prof_name for armor in ["Armor", "Shield", "Light", "Medium", "Heavy"]):
+            if any(
+                armor in prof_name
+                for armor in ["Armor", "Shield", "Light", "Medium", "Heavy"]
+            ):
                 category = "Armor"
-            elif any(weapon in prof_name for weapon in ["Weapon", "Sword", "Bow", "Axe", "Hammer", "Simple", "Martial"]):
+            elif any(
+                weapon in prof_name
+                for weapon in [
+                    "Weapon",
+                    "Sword",
+                    "Bow",
+                    "Axe",
+                    "Hammer",
+                    "Simple",
+                    "Martial",
+                ]
+            ):
                 category = "Weapon"
             elif "Tools" in prof_name or "Kit" in prof_name:
                 category = "Tool"
 
-            optional_proficiencies_list.append({
-                "id": f"opt_{len(optional_proficiencies_list) + 1}",
-                "name": prof_name,
-                "category": category
-            })
+            optional_proficiencies_list.append(
+                {
+                    "id": f"opt_{len(optional_proficiencies_list) + 1}",
+                    "name": prof_name,
+                    "category": category,
+                }
+            )
 
     max_skill_selections = get_max_skill_proficiencies(class_id)
 
-    return jsonify({
-        "required": required_proficiencies,
-        "optional": optional_proficiencies_list,
-        "max_selections": max_skill_selections,
-        "skill_count": max_skill_selections
-    })
+    return jsonify(
+        {
+            "required": required_proficiencies,
+            "optional": optional_proficiencies_list,
+            "max_selections": max_skill_selections,
+            "skill_count": max_skill_selections,
+        }
+    )
 
 
 @bp.route("/api/languages")
@@ -621,15 +787,33 @@ def get_available_languages():
 
     # Standard optional languages for selection
     standard_languages = [
-        "Common", "Dwarvish", "Elvish", "Giant", "Gnomish", "Goblin", "Halfling", "Orc"
+        "Common",
+        "Dwarvish",
+        "Elvish",
+        "Giant",
+        "Gnomish",
+        "Goblin",
+        "Halfling",
+        "Orc",
     ]
     exotic_languages = [
-        "Abyssal", "Celestial", "Draconic", "Deep Speech", "Infernal", "Primordial", "Sylvan", "Undercommon"
+        "Abyssal",
+        "Celestial",
+        "Draconic",
+        "Deep Speech",
+        "Infernal",
+        "Primordial",
+        "Sylvan",
+        "Undercommon",
     ]
 
     # Add optional languages (excluding already known ones)
-    optional_languages.update(lang for lang in standard_languages if lang not in base_languages)
-    optional_languages.update(lang for lang in exotic_languages if lang not in base_languages)
+    optional_languages.update(
+        lang for lang in standard_languages if lang not in base_languages
+    )
+    optional_languages.update(
+        lang for lang in exotic_languages if lang not in base_languages
+    )
 
     # Format for frontend as base and optional languages
     base_language_list = []
@@ -637,22 +821,17 @@ def get_available_languages():
 
     # Process base languages
     for lang in base_languages:
-        base_language_list.append({
-            "id": f"base_{len(base_language_list) + 1}",
-            "name": lang
-        })
+        base_language_list.append(
+            {"id": f"base_{len(base_language_list) + 1}", "name": lang}
+        )
 
     # Process optional languages
     for lang in optional_languages:
-        optional_language_list.append({
-            "id": f"opt_{len(optional_language_list) + 1}",
-            "name": lang
-        })
+        optional_language_list.append(
+            {"id": f"opt_{len(optional_language_list) + 1}", "name": lang}
+        )
 
-    return jsonify({
-        "base": base_language_list,
-        "optional": optional_language_list
-    })
+    return jsonify({"base": base_language_list, "optional": optional_language_list})
 
 
 @bp.route("/api/features")
@@ -782,10 +961,7 @@ def get_ability_bonuses():
     """Get ability score bonuses for species and subspecies combination."""
     species_id = request.args.get("species_id")
     subspecies_id = request.args.get("subspecies_id")
-    bonuses = {
-        "str": 0, "dex": 0, "con": 0,
-        "int": 0, "wis": 0, "cha": 0
-    }
+    bonuses = {"str": 0, "dex": 0, "con": 0, "int": 0, "wis": 0, "cha": 0}
     species_info = {}
     subspecies_info = {}
     if species_id:
@@ -796,7 +972,7 @@ def get_ability_bonuses():
                 "size": species.size,
                 "speed": species.speed,
                 "traits": species.traits or [],
-                "languages": species.languages or []
+                "languages": species.languages or [],
             }
             if species.ability_score_increases:
                 for ability, bonus in species.ability_score_increases.items():
@@ -807,16 +983,19 @@ def get_ability_bonuses():
         if subspecies and subspecies.additional_traits:
             subspecies_info = {
                 "name": subspecies.name,
-                "additional_traits": subspecies.additional_traits
+                "additional_traits": subspecies.additional_traits,
             }
-    return jsonify({
-        "bonuses": bonuses,
-        "species_info": species_info,
-        "subspecies_info": subspecies_info
-    })
+    return jsonify(
+        {
+            "bonuses": bonuses,
+            "species_info": species_info,
+            "subspecies_info": subspecies_info,
+        }
+    )
 
 
 # Advanced Character Customization API Endpoints
+
 
 @bp.route("/api/backgrounds")
 def api_backgrounds():
@@ -824,18 +1003,23 @@ def api_backgrounds():
     from project.models import Background
 
     backgrounds = Background.query.all()
-    return jsonify([{
-        "id": bg.id,
-        "name": bg.name,
-        "description": bg.description,
-        "skill_proficiencies": bg.skill_proficiencies,
-        "tool_proficiencies": bg.tool_proficiencies,
-        "languages": bg.languages,
-        "equipment": bg.equipment,
-        "feature_name": bg.feature_name,
-        "feature_description": bg.feature_description,
-        "starting_gold": bg.starting_gold
-    } for bg in backgrounds])
+    return jsonify(
+        [
+            {
+                "id": bg.id,
+                "name": bg.name,
+                "description": bg.description,
+                "skill_proficiencies": bg.skill_proficiencies,
+                "tool_proficiencies": bg.tool_proficiencies,
+                "languages": bg.languages,
+                "equipment": bg.equipment,
+                "feature_name": bg.feature_name,
+                "feature_description": bg.feature_description,
+                "starting_gold": bg.starting_gold,
+            }
+            for bg in backgrounds
+        ]
+    )
 
 
 @bp.route("/api/equipment")
@@ -853,7 +1037,9 @@ def api_equipment():
         char_class = db.session.get(CharacterClass, class_id)
         if char_class:
             # Get class-appropriate equipment
-            class_equipment = Equipment.get_starting_equipment_for_class(char_class.name)
+            class_equipment = Equipment.get_starting_equipment_for_class(
+                char_class.name
+            )
             equipment.extend(class_equipment)
 
     if background_id:
@@ -866,22 +1052,29 @@ def api_equipment():
             equipment.extend(bg_equipment)
 
     if category:
-        equipment = [item for item in equipment if item.category.lower() == category.lower()]
+        equipment = [
+            item for item in equipment if item.category.lower() == category.lower()
+        ]
 
     # Remove duplicates
     equipment = list({item.id: item for item in equipment}.values())
 
-    return jsonify([{
-        "id": item.id,
-        "name": item.name,
-        "category": item.category,
-        "cost_cp": item.cost_cp,
-        "weight": item.weight,
-        "description": item.description,
-        "damage_dice": item.damage_dice,
-        "damage_type": item.damage_type,
-        "armor_class": item.armor_class
-    } for item in equipment])
+    return jsonify(
+        [
+            {
+                "id": item.id,
+                "name": item.name,
+                "category": item.category,
+                "cost_cp": item.cost_cp,
+                "weight": item.weight,
+                "description": item.description,
+                "damage_dice": item.damage_dice,
+                "damage_type": item.damage_type,
+                "armor_class": item.armor_class,
+            }
+            for item in equipment
+        ]
+    )
 
 
 @bp.route("/api/cantrips")
@@ -898,20 +1091,24 @@ def api_cantrips():
 
     # Get cantrips available to this class
     cantrips = Spell.query.filter(
-        Spell.level == 0,
-        Spell.class_lists.contains(char_class.name.lower())
+        Spell.level == 0, Spell.class_lists.contains(char_class.name.lower())
     ).all()
 
-    return jsonify([{
-        "id": spell.id,
-        "name": spell.name,
-        "school": spell.school,
-        "casting_time": spell.casting_time,
-        "range": spell.spell_range,
-        "components": spell.components,
-        "duration": spell.duration,
-        "description": spell.description
-    } for spell in cantrips])
+    return jsonify(
+        [
+            {
+                "id": spell.id,
+                "name": spell.name,
+                "school": spell.school,
+                "casting_time": spell.casting_time,
+                "range": spell.spell_range,
+                "components": spell.components,
+                "duration": spell.duration,
+                "description": spell.description,
+            }
+            for spell in cantrips
+        ]
+    )
 
 
 @bp.route("/api/starting-spells")
@@ -928,8 +1125,7 @@ def api_starting_spells():
 
     # Get 1st level spells available to this class
     spells = Spell.query.filter(
-        Spell.level == 1,
-        Spell.class_lists.contains(char_class.name.lower())
+        Spell.level == 1, Spell.class_lists.contains(char_class.name.lower())
     ).all()
 
     # Determine spell limits based on class
@@ -939,25 +1135,30 @@ def api_starting_spells():
         "Bard": {"known": 4, "can_choose": True},
         "Warlock": {"known": 2, "can_choose": True},
         "Cleric": {"known": -1, "can_choose": False},  # Prepares from full list
-        "Druid": {"known": -1, "can_choose": False},   # Prepares from full list
+        "Druid": {"known": -1, "can_choose": False},  # Prepares from full list
     }
 
     limits = spell_limits.get(char_class.name, {"known": 0, "can_choose": False})
 
-    return jsonify({
-        "spells": [{
-            "id": spell.id,
-            "name": spell.name,
-            "school": spell.school,
-            "casting_time": spell.casting_time,
-            "range": spell.spell_range,
-            "components": spell.components,
-            "duration": spell.duration,
-            "description": spell.description,
-            "is_ritual": spell.is_ritual
-        } for spell in spells],
-        "limits": limits
-    })
+    return jsonify(
+        {
+            "spells": [
+                {
+                    "id": spell.id,
+                    "name": spell.name,
+                    "school": spell.school,
+                    "casting_time": spell.casting_time,
+                    "range": spell.spell_range,
+                    "components": spell.components,
+                    "duration": spell.duration,
+                    "description": spell.description,
+                    "is_ritual": spell.is_ritual,
+                }
+                for spell in spells
+            ],
+            "limits": limits,
+        }
+    )
 
 
 @bp.route("/api/ability-score-methods")
@@ -968,7 +1169,7 @@ def api_ability_score_methods():
             "name": "Standard Array",
             "description": "Use the standard array: 15, 14, 13, 12, 10, 8",
             "values": [15, 14, 13, 12, 10, 8],
-            "point_buy": False
+            "point_buy": False,
         },
         "point_buy": {
             "name": "Point Buy",
@@ -976,20 +1177,20 @@ def api_ability_score_methods():
             "base_cost": 27,
             "min_score": 8,
             "max_score": 15,
-            "point_buy": True
+            "point_buy": True,
         },
         "rolling": {
             "name": "Rolling",
             "description": "Roll 4d6, drop lowest, six times",
             "point_buy": False,
-            "requires_rolling": True
+            "requires_rolling": True,
         },
         "custom": {
             "name": "Custom",
             "description": "Enter custom ability scores (DM approval may be required)",
             "point_buy": False,
-            "custom": True
-        }
+            "custom": True,
+        },
     }
 
     return jsonify(methods)
@@ -1015,9 +1216,11 @@ def api_character_optimization():
     # Basic optimization suggestions
     suggestions = {
         "recommended_abilities": _get_recommended_abilities(char_class, species),
-        "recommended_proficiencies": _get_recommended_proficiencies(char_class, background),
+        "recommended_proficiencies": _get_recommended_proficiencies(
+            char_class, background
+        ),
         "synergies": _get_species_class_synergies(species, char_class),
-        "warnings": _get_build_warnings(species, char_class)
+        "warnings": _get_build_warnings(species, char_class),
     }
 
     return jsonify(suggestions)
@@ -1037,7 +1240,7 @@ def _get_recommended_abilities(char_class, species):
         "Barbarian": ["Strength", "Constitution", "Dexterity"],
         "Druid": ["Wisdom", "Constitution", "Dexterity"],
         "Monk": ["Dexterity", "Wisdom", "Constitution"],
-        "Paladin": ["Strength", "Charisma", "Constitution"]
+        "Paladin": ["Strength", "Charisma", "Constitution"],
     }
 
     priorities = class_priorities.get(char_class.name, ["Constitution"])
@@ -1048,10 +1251,14 @@ def _get_recommended_abilities(char_class, species):
         # Move species-boosted abilities higher in priority
         for ability in species_bonuses:
             ability_full = {
-                "str": "Strength", "dex": "Dexterity", "con": "Constitution",
-                "int": "Intelligence", "wis": "Wisdom", "cha": "Charisma"
+                "str": "Strength",
+                "dex": "Dexterity",
+                "con": "Constitution",
+                "int": "Intelligence",
+                "wis": "Wisdom",
+                "cha": "Charisma",
             }.get(ability, ability)
-           
+
             if ability_full in priorities:
                 priorities.remove(ability_full)
                 priorities.insert(0, ability_full)
@@ -1068,9 +1275,21 @@ def _get_recommended_proficiencies(char_class, background):
         primary_skills = {
             "Strength": ["Athletics"],
             "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"],
-            "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"],
-            "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"],
-            "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"]
+            "Intelligence": [
+                "Arcana",
+                "History",
+                "Investigation",
+                "Nature",
+                "Religion",
+            ],
+            "Wisdom": [
+                "Animal Handling",
+                "Insight",
+                "Medicine",
+                "Perception",
+                "Survival",
+            ],
+            "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"],
         }
 
         if char_class.primary_ability in primary_skills:
@@ -1087,24 +1306,34 @@ def _get_species_class_synergies(species, char_class):
 
     if species.ability_score_increases and char_class.primary_ability:
         primary_short = {
-            "Strength": "str", "Dexterity": "dex", "Constitution": "con",
-            "Intelligence": "int", "Wisdom": "wis", "Charisma": "cha"
+            "Strength": "str",
+            "Dexterity": "dex",
+            "Constitution": "con",
+            "Intelligence": "int",
+            "Wisdom": "wis",
+            "Charisma": "cha",
         }.get(char_class.primary_ability, "")
 
         if primary_short in species.ability_score_increases:
-            synergies.append({
-                "type": "ability_synergy",
-                "description": f"{species.name} gets a bonus to {char_class.primary_ability}, which is {char_class.name}'s primary ability"
-            })
+            synergies.append(
+                {
+                    "type": "ability_synergy",
+                    "description": f"{species.name} gets a bonus to {char_class.primary_ability}, which is {char_class.name}'s primary ability",
+                }
+            )
 
     # Check for matching proficiencies
     if species.proficiencies and char_class.skill_proficiencies:
-        matching_profs = set(species.proficiencies).intersection(set(char_class.skill_proficiencies))
+        matching_profs = set(species.proficiencies).intersection(
+            set(char_class.skill_proficiencies)
+        )
         if matching_profs:
-            synergies.append({
-                "type": "proficiency_synergy",
-                "description": f"Both {species.name} and {char_class.name} provide {', '.join(matching_profs)} proficiency"
-            })
+            synergies.append(
+                {
+                    "type": "proficiency_synergy",
+                    "description": f"Both {species.name} and {char_class.name} provide {', '.join(matching_profs)} proficiency",
+                }
+            )
 
     return synergies
 
@@ -1116,14 +1345,20 @@ def _get_build_warnings(species, char_class):
     # Check for ability score conflicts
     if species.ability_score_increases and char_class.primary_ability:
         primary_short = {
-            "Strength": "str", "Dexterity": "dex", "Constitution": "con",
-            "Intelligence": "int", "Wisdom": "wis", "Charisma": "cha"
+            "Strength": "str",
+            "Dexterity": "dex",
+            "Constitution": "con",
+            "Intelligence": "int",
+            "Wisdom": "wis",
+            "Charisma": "cha",
         }.get(char_class.primary_ability, "")
 
         if primary_short not in species.ability_score_increases:
-            warnings.append({
-                "type": "ability_mismatch",
-                "description": f"{species.name} doesn't boost {char_class.primary_ability}, which may make this build less optimal"
-            })
+            warnings.append(
+                {
+                    "type": "ability_mismatch",
+                    "description": f"{species.name} doesn't boost {char_class.primary_ability}, which may make this build less optimal",
+                }
+            )
 
     return warnings

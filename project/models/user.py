@@ -5,9 +5,10 @@ This module contains the User model and related functionality for user
 authentication, password management, and user-character relationships.
 """
 
-from project import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+
+from project import db
 
 
 class User(UserMixin, db.Model):

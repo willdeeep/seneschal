@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import logging
 
+
 class FiveEDataLoader:
     """Load and access D&D 5e data from JSON files."""
 
@@ -32,7 +33,7 @@ class FiveEDataLoader:
             return []
 
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
             self._cache[filename] = data
@@ -50,6 +51,7 @@ class FiveEDataLoader:
     def get_classes(self):
         """Get character classes data."""
         return self.load_json_file("5e-SRD-Classes.json")
+
 
 # Global instance for easy access
 data_loader = FiveEDataLoader()

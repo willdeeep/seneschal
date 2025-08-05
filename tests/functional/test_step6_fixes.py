@@ -1,4 +1,5 @@
 """Tests for Step 6 character creation fixes."""
+
 import pytest
 
 
@@ -10,7 +11,7 @@ class TestStep6Fixes:
         auth.signup()
         auth.login()
 
-        response = client.get('/characters/create')
+        response = client.get("/characters/create")
         assert response.status_code == 200
 
         html = response.get_data(as_text=True)
@@ -20,25 +21,25 @@ class TestStep6Fixes:
         assert 'id="progress-percentage"' in html
 
         # Check that JavaScript uses correct element IDs
-        assert 'getElementById(\'progress-bar\')' in html
-        assert 'getElementById(\'progress-percentage\')' in html
+        assert "getElementById('progress-bar')" in html
+        assert "getElementById('progress-percentage')" in html
 
     def test_subspecies_filtering_attributes(self, client, auth):
         """Test that subspecies options have correct data attributes for filtering."""
         auth.signup()
         auth.login()
 
-        response = client.get('/characters/create')
+        response = client.get("/characters/create")
         assert response.status_code == 200
 
         html = response.get_data(as_text=True)
 
         # Check that subspecies select exists (data attributes are added by Jinja template)
         assert 'id="subspecies_id"' in html
-        assert 'Select Subspecies (Optional)' in html
+        assert "Select Subspecies (Optional)" in html
 
         # Check that filterSubspecies function exists (function call exists)
-        assert 'filterSubspecies()' in html
+        assert "filterSubspecies()" in html
 
     def test_proficiency_api_includes_limits(self, client, auth):
         """Test that proficiency API includes max_selections field."""
@@ -46,13 +47,13 @@ class TestStep6Fixes:
         auth.login()
 
         # Test proficiencies API includes max_selections
-        response = client.get('/characters/api/proficiencies?species_id=1&class_id=1')
+        response = client.get("/characters/api/proficiencies?species_id=1&class_id=1")
         assert response.status_code == 200
 
         data = response.get_json()
-        assert 'max_selections' in data
-        assert isinstance(data['max_selections'], int)
-        assert data['max_selections'] >= 2
+        assert "max_selections" in data
+        assert isinstance(data["max_selections"], int)
+        assert data["max_selections"] >= 2
 
     def test_rogue_gets_more_proficiencies(self, client, auth):
         """Test that Rogue class gets 4 skill proficiencies."""
@@ -64,24 +65,31 @@ class TestStep6Fixes:
         from project.models import CharacterClass
 
         # Check if Rogue already exists
-        rogue = CharacterClass.query.filter_by(name='Rogue').first()
+        rogue = CharacterClass.query.filter_by(name="Rogue").first()
         if not rogue:
             rogue = CharacterClass(
                 name="Rogue",
                 hit_die=8,
                 primary_ability="Dexterity",
                 saving_throw_proficiencies=["Dexterity", "Intelligence"],
-                skill_proficiencies=["Stealth", "Sleight of Hand", "Perception", "Investigation"]
+                skill_proficiencies=[
+                    "Stealth",
+                    "Sleight of Hand",
+                    "Perception",
+                    "Investigation",
+                ],
             )
             db.session.add(rogue)
             db.session.commit()
 
         # Test proficiencies API with Rogue (should allow 4 selections)
-        response = client.get(f'/characters/api/proficiencies?species_id=1&class_id={rogue.id}')
+        response = client.get(
+            f"/characters/api/proficiencies?species_id=1&class_id={rogue.id}"
+        )
         assert response.status_code == 200
 
         data = response.get_json()
-        assert data['max_selections'] == 4  # Rogue gets 4 skill proficiencies
+        assert data["max_selections"] == 4  # Rogue gets 4 skill proficiencies
 
     def test_all_classes_have_proficiencies(self, client, auth):
         """Test that all character classes have some proficiencies available."""
@@ -91,56 +99,60 @@ class TestStep6Fixes:
         # Test several different classes
         class_ids = [1, 2, 3, 4, 5]  # Fighter, Wizard, Rogue, Cleric, Ranger
         for class_id in class_ids:
-            response = client.get(f'/characters/api/proficiencies?species_id=1&class_id={class_id}')
+            response = client.get(
+                f"/characters/api/proficiencies?species_id=1&class_id={class_id}"
+            )
             assert response.status_code == 200
 
             data = response.get_json()
-            assert 'optional' in data
-            assert len(data['optional']) > 0  # Should have at least some optional proficiencies
+            assert "optional" in data
+            assert (
+                len(data["optional"]) > 0
+            )  # Should have at least some optional proficiencies
 
     def test_proficiency_selection_counter_elements(self, client, auth):
         """Test that proficiency selection counter elements exist."""
         auth.signup()
         auth.login()
 
-        response = client.get('/characters/create')
+        response = client.get("/characters/create")
         assert response.status_code == 200
 
         html = response.get_data(as_text=True)
 
         # Check for proficiency counter elements
         assert 'id="proficiency-count"' in html
-        assert 'handleProficiencySelection' in html
-        assert 'updateProficiencyCounter' in html
+        assert "handleProficiencySelection" in html
+        assert "updateProficiencyCounter" in html
 
     def test_progress_update_event_listeners(self, client, auth):
         """Test that progress update event listeners are properly attached."""
         auth.signup()
         auth.login()
 
-        response = client.get('/characters/create')
+        response = client.get("/characters/create")
         assert response.status_code == 200
 
         html = response.get_data(as_text=True)
 
         # Check for updateProgress function calls
-        assert 'updateProgress()' in html
-        assert 'updateCharacterPreview()' in html
-        assert 'addEventListener' in html
+        assert "updateProgress()" in html
+        assert "updateCharacterPreview()" in html
+        assert "addEventListener" in html
 
     def test_subspecies_initial_filtering(self, client, auth):
         """Test that subspecies filtering is called on page load."""
         auth.signup()
         auth.login()
 
-        response = client.get('/characters/create')
+        response = client.get("/characters/create")
         assert response.status_code == 200
 
         html = response.get_data(as_text=True)
 
         # Check that filterSubspecies is called on DOMContentLoaded
-        assert 'filterSubspecies();' in html
-        assert 'DOMContentLoaded' in html
+        assert "filterSubspecies();" in html
+        assert "DOMContentLoaded" in html
 
 
 class TestProficiencyLimitsIntegration:
@@ -151,15 +163,15 @@ class TestProficiencyLimitsIntegration:
         auth.signup()
         auth.login()
 
-        response = client.get('/characters/create')
+        response = client.get("/characters/create")
         assert response.status_code == 200
 
         html = response.get_data(as_text=True)
 
         # Check for limit handling in JavaScript
-        assert 'data-max=' in html  # Checkboxes should have max attribute
-        assert 'optional-proficiency' in html  # CSS class for optional proficiencies
-        assert 'You can only select up to' in html  # Limit warning message
+        assert "data-max=" in html  # Checkboxes should have max attribute
+        assert "optional-proficiency" in html  # CSS class for optional proficiencies
+        assert "You can only select up to" in html  # Limit warning message
 
     def test_comprehensive_class_proficiencies(self, client, auth):
         """Test that comprehensive class proficiencies are available."""
@@ -185,7 +197,7 @@ class TestProficiencyLimitsIntegration:
                     name=class_name,
                     hit_die=8,
                     primary_ability="Strength",
-                    saving_throw_proficiencies=["Strength"]
+                    saving_throw_proficiencies=["Strength"],
                 )
                 db.session.add(char_class)
                 db.session.commit()
@@ -194,11 +206,13 @@ class TestProficiencyLimitsIntegration:
 
         # Test each class
         for class_id, expected_max in created_classes:
-            response = client.get(f'/characters/api/proficiencies?species_id=1&class_id={class_id}')
+            response = client.get(
+                f"/characters/api/proficiencies?species_id=1&class_id={class_id}"
+            )
             assert response.status_code == 200
 
             data = response.get_json()
-            assert data['max_selections'] == expected_max
+            assert data["max_selections"] == expected_max
 
     def test_proficiency_categories_are_logical(self, client, auth):
         """Test that proficiency categories make sense for D&D 5e."""
@@ -206,18 +220,20 @@ class TestProficiencyLimitsIntegration:
         auth.login()
 
         # Test that proficiencies have logical categories
-        response = client.get('/characters/api/proficiencies?species_id=1&class_id=1')
+        response = client.get("/characters/api/proficiencies?species_id=1&class_id=1")
         assert response.status_code == 200
 
         data = response.get_json()
 
         # Check that proficiencies have proper structure
-        if 'optional' in data and data['optional']:
-            for prof in data['optional']:
-                assert 'id' in prof
-                assert 'name' in prof
-                assert 'category' in prof
+        if "optional" in data and data["optional"]:
+            for prof in data["optional"]:
+                assert "id" in prof
+                assert "name" in prof
+                assert "category" in prof
 
                 # Categories should be D&D appropriate
-                valid_categories = ['Skill', 'Tool', 'Weapon', 'Armor', 'Language']
-                assert prof['category'] in valid_categories or prof['category'].endswith('Proficiency')
+                valid_categories = ["Skill", "Tool", "Weapon", "Armor", "Language"]
+                assert prof["category"] in valid_categories or prof[
+                    "category"
+                ].endswith("Proficiency")
