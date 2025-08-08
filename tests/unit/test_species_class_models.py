@@ -6,7 +6,6 @@ These tests are marked as skip since they test features in development.
 
 import pytest
 from project.models import db
-from project import create_app
 
 
 @pytest.mark.unit
@@ -189,9 +188,7 @@ class TestCharacterClassModel:
             assert str(char_class) == "<CharacterClass Rogue>"
 
 
-@pytest.mark.skip(
-    reason="Testing features in development - Species/CharacterClass models"
-)
+@pytest.mark.skip(reason="Testing features in development - Species/CharacterClass models")
 @pytest.mark.unit
 class TestSubSpeciesModel:
     """Unit tests for the SubSpecies model."""
@@ -499,9 +496,7 @@ class TestCharacterSpeciesClassIntegration:
             assert "Cantrip" in character.subspecies.additional_traits
 
 
-@pytest.mark.skip(
-    reason="Testing features in development - Species/CharacterClass models"
-)
+@pytest.mark.skip(reason="Testing features in development - Species/CharacterClass models")
 @pytest.mark.functional
 class TestSpeciesClassPersistence:
     """Test persistence of Species and CharacterClass models."""
@@ -657,9 +652,7 @@ class TestSpeciesClassPersistence:
             db.session.commit()
 
             # Retrieve character with relationships
-            retrieved_character = Character.query.filter_by(
-                name="Halfling Rogue"
-            ).first()
+            retrieved_character = Character.query.filter_by(name="Halfling Rogue").first()
 
             assert retrieved_character is not None
             assert retrieved_character.name == "Halfling Rogue"
@@ -671,16 +664,12 @@ class TestSpeciesClassPersistence:
             assert retrieved_character.dexterity == 16
 
 
-@pytest.mark.skip(
-    reason="Testing features in development - Species/CharacterClass models"
-)
+@pytest.mark.skip(reason="Testing features in development - Species/CharacterClass models")
 @pytest.mark.functional
 class TestCharacterLifecycleWithSpeciesClass:
     """Test character lifecycle operations with Species and CharacterClass."""
 
-    def test_character_creation_with_species_class(
-        self, character_lifecycle_setup, app
-    ):
+    def test_character_creation_with_species_class(self, character_lifecycle_setup, app):
         """
         GIVEN: CharacterLifecycle setup with Species and CharacterClass
         WHEN: A character is created with species and class
@@ -745,9 +734,7 @@ class TestCharacterLifecycleWithSpeciesClass:
             assert character.level == 1
             assert character.charisma == 15
 
-    def test_character_level_up_with_species_class(
-        self, character_lifecycle_setup, app
-    ):
+    def test_character_level_up_with_species_class(self, character_lifecycle_setup, app):
         """
         GIVEN: A character with Species and CharacterClass
         WHEN: The character levels up

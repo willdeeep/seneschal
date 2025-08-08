@@ -48,9 +48,7 @@ class Species(db.Model):
     )
 
     # Relationships
-    subspecies = db.relationship(
-        "SubSpecies", backref="species", lazy=True, cascade="all, delete-orphan"
-    )
+    subspecies = db.relationship("SubSpecies", backref="species", lazy=True, cascade="all, delete-orphan")
     characters = db.relationship("Character", backref="species", lazy=True)
 
     def __repr__(self):

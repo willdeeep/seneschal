@@ -49,9 +49,7 @@ class Item(db.Model):
     # General properties
     # Can multiple be in one inventory slot
     stackable = db.Column(db.Boolean, default=True, nullable=False)
-    consumable = db.Column(
-        db.Boolean, default=False, nullable=False
-    )  # Gets used up when used
+    consumable = db.Column(db.Boolean, default=False, nullable=False)  # Gets used up when used
 
     def __repr__(self):
         return f"<Item {self.name}>"

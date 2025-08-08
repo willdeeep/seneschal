@@ -100,9 +100,7 @@ class TestCharacterCreationUI:
         assert data["species_info"]["speed"] == 30
 
         # Test API endpoint with subspecies
-        response = client.get(
-            f"/characters/ability-bonuses?species_id={species_id}&subspecies_id={subspecies_id}"
-        )
+        response = client.get(f"/characters/ability-bonuses?species_id={species_id}&subspecies_id={subspecies_id}")
         assert response.status_code == 200
 
         data = json.loads(response.get_data(as_text=True))
@@ -123,9 +121,7 @@ class TestCharacterCreationUI:
             db.session.delete(db.session.get(Species, species_id))
             db.session.commit()
 
-    def test_character_creation_form_submission_with_new_fields(
-        self, client, auth, test_user
-    ):
+    def test_character_creation_form_submission_with_new_fields(self, client, auth, test_user):
         """Test character creation form submission with species_id and class_id."""
         # Login first
         auth.login()
@@ -187,17 +183,13 @@ class TestCharacterCreationUI:
         )
 
         assert response.status_code == 200
-        assert (
-            b"Character Test Enhanced Character created successfully!" in response.data
-        )
+        assert b"Character Test Enhanced Character created successfully!" in response.data
 
         # Verify character was created in database
         with client.application.app_context():
             from project.models import Character
 
-            character = Character.query.filter_by(
-                name="Test Enhanced Character"
-            ).first()
+            character = Character.query.filter_by(name="Test Enhanced Character").first()
             assert character is not None
             assert character.species_id == species_id
             assert character.class_id == class_id
@@ -248,9 +240,7 @@ class TestCharacterCreationUI:
             },
             {
                 "data": {"name": "A", "species_id": "1", "class_id": "1"},
-                "expected_errors": [
-                    "Character name must be at least 2 characters long."
-                ],
+                "expected_errors": ["Character name must be at least 2 characters long."],
             },
             {
                 "data": {
@@ -288,9 +278,7 @@ class TestCharacterCreationUI:
             response_text = response.get_data(as_text=True)
 
             for expected_error in test_case["expected_errors"]:
-                assert (
-                    expected_error in response_text
-                ), f"Expected error '{expected_error}' not found in response"
+                assert expected_error in response_text, f"Expected error '{expected_error}' not found in response"
 
     def test_subspecies_data_in_template(self, client, auth, test_user):
         """Test that subspecies data is properly passed to template."""
@@ -307,9 +295,7 @@ class TestCharacterCreationUI:
                 speed=30,
                 size="Medium",
             )
-            subspecies = SubSpecies(
-                name="High Elf", species=species, additional_traits=["Cantrip"]
-            )
+            subspecies = SubSpecies(name="High Elf", species=species, additional_traits=["Cantrip"])
             db.session.add_all([species, subspecies])
             db.session.commit()
 

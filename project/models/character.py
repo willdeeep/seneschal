@@ -27,9 +27,7 @@ class Character(db.Model):
 
     # Experience and advancement
     experience_points = db.Column(db.Integer, default=0, nullable=False)
-    proficiency_bonus = db.Column(
-        db.Integer, default=2, nullable=False
-    )  # Calculated from level
+    proficiency_bonus = db.Column(db.Integer, default=2, nullable=False)  # Calculated from level
 
     # Core stats
     strength = db.Column(db.Integer, nullable=False)
@@ -109,13 +107,9 @@ class Character(db.Model):
 
     # Enhanced character creation foreign keys
     species_id = db.Column(db.Integer, db.ForeignKey("species.id"), nullable=True)
-    subspecies_id = db.Column(
-        db.Integer, db.ForeignKey("sub_species.id"), nullable=True
-    )
+    subspecies_id = db.Column(db.Integer, db.ForeignKey("sub_species.id"), nullable=True)
     class_id = db.Column(db.Integer, db.ForeignKey("character_class.id"), nullable=True)
-    background_id = db.Column(
-        db.Integer, db.ForeignKey("backgrounds.id"), nullable=True
-    )
+    background_id = db.Column(db.Integer, db.ForeignKey("backgrounds.id"), nullable=True)
 
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(
@@ -151,22 +145,16 @@ class Character(db.Model):
     )
 
     # One-to-many relationship with inventory
-    inventory = db.relationship(
-        "CharacterItem", backref="character", lazy=True, cascade="all, delete-orphan"
-    )
+    inventory = db.relationship("CharacterItem", backref="character", lazy=True, cascade="all, delete-orphan")
 
     # One-to-many relationship with spell slots
-    spell_slots = db.relationship(
-        "SpellSlot", backref="character", lazy=True, cascade="all, delete-orphan"
-    )
+    spell_slots = db.relationship("SpellSlot", backref="character", lazy=True, cascade="all, delete-orphan")
 
     # Foreign key relationships (using backrefs from related models)
     # species -> relationship defined in Species model with backref="species"
     # subspecies -> relationship defined in SubSpecies model with backref="subspecies"
     # char_class -> relationship defined in CharacterClass model with backref="char_class"
-    char_background = db.relationship(
-        "Background", lazy="select", foreign_keys=[background_id]
-    )
+    char_background = db.relationship("Background", lazy="select", foreign_keys=[background_id])
 
     def get_ability_modifier(self, score):
         """Calculate ability modifier from ability score."""

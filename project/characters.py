@@ -38,17 +38,9 @@ def create():
         name = request.form.get("name")
         player_name = request.form.get("player_name")
         species_id = request.form.get("species_id")
-        subspecies_id = (
-            request.form.get("subspecies_id")
-            if request.form.get("subspecies_id")
-            else None
-        )
+        subspecies_id = request.form.get("subspecies_id") if request.form.get("subspecies_id") else None
         class_id = request.form.get("class_id")
-        background_id = (
-            request.form.get("background_id")
-            if request.form.get("background_id")
-            else None
-        )
+        background_id = request.form.get("background_id") if request.form.get("background_id") else None
         level = int(request.form.get("level", 1))
         background = request.form.get("background")  # Keep for backward compatibility
 
@@ -118,9 +110,7 @@ def create():
             if not subspecies:
                 errors.append("Selected subspecies is invalid.")
             elif subspecies.species_id != int(species_id):
-                errors.append(
-                    "Selected subspecies does not belong to the chosen species."
-                )
+                errors.append("Selected subspecies does not belong to the chosen species.")
 
         # Validate ability scores
         ability_scores = [
@@ -281,9 +271,7 @@ def create():
 @login_required
 def view(character_id):
     """View a specific character."""
-    character = Character.query.filter_by(
-        id=character_id, user_id=current_user.id
-    ).first_or_404()
+    character = Character.query.filter_by(id=character_id, user_id=current_user.id).first_or_404()
     return render_template("characters/view.html", character=character)
 
 
@@ -291,9 +279,7 @@ def view(character_id):
 @login_required
 def edit(character_id):
     """Edit a character."""
-    character = Character.query.filter_by(
-        id=character_id, user_id=current_user.id
-    ).first_or_404()
+    character = Character.query.filter_by(id=character_id, user_id=current_user.id).first_or_404()
 
     if request.method == "POST":
         # Update character with form data
@@ -384,9 +370,7 @@ def edit(character_id):
 @login_required
 def delete(character_id):
     """Delete a character."""
-    character = Character.query.filter_by(
-        id=character_id, user_id=current_user.id
-    ).first_or_404()
+    character = Character.query.filter_by(id=character_id, user_id=current_user.id).first_or_404()
 
     try:
         db.session.delete(character)
@@ -403,22 +387,16 @@ def delete(character_id):
 @login_required
 def inventory(character_id):
     """Manage character inventory."""
-    character = Character.query.filter_by(
-        id=character_id, user_id=current_user.id
-    ).first_or_404()
+    character = Character.query.filter_by(id=character_id, user_id=current_user.id).first_or_404()
     items = Item.query.all()
-    return render_template(
-        "characters/inventory.html", character=character, items=items
-    )
+    return render_template("characters/inventory.html", character=character, items=items)
 
 
 @bp.route("/<int:character_id>/inventory/add", methods=["POST"])
 @login_required
 def add_item(character_id):
     """Add item to character inventory."""
-    character = Character.query.filter_by(
-        id=character_id, user_id=current_user.id
-    ).first_or_404()
+    character = Character.query.filter_by(id=character_id, user_id=current_user.id).first_or_404()
 
     item_id = request.form.get("item_id")
     quantity = int(request.form.get("quantity", 1))
@@ -429,9 +407,7 @@ def add_item(character_id):
         return redirect(url_for("characters.inventory", character_id=character_id))
 
     # Check if item already exists in inventory
-    existing_item = CharacterItem.query.filter_by(
-        character_id=character.id, item_id=item_id
-    ).first()
+    existing_item = CharacterItem.query.filter_by(character_id=character.id, item_id=item_id).first()
 
     if existing_item:
         existing_item.quantity += quantity
@@ -513,7 +489,6 @@ def get_available_proficiencies():
     species_id = request.args.get("species_id")
     class_id = request.args.get("class_id")
 
-    available_proficiencies = []
     base_proficiencies = set()
     optional_proficiencies = set()
 
@@ -577,9 +552,7 @@ def get_available_proficiencies():
                     ]
                 )
             elif char_class.name == "Cleric":
-                optional_proficiencies.update(
-                    ["History", "Insight", "Medicine", "Persuasion", "Religion"]
-                )
+                optional_proficiencies.update(["History", "Insight", "Medicine", "Persuasion", "Religion"])
             elif char_class.name == "Barbarian":
                 optional_proficiencies.update(
                     [
@@ -676,9 +649,7 @@ def get_available_proficiencies():
 
     # If no specific proficiencies found, add some general ones
     if not optional_proficiencies:
-        optional_proficiencies.update(
-            ["Athletics", "Insight", "Perception", "Persuasion"]
-        )
+        optional_proficiencies.update(["Athletics", "Insight", "Perception", "Persuasion"])
 
     # Create required and optional proficiency objects for the frontend
     required_proficiencies = []
@@ -688,10 +659,7 @@ def get_available_proficiencies():
     for prof_name in base_proficiencies:
         # Determine proficiency category based on name
         category = "Skill"
-        if any(
-            armor in prof_name
-            for armor in ["Armor", "Shield", "Light", "Medium", "Heavy"]
-        ):
+        if any(armor in prof_name for armor in ["Armor", "Shield", "Light", "Medium", "Heavy"]):
             category = "Armor"
         elif any(
             weapon in prof_name
@@ -722,10 +690,7 @@ def get_available_proficiencies():
         if prof_name not in base_proficiencies:
             # Determine proficiency category based on name
             category = "Skill"
-            if any(
-                armor in prof_name
-                for armor in ["Armor", "Shield", "Light", "Medium", "Heavy"]
-            ):
+            if any(armor in prof_name for armor in ["Armor", "Shield", "Light", "Medium", "Heavy"]):
                 category = "Armor"
             elif any(
                 weapon in prof_name
@@ -808,12 +773,8 @@ def get_available_languages():
     ]
 
     # Add optional languages (excluding already known ones)
-    optional_languages.update(
-        lang for lang in standard_languages if lang not in base_languages
-    )
-    optional_languages.update(
-        lang for lang in exotic_languages if lang not in base_languages
-    )
+    optional_languages.update(lang for lang in standard_languages if lang not in base_languages)
+    optional_languages.update(lang for lang in exotic_languages if lang not in base_languages)
 
     # Format for frontend as base and optional languages
     base_language_list = []
@@ -821,15 +782,11 @@ def get_available_languages():
 
     # Process base languages
     for lang in base_languages:
-        base_language_list.append(
-            {"id": f"base_{len(base_language_list) + 1}", "name": lang}
-        )
+        base_language_list.append({"id": f"base_{len(base_language_list) + 1}", "name": lang})
 
     # Process optional languages
     for lang in optional_languages:
-        optional_language_list.append(
-            {"id": f"opt_{len(optional_language_list) + 1}", "name": lang}
-        )
+        optional_language_list.append({"id": f"opt_{len(optional_language_list) + 1}", "name": lang})
 
     return jsonify({"base": base_language_list, "optional": optional_language_list})
 
@@ -850,9 +807,7 @@ def get_available_features():
     ).all()
 
     # Get general features available to all
-    general_features = Feature.query.filter(
-        Feature.feature_type.in_(["general", "feat"])
-    ).all()
+    general_features = Feature.query.filter(Feature.feature_type.in_(["general", "feat"])).all()
 
     # Combine all available features
     features = racial_features + class_features + general_features
@@ -905,9 +860,7 @@ def get_available_spells():
                     "level": spell.level,
                     "school": spell.school,
                     "description": (
-                        spell.description[:100] + "..."
-                        if len(spell.description) > 100
-                        else spell.description
+                        spell.description[:100] + "..." if len(spell.description) > 100 else spell.description
                     ),
                 }
                 for spell in spells
@@ -1000,8 +953,6 @@ def get_ability_bonuses():
 @bp.route("/api/backgrounds")
 def api_backgrounds():
     """Get available character backgrounds."""
-    from project.models import Background
-
     backgrounds = Background.query.all()
     return jsonify(
         [
@@ -1025,7 +976,7 @@ def api_backgrounds():
 @bp.route("/api/equipment")
 def api_equipment():
     """Get equipment based on class and background."""
-    from project.models import Equipment, CharacterClass, Background
+    from project.models import Equipment
 
     class_id = request.args.get("class_id", type=int)
     background_id = request.args.get("background_id", type=int)
@@ -1037,24 +988,18 @@ def api_equipment():
         char_class = db.session.get(CharacterClass, class_id)
         if char_class:
             # Get class-appropriate equipment
-            class_equipment = Equipment.get_starting_equipment_for_class(
-                char_class.name
-            )
+            class_equipment = Equipment.get_starting_equipment_for_class(char_class.name)
             equipment.extend(class_equipment)
 
     if background_id:
         background = db.session.get(Background, background_id)
         if background and background.equipment:
             # Get background equipment
-            bg_equipment = Equipment.query.filter(
-                Equipment.name.in_(background.equipment)
-            ).all()
+            bg_equipment = Equipment.query.filter(Equipment.name.in_(background.equipment)).all()
             equipment.extend(bg_equipment)
 
     if category:
-        equipment = [
-            item for item in equipment if item.category.lower() == category.lower()
-        ]
+        equipment = [item for item in equipment if item.category.lower() == category.lower()]
 
     # Remove duplicates
     equipment = list({item.id: item for item in equipment}.values())
@@ -1090,9 +1035,7 @@ def api_cantrips():
         return jsonify({"error": "Invalid class_id"}), 400
 
     # Get cantrips available to this class
-    cantrips = Spell.query.filter(
-        Spell.level == 0, Spell.class_lists.contains(char_class.name.lower())
-    ).all()
+    cantrips = Spell.query.filter(Spell.level == 0, Spell.class_lists.contains(char_class.name.lower())).all()
 
     return jsonify(
         [
@@ -1124,9 +1067,7 @@ def api_starting_spells():
         return jsonify({"error": "Invalid class_id"}), 400
 
     # Get 1st level spells available to this class
-    spells = Spell.query.filter(
-        Spell.level == 1, Spell.class_lists.contains(char_class.name.lower())
-    ).all()
+    spells = Spell.query.filter(Spell.level == 1, Spell.class_lists.contains(char_class.name.lower())).all()
 
     # Determine spell limits based on class
     spell_limits = {
@@ -1216,9 +1157,7 @@ def api_character_optimization():
     # Basic optimization suggestions
     suggestions = {
         "recommended_abilities": _get_recommended_abilities(char_class, species),
-        "recommended_proficiencies": _get_recommended_proficiencies(
-            char_class, background
-        ),
+        "recommended_proficiencies": _get_recommended_proficiencies(char_class, background),
         "synergies": _get_species_class_synergies(species, char_class),
         "warnings": _get_build_warnings(species, char_class),
     }
@@ -1297,7 +1236,17 @@ def _get_recommended_proficiencies(char_class, background):
             recommended_skills = set(primary_skills[char_class.primary_ability])
             recommendations.extend(list(class_skills.intersection(recommended_skills)))
 
-    return recommendations
+    # Add background skill proficiencies as recommendations
+    if background and background.skill_proficiencies:
+        background_skills = background.skill_proficiencies
+        if isinstance(background_skills, list):
+            recommendations.extend(background_skills)
+        elif isinstance(background_skills, str):
+            # Handle case where it might be a comma-separated string
+            recommendations.extend([skill.strip() for skill in background_skills.split(",") if skill.strip()])
+
+    # Remove duplicates while preserving order
+    return list(dict.fromkeys(recommendations))
 
 
 def _get_species_class_synergies(species, char_class):
@@ -1318,20 +1267,23 @@ def _get_species_class_synergies(species, char_class):
             synergies.append(
                 {
                     "type": "ability_synergy",
-                    "description": f"{species.name} gets a bonus to {char_class.primary_ability}, which is {char_class.name}'s primary ability",
+                    "description": (
+                        f"{species.name} gets a bonus to {char_class.primary_ability}, "
+                        f"which is {char_class.name}'s primary ability"
+                    ),
                 }
             )
 
     # Check for matching proficiencies
     if species.proficiencies and char_class.skill_proficiencies:
-        matching_profs = set(species.proficiencies).intersection(
-            set(char_class.skill_proficiencies)
-        )
+        matching_profs = set(species.proficiencies).intersection(set(char_class.skill_proficiencies))
         if matching_profs:
             synergies.append(
                 {
                     "type": "proficiency_synergy",
-                    "description": f"Both {species.name} and {char_class.name} provide {', '.join(matching_profs)} proficiency",
+                    "description": (
+                        f"Both {species.name} and {char_class.name} provide " f"{', '.join(matching_profs)} proficiency"
+                    ),
                 }
             )
 
@@ -1357,7 +1309,10 @@ def _get_build_warnings(species, char_class):
             warnings.append(
                 {
                     "type": "ability_mismatch",
-                    "description": f"{species.name} doesn't boost {char_class.primary_ability}, which may make this build less optimal",
+                    "description": (
+                        f"{species.name} doesn't boost {char_class.primary_ability}, "
+                        "which may make this build less optimal"
+                    ),
                 }
             )
 

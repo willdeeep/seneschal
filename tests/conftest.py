@@ -86,16 +86,12 @@ def auth(client):
             self._client = client
 
         def login(self, email="test@example.com", password="testpass"):
-            return self._client.post(
-                "/auth/login", data={"email": email, "password": password}
-            )
+            return self._client.post("/auth/login", data={"email": email, "password": password})
 
         def logout(self):
             return self._client.get("/auth/logout")
 
-        def signup(
-            self, name="Test User", email="test@example.com", password="testpass"
-        ):
+        def signup(self, name="Test User", email="test@example.com", password="testpass"):
             return self._client.post(
                 "/auth/signup",
                 data={"name": name, "email": email, "password": password},

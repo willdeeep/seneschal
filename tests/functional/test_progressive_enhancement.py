@@ -9,8 +9,6 @@ Tests the enhanced UI components including:
 - Enhanced validation
 """
 
-import pytest
-
 
 class TestProgressiveEnhancement:
     """Test progressive enhancement features in character creation."""
@@ -231,9 +229,7 @@ class TestProgressiveEnhancementIntegration:
             "charisma": "8",
         }
 
-        response = client.post(
-            "/characters/create", data=form_data, follow_redirects=True
-        )
+        response = client.post("/characters/create", data=form_data, follow_redirects=True)
         assert response.status_code == 200
 
         # Check if form submission was successful

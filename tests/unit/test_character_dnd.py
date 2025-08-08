@@ -465,9 +465,7 @@ class TestCharacterBackstoryFields:
             reloaded_character = db.session.get(Character, character_id)
 
             # Verify all backstory fields persisted correctly
-            assert (
-                reloaded_character.why_adventuring == "Forest was destroyed by industry"
-            )
+            assert reloaded_character.why_adventuring == "Forest was destroyed by industry"
             assert reloaded_character.motivation == "Environmental protection, justice"
             assert reloaded_character.origin == "Ancient forest grove"
 
@@ -536,9 +534,7 @@ class TestAdvancedCharacterScenarios:
         lifecycle = character_lifecycle_setup
 
         # Step 1: Create a new character
-        character = lifecycle.create_character(
-            name="Aragorn", species="Human", character_class="Ranger"
-        )
+        character = lifecycle.create_character(name="Aragorn", species="Human", character_class="Ranger")
         assert character.level == 1
         assert character.proficiency_bonus == 2
 
@@ -606,9 +602,7 @@ class TestAdvancedCharacterScenarios:
             # testing
 
             # Verify both characters exist and can be queried together
-            characters = Character.query.filter(
-                Character.name.in_(["Gandalf the Grey", "Frodo Baggins"])
-            ).all()
+            characters = Character.query.filter(Character.name.in_(["Gandalf the Grey", "Frodo Baggins"])).all()
             assert len(characters) == 2
 
             # Test level difference calculations (for mentorship mechanics)
@@ -617,9 +611,7 @@ class TestAdvancedCharacterScenarios:
 
             # Future: Test mentor bonuses, experience sharing, etc.
 
-    def test_character_data_integrity_across_operations(
-        self, persistent_test_user, app
-    ):
+    def test_character_data_integrity_across_operations(self, persistent_test_user, app):
         """Test that character data remains consistent across multiple operations."""
         with app.app_context():
             # Create test species

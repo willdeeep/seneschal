@@ -55,9 +55,7 @@ class SpellSlot(db.Model):
     level = db.Column(db.Integer, nullable=False)  # Spell slot level (1-9)
     # Total slots available
     total_slots = db.Column(db.Integer, nullable=False)
-    used_slots = db.Column(
-        db.Integer, default=0, nullable=False
-    )  # Slots currently used
+    used_slots = db.Column(db.Integer, default=0, nullable=False)  # Slots currently used
 
     @property
     def remaining_slots(self):
@@ -83,6 +81,4 @@ class SpellSlot(db.Model):
         self.used_slots = 0
 
     def __repr__(self):
-        return (
-            f"<SpellSlot Level {self.level}: {self.remaining_slots}/{self.total_slots}>"
-        )
+        return f"<SpellSlot Level {self.level}: {self.remaining_slots}/{self.total_slots}>"

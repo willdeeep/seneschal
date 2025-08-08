@@ -1,7 +1,5 @@
 """Tests for Step 6 character creation fixes."""
 
-import pytest
-
 
 class TestStep6Fixes:
     """Test class for Step 6 progressive enhancement fixes."""
@@ -83,9 +81,7 @@ class TestStep6Fixes:
             db.session.commit()
 
         # Test proficiencies API with Rogue (should allow 4 selections)
-        response = client.get(
-            f"/characters/api/proficiencies?species_id=1&class_id={rogue.id}"
-        )
+        response = client.get(f"/characters/api/proficiencies?species_id=1&class_id={rogue.id}")
         assert response.status_code == 200
 
         data = response.get_json()
@@ -99,16 +95,12 @@ class TestStep6Fixes:
         # Test several different classes
         class_ids = [1, 2, 3, 4, 5]  # Fighter, Wizard, Rogue, Cleric, Ranger
         for class_id in class_ids:
-            response = client.get(
-                f"/characters/api/proficiencies?species_id=1&class_id={class_id}"
-            )
+            response = client.get(f"/characters/api/proficiencies?species_id=1&class_id={class_id}")
             assert response.status_code == 200
 
             data = response.get_json()
             assert "optional" in data
-            assert (
-                len(data["optional"]) > 0
-            )  # Should have at least some optional proficiencies
+            assert len(data["optional"]) > 0  # Should have at least some optional proficiencies
 
     def test_proficiency_selection_counter_elements(self, client, auth):
         """Test that proficiency selection counter elements exist."""
@@ -206,9 +198,7 @@ class TestProficiencyLimitsIntegration:
 
         # Test each class
         for class_id, expected_max in created_classes:
-            response = client.get(
-                f"/characters/api/proficiencies?species_id=1&class_id={class_id}"
-            )
+            response = client.get(f"/characters/api/proficiencies?species_id=1&class_id={class_id}")
             assert response.status_code == 200
 
             data = response.get_json()
@@ -234,6 +224,4 @@ class TestProficiencyLimitsIntegration:
 
                 # Categories should be D&D appropriate
                 valid_categories = ["Skill", "Tool", "Weapon", "Armor", "Language"]
-                assert prof["category"] in valid_categories or prof[
-                    "category"
-                ].endswith("Proficiency")
+                assert prof["category"] in valid_categories or prof["category"].endswith("Proficiency")
