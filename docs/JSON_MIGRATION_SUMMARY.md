@@ -2,7 +2,7 @@
 
 ## Migration Completed: CSV → JSON
 
-**Date**: July 22, 2025 
+**Date**: July 22, 2025
 **Status**: ✅ **COMPLETE** - Successfully migrated from CSV to JSON storage
 
 ## What Changed
@@ -42,7 +42,7 @@
 ```
 json_backups/
 ├── 5e-SRD-Ability-Scores.json      # 6 ability scores
-├── 5e-SRD-Alignments.json          # 9 alignments 
+├── 5e-SRD-Alignments.json          # 9 alignments
 ├── 5e-SRD-Backgrounds.json         # Character backgrounds
 ├── 5e-SRD-Classes.json             # 12 character classes
 ├── 5e-SRD-Conditions.json          # 15 game conditions
@@ -107,7 +107,7 @@ for option in starting_equipment:
 species = data_loader.get_species()
 # Data contains "species" not "race" terminology
 
-subspecies = data_loader.get_subspecies() 
+subspecies = data_loader.get_subspecies()
 # Data contains "subspecies" not "subrace" terminology
 ```
 

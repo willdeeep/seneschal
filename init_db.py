@@ -24,10 +24,10 @@ from json_data_loader import FiveEDataLoader
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 class DataSourceManager:
     """Manages the robust data sourcing strategy."""
@@ -36,7 +36,9 @@ class DataSourceManager:
         self.base_path = Path(__file__).parent
         self.json_backups_path = self.base_path / "json_backups"
         self.repo_path = self.base_path / "5e-database-repo"
-        self.source_url = "https://github.com/5e-bits/5e-database/archive/refs/heads/main.zip"
+        self.source_url = (
+            "https://github.com/5e-bits/5e-database/archive/refs/heads/main.zip"
+        )
 
         # Required JSON files for database initialization
         self.required_files = [
@@ -49,7 +51,7 @@ class DataSourceManager:
             "5e-SRD-Backgrounds.json",
             "5e-SRD-Features.json",
             "5e-SRD-Proficiencies.json",
-            "5e-SRD-Languages.json"
+            "5e-SRD-Languages.json",
         ]
 
     def check_json_backups(self):
@@ -67,8 +69,9 @@ class DataSourceManager:
         if missing_files:
             logger.info(
                 "Missing %d files in json_backups: %s...",
-                len(missing_files), missing_files[:3]
-                )
+                len(missing_files),
+                missing_files[:3],
+            )
             return False
 
         logger.info("✅ All required JSON files found in json_backups")
@@ -93,7 +96,11 @@ class DataSourceManager:
                 missing_files.append(filename)
 
         if missing_files:
-            logger.info("Missing %d files in repo/src/2014: %s...", len(missing_files), missing_files[:3])
+            logger.info(
+                "Missing %d files in repo/src/2014: %s...",
+                len(missing_files),
+                missing_files[:3],
+            )
             return False
 
         logger.info("✅ All required JSON files found in 5e-database-repo/src/2014")
@@ -146,7 +153,7 @@ class DataSourceManager:
 
                 # Extract the zip file
                 logger.info("📦 Extracting archive...")
-                with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                with zipfile.ZipFile(zip_file, "r") as zip_ref:
                     zip_ref.extractall(temp_path)
 
                 # Find the extracted directory (it should be 5e-database-main)
@@ -159,7 +166,9 @@ class DataSourceManager:
                 src_path = extracted_path / "src" / "2014"
 
                 if not src_path.exists():
-                    raise FileNotFoundError("src/2014 directory not found in extracted archive")
+                    raise FileNotFoundError(
+                        "src/2014 directory not found in extracted archive"
+                    )
 
                 # Create json_backups directory
                 self.json_backups_path.mkdir(exist_ok=True)
@@ -177,7 +186,11 @@ class DataSourceManager:
                     else:
                         logger.warning("File not found in download: %s", filename)
 
-                logger.info("✅ Successfully copied %d/%d files", copied_count, len(self.required_files))
+                logger.info(
+                    "✅ Successfully copied %d/%d files",
+                    copied_count,
+                    len(self.required_files),
+                )
                 return copied_count == len(self.required_files)
 
             except (URLError, HTTPError) as e:
@@ -225,6 +238,7 @@ class DataSourceManager:
         logger.error("   3. Extract and copy src/*.json files to json_backups/")
         return False
 
+
 class DatabaseInitializer:
     """Handles database initialization with user prompts and data population."""
 
@@ -238,13 +252,19 @@ class DatabaseInitializer:
             class_count = CharacterClass.query.count()
 
             if species_count > 0 or class_count > 0:
-                logger.info("📊 Existing data found: %d species, %d classes", species_count, class_count)
+                logger.info(
+                    "📊 Existing data found: %d species, %d classes",
+                    species_count,
+                    class_count,
+                )
                 return True
 
             logger.info("📊 Database is empty")
             return False
         except (SQLAlchemyError, OperationalError) as e:
-            logger.debug("Database connectivity check failed (normal for first run): %s", e)
+            logger.debug(
+                "Database connectivity check failed (normal for first run): %s", e
+            )
             return False
 
     def create_tables(self):
@@ -267,38 +287,49 @@ class DatabaseInitializer:
             try:
                 # Parse ability score increases
                 ability_increases = {}
-                for bonus in species_info.get('ability_bonuses', []):
-                    ability_name = bonus.get('ability_score', {}).get('index', '')
-                    bonus_value = bonus.get('bonus', 0)
+                for bonus in species_info.get("ability_bonuses", []):
+                    ability_name = bonus.get("ability_score", {}).get("index", "")
+                    bonus_value = bonus.get("bonus", 0)
                     if ability_name and bonus_value:
                         ability_increases[ability_name] = bonus_value
 
                 # Parse traits from various sources
                 traits = []
-                if 'traits' in species_info:
-                    traits.extend([trait.get('name', '') for trait in species_info['traits']])
+                if "traits" in species_info:
+                    traits.extend(
+                        [trait.get("name", "") for trait in species_info["traits"]]
+                    )
 
                 # Parse languages
                 languages = []
-                if 'languages' in species_info:
-                    languages.extend([lang.get('name', '') for lang in species_info['languages']])
+                if "languages" in species_info:
+                    languages.extend(
+                        [lang.get("name", "") for lang in species_info["languages"]]
+                    )
 
                 # Parse proficiencies
                 proficiencies = []
-                if 'starting_proficiencies' in species_info:
-                    proficiencies.extend([prof.get('name', '') for prof in species_info['starting_proficiencies']])
+                if "starting_proficiencies" in species_info:
+                    proficiencies.extend(
+                        [
+                            prof.get("name", "")
+                            for prof in species_info["starting_proficiencies"]
+                        ]
+                    )
 
                 # Create Species instance
                 species = Species(
-                    name=species_info.get('name', ''),
+                    name=species_info.get("name", ""),
                     ability_score_increases=ability_increases,
                     traits=traits,
                     languages=languages,
                     proficiencies=proficiencies,
-                    speed=species_info.get('speed', 30),
-                    size=species_info.get('size', 'Medium'),
-                    source='5e-SRD',
-                    description=species_info.get('age', '') + ' ' + species_info.get('alignment', '')
+                    speed=species_info.get("speed", 30),
+                    size=species_info.get("size", "Medium"),
+                    source="5e-SRD",
+                    description=species_info.get("age", "")
+                    + " "
+                    + species_info.get("alignment", ""),
                 )
 
                 db.session.add(species)
@@ -306,7 +337,11 @@ class DatabaseInitializer:
                 logger.debug("Loaded species: %s", species.name)
 
             except (KeyError, ValueError, TypeError) as e:
-                logger.warning("Data parsing error for species %s: %s", species_info.get('name', 'unknown'), e)
+                logger.warning(
+                    "Data parsing error for species %s: %s",
+                    species_info.get("name", "unknown"),
+                    e,
+                )
 
         try:
             db.session.commit()
@@ -331,34 +366,38 @@ class DatabaseInitializer:
             try:
                 # Parse saving throws
                 saving_throws = []
-                if 'saving_throws' in class_info:
-                    saving_throws = [save.get('name', '') for save in class_info['saving_throws']]
+                if "saving_throws" in class_info:
+                    saving_throws = [
+                        save.get("name", "") for save in class_info["saving_throws"]
+                    ]
 
                 # Parse skill proficiencies from proficiency_choices
                 available_skills = []
                 skill_choices = 2  # default
 
-                if 'proficiency_choices' in class_info:
-                    for choice in class_info['proficiency_choices']:
-                        if choice.get('type') == 'proficiencies':
-                            skill_choices = choice.get('choose', 2)
-                            options = choice.get('from', {}).get('options', [])
+                if "proficiency_choices" in class_info:
+                    for choice in class_info["proficiency_choices"]:
+                        if choice.get("type") == "proficiencies":
+                            skill_choices = choice.get("choose", 2)
+                            options = choice.get("from", {}).get("options", [])
                             for option in options:
-                                item = option.get('item', {})
-                                skill_name = item.get('name', '')
-                                if 'Skill:' in skill_name:
-                                    available_skills.append(skill_name.replace('Skill: ', ''))
+                                item = option.get("item", {})
+                                skill_name = item.get("name", "")
+                                if "Skill:" in skill_name:
+                                    available_skills.append(
+                                        skill_name.replace("Skill: ", "")
+                                    )
 
                 # Parse proficiencies
                 armor_profs = []
                 weapon_profs = []
 
-                if 'proficiencies' in class_info:
-                    for prof in class_info['proficiencies']:
-                        prof_name = prof.get('name', '')
-                        if 'Armor' in prof_name:
+                if "proficiencies" in class_info:
+                    for prof in class_info["proficiencies"]:
+                        prof_name = prof.get("name", "")
+                        if "Armor" in prof_name:
                             armor_profs.append(prof_name)
-                        elif 'Weapon' in prof_name or 'weapons' in prof_name.lower():
+                        elif "Weapon" in prof_name or "weapons" in prof_name.lower():
                             weapon_profs.append(prof_name)
 
                 # Determine primary ability and spellcasting
@@ -366,28 +405,28 @@ class DatabaseInitializer:
                 spellcasting_ability = None
 
                 # Basic mapping based on class name
-                class_name = class_info.get('name', '').lower()
-                if class_name in ['wizard', 'warlock']:
+                class_name = class_info.get("name", "").lower()
+                if class_name in ["wizard", "warlock"]:
                     primary_ability = "Intelligence"
                     spellcasting_ability = "Intelligence"
-                elif class_name in ['sorcerer', 'bard']:
+                elif class_name in ["sorcerer", "bard"]:
                     primary_ability = "Charisma"
                     spellcasting_ability = "Charisma"
-                elif class_name in ['cleric', 'druid', 'ranger']:
+                elif class_name in ["cleric", "druid", "ranger"]:
                     primary_ability = "Wisdom"
                     spellcasting_ability = "Wisdom"
-                elif class_name in ['rogue', 'ranger']:
+                elif class_name in ["rogue", "ranger"]:
                     primary_ability = "Dexterity"
-                elif class_name in ['barbarian', 'fighter', 'paladin']:
+                elif class_name in ["barbarian", "fighter", "paladin"]:
                     primary_ability = "Strength"
-                elif class_name in ['monk']:
+                elif class_name in ["monk"]:
                     primary_ability = "Dexterity"
                     spellcasting_ability = "Wisdom"
 
                 # Create CharacterClass instance
                 char_class = CharacterClass(
-                    name=class_info.get('name', ''),
-                    hit_die=class_info.get('hit_die', 8),
+                    name=class_info.get("name", ""),
+                    hit_die=class_info.get("hit_die", 8),
                     primary_ability=primary_ability,
                     saving_throw_proficiencies=saving_throws,
                     skill_proficiencies=available_skills,
@@ -395,7 +434,7 @@ class DatabaseInitializer:
                     weapon_proficiencies=weapon_profs,
                     skill_choices=skill_choices,
                     spellcasting_ability=spellcasting_ability,
-                    source='5e-SRD'
+                    source="5e-SRD",
                 )
 
                 db.session.add(char_class)
@@ -404,8 +443,10 @@ class DatabaseInitializer:
 
             except (KeyError, ValueError, TypeError) as e:
                 logger.warning(
-                    "Data parsing error for class %s: %s", class_info.get('name', 'unknown'), e
-                    )
+                    "Data parsing error for class %s: %s",
+                    class_info.get("name", "unknown"),
+                    e,
+                )
 
         try:
             db.session.commit()
@@ -425,10 +466,12 @@ class DatabaseInitializer:
 
         # Check for existing data
         if not force_rebuild and self.check_database_exists():
-            response = input(
-                "\n⚠️  Database already contains data. Rebuild? [y/N]: "
-                ).lower().strip()
-            if response not in ['y', 'yes']:
+            response = (
+                input("\n⚠️  Database already contains data. Rebuild? [y/N]: ")
+                .lower()
+                .strip()
+            )
+            if response not in ["y", "yes"]:
                 logger.info("⏭️  Skipping database population (existing data preserved)")
                 return True
 
@@ -462,6 +505,7 @@ class DatabaseInitializer:
 
         return success
 
+
 def main():
     """Main initialization function with robust data sourcing."""
     logger.info("🎲 D&D 5e Database Initialization")
@@ -481,7 +525,7 @@ def main():
         db_initializer = DatabaseInitializer()
 
         # Check command line arguments for force rebuild
-        force_rebuild = '--force' in sys.argv or '-f' in sys.argv
+        force_rebuild = "--force" in sys.argv or "-f" in sys.argv
 
         if db_initializer.initialize_database(force_rebuild=force_rebuild):
             logger.info("🎉 Initialization completed successfully!")
@@ -489,10 +533,13 @@ def main():
             # Show summary
             species_count = Species.query.count()
             class_count = CharacterClass.query.count()
-            logger.info("📊 Final counts: %d species, %d classes", species_count, class_count)
+            logger.info(
+                "📊 Final counts: %d species, %d classes", species_count, class_count
+            )
         else:
             logger.error("💥 Initialization failed!")
             sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

@@ -12,7 +12,12 @@ Example usage:
 
 # Import shared database components
 from project import db
-from .base import character_proficiencies, character_languages, character_features, character_spells
+from .base import (
+    character_proficiencies,
+    character_languages,
+    character_features,
+    character_spells,
+)
 
 # Import all model classes
 from .user import User
@@ -24,30 +29,33 @@ from .item import Item, CharacterItem
 from .feature import Feature
 from .spell import Spell, SpellSlot
 from .post import Post
+from .background import Background
+from .equipment import Equipment, CharacterEquipment
 
 # Define what gets imported with "from project.models import *"
 __all__ = [
     # Database components
-    'db',
-    'character_proficiencies',
-    'character_languages',
-    'character_features',
-    'character_spells',
-
+    "db",
+    "character_proficiencies",
+    "character_languages",
+    "character_features",
+    "character_spells",
     # Core models
-    'User',
-    'Character',
-    'Species',
-    'SubSpecies',
-    'CharacterClass',
-
+    "User",
+    "Character",
+    "Species",
+    "SubSpecies",
+    "CharacterClass",
     # Supporting models
-    'Proficiency',
-    'Language',
-    'Item',
-    'CharacterItem',
-    'Feature',
-    'Spell',
-    'SpellSlot',
-    'Post',
+    "Proficiency",
+    "Language",
+    "Item",
+    "CharacterItem",
+    "Feature",
+    "Spell",
+    "SpellSlot",
+    "Post",
+    "Background",
+    "Equipment",
+    "CharacterEquipment",
 ]

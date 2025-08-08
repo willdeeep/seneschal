@@ -152,7 +152,7 @@ The project uses custom pytest markers for test organization:
 ```ini
 [pytest]
 markers =
-    unit: Unit tests that dont require external services
+    unit: Unit tests that do not require external services
     functional: Functional tests that may require database
     e2e: End-to-end tests
     slow: Tests that take a long time to run
@@ -235,12 +235,12 @@ repos:
     rev: 22.3.0
     hooks:
       - id: black
- 
+
   - repo: https://github.com/pycqa/flake8
     rev: 4.0.1
     hooks:
       - id: flake8
- 
+
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
     hooks:
@@ -275,7 +275,7 @@ deploy-staging:
   needs: test
   runs-on: ubuntu-latest
   if: github.ref == 'refs/heads/dev'
- 
+
   steps:
     - name: Deploy to staging
       run: |
@@ -290,7 +290,7 @@ deploy-production:
   needs: test
   runs-on: ubuntu-latest
   if: github.ref == 'refs/heads/main'
- 
+
   steps:
     - name: Deploy to production
       run: |

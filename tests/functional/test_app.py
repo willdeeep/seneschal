@@ -1,3 +1,8 @@
+"""This module contains functional tests for the application routes and authentication.
+It tests the main application routes, user authentication workflows, and protected routes.
+The tests ensure that the application behaves as expected when users interact with it.
+"""
+
 import pytest
 
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Create database tables and populate with D&D data."""
 
+import sys
 from init_db import DataSourceManager, DatabaseInitializer
 from project.models import (
     User,
@@ -14,7 +15,7 @@ from project.models import (
 )
 from project import create_app, db
 from sqlalchemy.exc import SQLAlchemyError
-import sys
+
 
 # Add the project directory to the Python path
 sys.path.insert(0, "/app")
@@ -56,7 +57,7 @@ def create_tables():
                 print(f"Warning: Could not retrieve counts: {e}")
 
             return True
-        
+
         print("Error: Database initialization failed")
         return False
 
