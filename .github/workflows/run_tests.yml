@@ -71,15 +71,25 @@ jobs:
         coverage html
 
     - name: Upload coverage to Codecov (optional)
+      if: github.actor != 'nektos/act'
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: false
 
     - name: Archive coverage reports
+      if: github.actor != 'nektos/act'
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report-${{ matrix.python-version }}
         path: htmlcov/
+
+    - name: Local coverage report summary (Act CLI only)
+      if: github.actor == 'nektos/act'
+      run: |
+        echo "=== LOCAL COVERAGE SUMMARY ==="
+        echo "Coverage reports generated in htmlcov/ directory"
+        echo "Open htmlcov/index.html in your browser to view detailed coverage"
+        ls -la htmlcov/ || echo "No coverage files found"
 
   test-with-postgres:
     runs-on: ubuntu-latest

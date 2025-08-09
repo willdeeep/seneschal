@@ -35,5 +35,6 @@
         "**/scraper/**": true,
         "**/csv_exports/**": true,
         "**/5e-database-repo/**": true
-    }
+    },
+    "python-envs.pythonProjects": []
 }
